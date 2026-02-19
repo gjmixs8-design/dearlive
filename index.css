@@ -61,7 +61,7 @@ body { background-color: #f0f7ff; padding: 20px 0 40px; }
 }
 .pink { background: linear-gradient(90deg, var(--pink), var(--teal));}
 .green { background: linear-gradient(90deg, var(--red), var(--teal));}
-.blue { background: linear-gradient(90deg, var(--blue), var(--teal)); }
+.blue { background: linear-gradient(90deg, var(--teal), var(--red)); }
 .orange { background: linear-gradient(90deg, var(--pink), var(--green)); }
 
 .machine .time { color: var(--red); }
