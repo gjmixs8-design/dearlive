@@ -1,5 +1,7 @@
 :root {
     --red: #b71c1c;
+    --pink: #e6138e;
+    --teal: #1399e6;
     --blue: #1a237e;
     --green: #008000;
     --border: 1px solid #000;
@@ -57,9 +59,9 @@ body { background-color: #f0f7ff; padding: 20px 0 40px; }
     text-decoration: none; color: white; padding: 12px;
     border-radius: 6px; font-weight: bold; font-size: 14px; text-align: center;
 }
-.pink { background: #e91e63; }
-.green { background: #4caf50; }
-.blue { background: #2196f3; }
-.orange { background: #ff9800; }
+.pink { background: linear-gradient(90deg, var(--pink), var(--teal));}
+.green { background: linear-gradient(90deg, var(--red), var(--teal));}
+.blue { background: linear-gradient(90deg, var(--blue), var(--teal)); }
+.orange { background: linear-gradient(90deg, var(--pink), var(--green)); }
 
 .machine .time { color: var(--red); }
