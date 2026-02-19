@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Kerala Jackpot</title>
+    <style>
+        :root {
+            --green-border: #2e7d32;
+            --header-bg: #ffefdb; /* Light peach/cream */
+            --text-red: #d32f2f;
+            --link-blue: #0000ee;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Responsive Container */
+        .wrapper {
+            width: 100%;
+            max-width: 500px; /* Limit width on desktop */
+            border: 2px solid var(--green-border);
+            text-align: center;
+            padding-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .title-red {
+            color: var(--text-red);
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: underline;
+            margin: 15px 0 5px;
+        }
+
+        .guessing-num {
+            font-size: 1.8rem;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+        }
+
+        /* Box Sections */
+        .box-header {
+            background-color: var(--header-bg);
+            border: 1px solid var(--green-border);
+            color: var(--text-red);
+            font-weight: bold;
+            padding: 10px;
+            margin: 10px 10px;
+            font-size: 1.2rem;
+        }
+
+        .number-display {
+            border: 1px solid var(--green-border);
+            margin: 0 10px;
+            padding: 12px;
+            font-size: 1.4rem;
+            letter-spacing: 3px;
+        }
+
+        /* Result Section */
+        .result-container {
+            border: 1px solid var(--green-border);
+            margin: 15px 10px;
+            padding: 20px 5px;
+        }
+
+        .result-code {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .refresh-btn {
+            background-color: #008000;
+            color: white;
+            border: none;
+            padding: 10px 35px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        
+        .refresh-btn:active { transform: scale(0.95); }
+
+        .link-text {
+            color: black;
+            font-weight: bold;
+            line-height: 1.5;
+            font-size: 1rem;
+        }
+
+        .blue-link { color: var(--link-blue); cursor: pointer; }
+
+        /* Grid Buttons */
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px;
+            padding: 0 10px;
+        }
+
+        /* Link Button Styling */
+        .btn {
+            color: white;
+            padding: 12px 5px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-decoration: none; /* Removes underline */
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover { opacity: 0.9; }
+
+        .btn-pink { background-color: #e91e63; }
+        .btn-green { background-color: #4caf50; }
+        .btn-blue { background-color: #2196f3; }
+        .btn-orange { background-color: #ff9800; }
+
+        /* Desktop specific tweaks */
+        @media (min-width: 768px) {
+            body { background-color: #f0f2f5; padding: 40px; }
+            .wrapper { box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: white; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="title-red">2pm KL Guessing Time</div>
+    <div class="guessing-num">3 r 6</div>
+
+    <div class="box-header">2.30 KL Machine Number</div>
+    <div class="number-display">490427</div>
+
+    <div class="box-header" style="font-size: 1.4rem;">
+        3pm Kerala Jackpot Result
+    </div>
+
+    <div class="result-container">
+        <div class="result-code">DW 809210</div>
+        <button class="refresh-btn" onclick="location.reload()">Refresh</button>
+        
+        <div class="link-text">
+            Check <span class="blue-link">Kerala Lottery Result Today</span><br>
+            18-02-2026<br>
+            Check <span class="blue-link">Dear Lottery Result 18-02-2026</span><br>
+            – Lottery Sambad<br>
+            Check <span class="blue-link">lottery sambad today 18-02-2026</span><br>
+            – nagaland state lottery
+        </div>
+    </div>
+
+    <div class="button-grid">
+        <a href="home.html" class="btn btn-pink">🎉 Kerala Jackpot</a>
+        <a href="index.html" class="btn btn-green">💰 Dear Jackpot</a>
+        <a href="kerala-chart.html" class="btn btn-blue">Kerala Lottery Chart</a>
+        <a href="kolkata-ff.html" class="btn btn-orange">Kolkata Fatafat</a>
+    </div>
+</div>
+
+</body>
+</html>

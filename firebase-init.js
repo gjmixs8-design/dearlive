@@ -3,7 +3,7 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth
 import { getDatabase } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCC2McOLYUoPL7E4WvCpu0xt6qgvYG5_e8",
+  apiKey: "AIzaSyCC2McOLYU0Pl7E4WVcpUOxt0gqvYG5_e8",
   authDomain: "dearlive-78af3.firebaseapp.com",
   databaseURL: "https://dearlive-78af3-default-rtdb.firebaseio.com",
   projectId: "dearlive-78af3",
