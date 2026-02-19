@@ -24,7 +24,7 @@
       color: #222;
       overflow-x: hidden;
       font-family: Arial, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #7bc4e4, #ffffff);
+      background: linear-gradient(135deg, #d0effcad, #ffffff);
     }
 
     .container {
@@ -56,6 +56,7 @@
       width: 90vw;
       max-width: 700px;
       margin: 0 auto;
+      overflow: hidden;
     }
 
     #template-img {
@@ -68,53 +69,68 @@
       -webkit-user-drag: none;
     }
 
-    /* Overlays Baseline */
+    /* Overlays Baseline updated to match provided image style */
     .overlay {
       position: absolute;
       width: 100%;
       text-align: center;
       z-index: 3;
       font-weight: 900;
-      font-family: 'Arial Black', sans-serif;
+      font-family: 'Arial Black', Gadget, sans-serif;
+      text-transform: uppercase;
     }
 
+    /* D-08:00pm Style */
     #time-text {
-      top: 34%;
-      font-size: 3.8rem;
-      letter-spacing: 1px !important;
-      color: #8B0000;
-      -webkit-text-stroke: 1.5px #000;
+      top: 33%;
+      font-size: 5rem;
+      color: #5a0a1a;
+      /* Dark Maroon/Burgundy */
+      opacity: 0.9;
+      letter-spacing: -2px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
 
+    /* D-09-02-26 Style */
     #date-text {
       top: 46%;
-      font-size: 2.5rem;
-      letter-spacing: 2px;
-      color: #FFFF00;
-      -webkit-text-stroke: 1px #000;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+      font-size: 3.5rem;
+      color: #ffff00;
+      /* Bright Yellow */
+      -webkit-text-stroke: 2px #2a2a72;
+      /* Dark blue/purple outline */
+      text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+      letter-spacing: 1px;
     }
 
+    /* Hidden/Removed Day text as it's not in the main visual focus of reference */
     #day-text {
-      top: 53%;
-      font-size: 1.4rem;
-      color: #ffffff;
-      letter-spacing: 2px !important;
-      -webkit-text-stroke: 0.5px #000;
+      display: none;
     }
 
-    /* 5-Digit Box: FIXED TO WHITE */
+    /* 5-Digit Yellow Box container */
+    .digit-box-bg {
+      position: absolute;
+      top: 59.5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 85%;
+      height: 19%;
+      background-color: #ffde00;
+      /* Match yellow bar */
+      z-index: 2;
+    }
+
     .digit {
       position: absolute;
       top: 69%;
       transform: translate(-50%, -50%);
-      font-size: 4.8rem;
+      font-size: 6rem;
       z-index: 4;
       font-family: 'Arial Black', sans-serif;
       color: #ffffff;
-      /* Font changed to white */
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-      /* Shadow for readability on yellow */
+      font-weight: 900;
+      text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.4);
       user-select: none;
     }
 
@@ -123,98 +139,54 @@
     }
 
     #digit-2 {
-      left: 38%;
+      left: 38.5%;
     }
 
     #digit-3 {
-      left: 49%;
+      left: 49.5%;
     }
 
     #digit-4 {
-      left: 59.7%;
+      left: 60.5%;
     }
 
     #digit-5 {
-      left: 70%;
+      left: 71.5%;
     }
 
     /* MOBILE AUTO-SIZE FIX */
     @media (max-width: 768px) {
       #time-text {
-        top: 34% !important;
-        font-size: 8vw !important;
+        top: 33% !important;
+        font-size: 11vw !important;
       }
 
       #date-text {
         top: 46% !important;
-        font-size: 5.5vw !important;
-      }
-
-      #day-text {
-        top: 53% !important;
-        font-size: 3.5vw !important;
+        font-size: 8vw !important;
       }
 
       .digit {
         top: 69% !important;
-        font-size: 10vw !important;
-      }
-
-      .container {
-        margin-top: 5%;
+        font-size: 13vw !important;
       }
     }
 
     /* UI Elements */
     button {
-      margin-top: 30px;
+      margin: 30px 0 60px 0;
       padding: 12px 24px;
       font-size: 1.2rem;
       border: none;
       background: #ff9900b7;
       color: #fff;
       border-radius: 8px;
-      cursor: pointer
+      cursor: pointer;
+      font-weight: bold;
     }
 
     button:hover {
-      background: #8fc2cf
-    }
-
-    .ticker-container {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: #222;
-      color: #fff;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      z-index: 10;
-    }
-
-    .ticker-text {
-      display: inline-block;
-      white-space: nowrap;
-      padding-left: 100%;
-      animation: ticker 15s linear infinite;
-      font-size: 18px;
-    }
-
-    .ticker-text a {
-      color: #00f0ff;
-      text-decoration: none;
-      font-weight: bold
-    }
-
-    @keyframes ticker {
-      0% {
-        transform: translateX(0%)
-      }
-
-      100% {
-        transform: translateX(-100%)
-      }
+      background: #e68a00;
     }
 
     .menu-icon {
@@ -247,6 +219,7 @@
       padding: 60px 20px;
       transition: left .3s ease;
       z-index: 1000;
+      text-align: left;
     }
 
     .sidebar.active {
@@ -297,7 +270,9 @@
     <h2 class="heading">Dear - Machine Number</h2>
 
     <div id="image-container">
-      <img id="template-img" src="images/mc.png" alt="MC Template" />
+      <img id="template-img" src="images/Dear-Mc img.png" alt="MC Template" />
+
+      <div class="digit-box-bg"></div>
 
       <div class="overlay" id="time-text"></div>
       <div class="overlay" id="date-text"></div>
@@ -310,15 +285,8 @@
       <div class="digit" id="digit-5">0</div>
     </div>
 
-    <button onclick="downloadImage()">Download</button>
+    <button onclick="downloadImage()">Download Image</button>
   </div>
-
-  <!-- <div class="ticker-container">
-    <div class="ticker-text">
-      🚨 Check out our latest updates at <a href="https://dearmc.com" target="_blank">https://dearmc.com</a> — Stay
-      tuned for more news! 🚨
-    </div>
-  </div> -->
 
   <script type="module">
     import { db } from './firebase-init.js';
@@ -332,7 +300,8 @@
     const now = new Date();
     const pad = n => String(n).padStart(2, '0');
 
-    const displayDate = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+    // Updated date format to use hyphens to match image (D-DD-MM-YY)
+    const displayDate = `D-${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${String(now.getFullYear()).slice(-2)}`;
     const todayKey = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 
     dateEl.textContent = displayDate;
@@ -383,7 +352,9 @@
 
     if (selectedSlotIndex >= 0) {
       const slot = timeSlots[selectedSlotIndex];
-      timeEl.textContent = `D-${slot}`;
+      // Format time to lower case 'pm/am' and 'D-' prefix to match image
+      const formattedTime = slot.toLowerCase().replace(' ', '');
+      timeEl.textContent = `D-${formattedTime}`;
       attachListenerForSlot(slot);
     } else {
       timeEl.textContent = 'No MC Yet';
@@ -391,9 +362,9 @@
 
     window.downloadImage = async function () {
       const container = document.getElementById('image-container');
-      const canvas = await html2canvas(container, { scale: 2 });
+      const canvas = await html2canvas(container, { scale: 2, useCORS: true });
       const link = document.createElement('a');
-      link.download = 'mc-number.png';
+      link.download = `mc-${todayKey}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     }
