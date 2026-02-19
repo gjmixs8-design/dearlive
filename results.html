@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEARMC Lottery</title>
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(135deg, #7bc4e4, #ffffff);
+      color: #fff;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    .stage {
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+    }
+
+    .frame {
+      position: relative;
+      width: min(1200px, 96vw);
+      aspect-ratio: 1247/768;
+      overflow: hidden;
+      background-color: #fff;
+    }
+
+    .frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* ===== Banners ===== */
+    .banner-live {
+      position: absolute;
+      inset: 0 0 auto 0;
+      top: 92%;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #000;
+      font-size: 50px;
+      pointer-events: none;
+    }
+
+    .banner-weekly {
+      position: absolute;
+      left: 0;
+      right: 75px;
+      top: 13.5%;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #fae902;
+      font-size: 35px;
+      pointer-events: none;
+    }
+
+    /* ===== Digits ===== */
+    .digit {
+      position: absolute;
+      left: var(--left);
+      top: var(--top);
+      transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--scale, 1));
+      font-weight: 800;
+      font-size: 100px;
+      color: #272626;
+    }
+
+    #d0 {
+      --left: 25%;
+      --top: 45.5%;
+      --rot: -0.6deg;
+    }
+
+    #d1 {
+      --left: 34.4%;
+      --top: 45.5%;
+      --rot: -0.2deg;
+    }
+
+    #d2 {
+      --left: 43.8%;
+      --top: 45.5%;
+      --rot: 0deg;
+    }
+
+    #d3 {
+      --left: 53.2%;
+      --top: 45.5%;
+      --rot: 0.2deg;
+    }
+
+    #d4 {
+      --left: 62.6%;
+      --top: 45.5%;
+      --rot: 0.6deg;
+    }
+
+    /* ===== Info Bars ===== */
+    .info-bar1 {
+      position: absolute;
+      top: 78.9%;
+      left: 29%;
+      transform: translateX(-50%);
+      font-weight: 800;
+      font-size: 30px;
+      color: #EACF46;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, .8);
+    }
+
+    .info-bar2 {
+      position: absolute;
+      top: 77.9%;
+      left: 70.5%;
+      transform: translateX(-50%);
+      font-weight: 800;
+      font-size: 35px;
+      color: #EACF46;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, .8);
+    }
+
+    .info-bar3 {
+      position: absolute;
+      top: 29.9%;
+      left: -0.8%;
+      transform: rotate(270deg);
+      font-weight: 800;
+      font-size: 35px;
+      color: #EACF46;
+    }
+
+    .countdown {
+      position: absolute;
+      width: 157px;
+      top: 27px;
+      right: 2px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 800;
+      background: #f3dd52;
+      color: #691a6b;
+      text-align: center;
+    }
+
+    /* ===== MOBILE RESPONSIVE FIXES ===== */
+    @media (max-width: 576px) {
+      .digit {
+        font-size: 37px;
+        font-weight: 750;
+      }
+
+      #d0,
+      #d1,
+      #d2,
+      #d3,
+      #d4 {
+        --scale: 0.72;
+        --top: 46%;
+      }
+
+      .countdown {
+        width: 65px;
+        font-size: 6px;
+        padding: 4px;
+        top: 4px;
+        right: -2px;
+      }
+
+      .info-bar1 {
+        font-size: 10px;
+        top: 77.9%;
+      }
+
+      .info-bar2 {
+        font-size: 10px;
+        top: 77.9%;
+      }
+
+      .info-bar3 {
+        font-size: 11px;
+        font-weight: 750;
+      }
+
+      .banner-live {
+        top: 85%;
+        font-size: 15px;
+      }
+
+      .banner-weekly {
+        left: 28px;
+        top: 7%;
+        font-size: 8px;
+      }
+    }
+
+    @media (min-width: 577px) and (max-width: 768px) {
+      .digit {
+        font-size: 50px;
+      }
+
+      .info-bar1,
+      .info-bar2,
+      .info-bar3 {
+        font-size: 20px;
+      }
+
+      .banner-live {
+        font-size: 25px;
+        top: 89%;
+      }
+
+      .banner-weekly {
+        font-size: 15px;
+        top: 10%;
+      }
+    }
+
+    /* ===== Sidebar & Menu ===== */
+    .menu-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 30px;
+      height: 25px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 1100;
+    }
+
+    .menu-icon span {
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: #fff;
+      box-shadow: 4px 0 12px rgba(0, 0, 0, .1);
+      padding: 60px 20px;
+      transition: .3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px;
+      color: #333;
+      text-decoration: none;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .download-bar {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .btn-download {
+      padding: 12px 20px;
+      background: #6e4bff;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(110, 75, 255, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+  
+  <div class="menu-icon" onclick="document.getElementById('sidebar').classList.add('active')">
+    <span></span><span></span><span></span>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="close-btn" onclick="document.getElementById('sidebar').classList.remove('active')">&times;</div>
+    <a href="index.html">Home</a>
+    <a href="mcchart.html" style="background: #eef2f5; color: var(--blue-dark);">Machine Chart</a>
+    <a href="result chart.html">Results chart </a>
+    <a href="mc.html">mc</a>
+    <a href="results.html">result</a>
+    <a href="mc and result.html">mc and result</a>
+  </div>
+
+  <div class="stage">
+    <div class="frame" id="capture-area">
+      <img src="./images/result.png" alt="Lottery Frame" crossorigin="anonymous" />
+      <div class="banner-live" id="banner-live">—</div>
+      <div class="banner-weekly" id="banner-weekly">—</div>
+      <div class="info-bar3">
+        <div id="draw-time-left">--</div>
+      </div>
+      <div id="reels">
+        <span class="digit" id="d0">0</span>
+        <span class="digit" id="d1">0</span>
+        <span class="digit" id="d2">0</span>
+        <span class="digit" id="d3">0</span>
+        <span class="digit" id="d4">0</span>
+      </div>
+      <div class="info-bar1">
+        <div id="draw-date">--</div>
+      </div>
+      <div class="info-bar2">
+        <div id="draw-time">--</div>
+      </div>
+      <div class="countdown" id="countdown">--:--:--</div>
+    </div>
+
+    <div class="download-bar">
+      <button class="btn-download" id="downloadBtn">⬇️ Download High-Res Result</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB7WHatcQ3QsHcoQqxAY2rJ4XVjVLY4CYQ",
+      authDomain: "dearmc-7bcee.firebaseapp.com",
+      databaseURL: "https://dearmc-7bcee-default-rtdb.firebaseio.com",
+      projectId: "dearmc-7bcee",
+      storageBucket: "dearmc-7bcee.appspot.com",
+      messagingSenderId: "690002837359",
+      appId: "1:690002837359:web:4046447df9b969c881f29a",
+      measurementId: "G-7G5928KRZ1"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const digits = ["d0", "d1", "d2", "d3", "d4"].map(id => document.getElementById(id));
+    const drawDateEl = document.getElementById("draw-date");
+    const drawTimeEl = document.getElementById("draw-time");
+    const drawTimeLeftEl = document.getElementById("draw-time-left");
+    const countdownEl = document.getElementById("countdown");
+    const liveEl = document.getElementById("banner-live");
+    const weeklyEl = document.getElementById("banner-weekly");
+
+    const TIMEZONE = "Asia/Kolkata";
+    const SLOTS = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
+    const pad2 = n => String(n).padStart(2, '0');
+    const nowIST = () => new Date(new Date().toLocaleString("en-US", { timeZone: TIMEZONE }));
+    const ymd = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+    const fmtDateHuman = d => new Intl.DateTimeFormat('en-IN', { timeZone: TIMEZONE, day: '2-digit', month: 'short', year: 'numeric' }).format(d);
+
+    function parseSlotOn(dateYMD, label) {
+      const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label); if (!m) return new Date();
+      let [_, hh, mm, ap] = m; let H = (parseInt(hh, 10) % 12) + (ap.toUpperCase() === 'PM' ? 12 : 0);
+      return new Date(`${dateYMD}T${pad2(H)}:${mm}:00`);
+    }
+
+    function nextAndPrevSlots(now) {
+      const today = ymd(now);
+      const todaySlots = SLOTS.map(lbl => ({ label: lbl, time: parseSlotOn(today, lbl), date: today }));
+      const futureToday = todaySlots.filter(s => s.time > now);
+      if (futureToday.length) {
+        const next = futureToday[0];
+        const prevCandidates = todaySlots.filter(s => s.time <= now);
+        const prev = prevCandidates.length ? prevCandidates.at(-1) : (() => {
+          const yst = new Date(now); yst.setDate(now.getDate() - 1);
+          const ymdY = ymd(yst); return { label: SLOTS.at(-1), time: parseSlotOn(ymdY, SLOTS.at(-1)), date: ymdY };
+        })();
+        return { next, prev };
+      }
+      const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);
+      const next = { label: SLOTS[0], time: parseSlotOn(ymd(tomorrow), SLOTS[0]), date: ymd(tomorrow) };
+      const prev = { label: SLOTS.at(-1), time: parseSlotOn(today, SLOTS.at(-1)), date: today };
+      return { next, prev };
+    }
+
+    const msToHMS = (ms) => { if (ms < 0) ms = 0; const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000), s = Math.floor((ms % 60000) / 1000); return `${pad2(h)}:${pad2(m)}:${pad2(s)}`; };
+
+    function refreshBanners(label, schedule) {
+      const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label); if (!m) return;
+      let [_, hh, mm, ap] = m; let H = (parseInt(hh, 10) % 12) + (ap.toUpperCase() === 'PM' ? 12 : 0);
+      let period = H < 12 ? "MORNING" : H < 17 ? "AFTERNOON" : "EVENING";
+      let weekday = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(nowIST()).toUpperCase();
+      let short = mm === "00" ? `${parseInt(hh)}${ap}` : `${parseInt(hh)}:${mm}${ap}`;
+      liveEl.textContent = `DEAR ${period} ${weekday} LIVE ${short}`;
+      weeklyEl.textContent = `DEAR ${period} ${weekday} WEEKLY LOTTERY`;
+    }
+
+    let schedule = nextAndPrevSlots(nowIST());
+    function update() {
+      const now = nowIST();
+      if (now > schedule.next.time) schedule = nextAndPrevSlots(now);
+      drawDateEl.textContent = fmtDateHuman(schedule.next.time);
+      drawTimeEl.textContent = schedule.prev.label;
+      drawTimeLeftEl.textContent = schedule.prev.label;
+      countdownEl.textContent = msToHMS(schedule.next.time - now);
+      refreshBanners(schedule.prev.label, schedule);
+    }
+
+    onValue(ref(db, `lottery/${schedule.prev.date}/${schedule.prev.label}/result`), snap => {
+      if (snap.exists()) {
+        const s = String(snap.val()).padStart(5, '0');
+        for (let i = 0; i < 5; i++) digits[i].textContent = s[i];
+      }
+    });
+
+    setInterval(update, 1000);
+    update();
+
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const area = document.getElementById('capture-area');
+      html2canvas(area, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: "#ffffff"
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `DearMC_Result_${drawTimeEl.textContent.replace(/\s/g, '')}.png`;
+        link.href = canvas.toDataURL("image/png", 1.0);
+        link.click();
+      });
+    });
+  </script>
+</body>
+
+</html>

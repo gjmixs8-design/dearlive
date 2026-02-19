@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DEAR-Machine Chart</title>
+    <style>
+        /* --- CSS Variables (The Formatting Toolkit) --- */
+        :root {
+            --blue-light: #a966e7;
+            --blue-dark: #8c40b8;
+            --bg-page: #fdfffa;
+            --border-color: #333;
+            --scale: 1;
+            /* Updated dynamically via JS */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-page);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar Navigation --- */
+        .menu-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 30px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 1100;
+        }
+
+        .menu-icon span {
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background: #fff;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, .1);
+            padding: 60px 20px;
+            transition: left .3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px;
+            color: #333;
+            text-decoration: none;
+            margin-bottom: 10px;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* --- Header & Filters --- */
+        .title-main {
+            text-align: center;
+            color: #9d81c3;
+            font-size: 26px;
+            margin: 20px 0 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .toolbar {
+            width: min(1024px, 95vw);
+            margin: 10px auto;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar select,
+        .toolbar button {
+            padding: 8px 15px;
+            border: 1px solid #ccd6dd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            background: #fff;
+        }
+
+        .btn-blue {
+            background: var(--blue-dark);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-outline {
+            color: var(--blue-dark);
+            border: 1px solid var(--blue-dark);
+            cursor: pointer;
+        }
+
+        /* --- Robust Scaling System --- */
+        .table-outer {
+            width: min(1024px, 95vw);
+            margin: 20px auto;
+            overflow: hidden;
+            /* Clips the scaled content correctly */
+            position: relative;
+        }
+
+        .table-inner {
+            transform: scale(var(--scale));
+            transform-origin: top left;
+            width: max-content;
+            /* Allows table to keep natural width before scaling */
+        }
+
+        /* --- Table Design --- */
+        table {
+            border-collapse: collapse;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .banner {
+            background: var(--blue-light);
+            color: white;
+            font-size: 24px;
+            padding: 18px;
+            font-weight: bold;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        th {
+            background: var(--blue-light);
+            color: white;
+            border: 1px solid #fff;
+            padding: 12px 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            min-width: 100px;
+        }
+
+        td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            font-weight: 800;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .date-cell {
+            background: var(--blue-light);
+            color: white;
+            width: 130px;
+        }
+
+        tr:nth-child(even) {
+            background: #fdfdfd;
+        }
+
+        tr:hover {
+            background: #f1f7ff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="menu-icon" onclick="document.getElementById('sidebar').classList.add('active')">
+        <span></span><span></span><span></span>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <div class="close-btn" onclick="document.getElementById('sidebar').classList.remove('active')">&times;</div>
+        <a href="index.html">Home</a>
+        <a href="mcchart.html" class="active">Machine Chart</a>
+        <a href="result chart.html">Results chart</a>
+        <a href="mc.html">MC</a>
+         <a href="results.html">Result</a>
+    </div>
+
+    <h1 class="title-main">DEAR - Machine Number Chart</h1>
+
+    <div class="toolbar">
+        <select id="monthSelect"></select>
+        <select id="yearSelect">
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+        </select>
+        <button class="btn-blue" id="applyBtn">Apply</button>
+        <button class="btn-outline" id="showAllBtn">Show All</button>
+    </div>
+
+    <div class="table-outer" id="tableOuter">
+        <div class="table-inner" id="tableInner">
+            <table id="machineTable">
+                <thead>
+                    <tr>
+                        <th colspan="9" class="banner">Dear-Mc Machine Number Chart</th>
+                    </tr>
+                    <tr>
+                        <th class="date-cell">Date</th>
+                        <th>10:00 AM</th>
+                        <th>11:00 AM</th>
+                        <th>12:00 PM</th>
+                        <th>01:00 PM</th>
+                        <th>05:00 PM</th>
+                        <th>06:00 PM</th>
+                        <th>07:00 PM</th>
+                        <th>08:00 PM</th>
+                    </tr>
+                </thead>
+                <tbody id="chartBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div style="text-align:center; padding: 30px;">
+        <button class="btn-blue" id="downloadBtn" style="padding: 12px 30px; font-size: 16px;">Download 
+            </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+
+    <script>
+        const chartBody = document.getElementById('chartBody');
+        const table = document.getElementById('machineTable');
+        const tableOuter = document.getElementById('tableOuter');
+        const monthSelect = document.getElementById('monthSelect');
+
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        // 1. Initialize Filters
+        monthNames.forEach((name, i) => {
+            let opt = document.createElement('option');
+            opt.value = i + 1;
+            opt.textContent = name;
+            if (i === 1) opt.selected = true; // Default to Feb
+            monthSelect.appendChild(opt);
+        });
+
+        // 2. Data Rendering Function
+        function renderChart(month, year) {
+            chartBody.innerHTML = "";
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const tr = document.createElement('tr');
+                const dateStr = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+
+                // Placeholder logic: In a real app, you'd fetch results[dateStr] here
+                let cells = `<td class="date-cell">${dateStr}</td>`;
+                for (let i = 0; i < 8; i++) {
+                    cells += `<td>-</td>`;
+                }
+                tr.innerHTML = cells;
+                chartBody.appendChild(tr);
+            }
+            applyAutoScale();
+        }
+
+        // 3. Robust Scaling Engine
+        function applyAutoScale() {
+            const root = document.documentElement;
+            root.style.setProperty('--scale', '1'); // Reset
+
+            requestAnimationFrame(() => {
+                const naturalWidth = table.scrollWidth;
+                const outerWidth = tableOuter.clientWidth;
+                const scale = Math.min(1, outerWidth / naturalWidth);
+
+                root.style.setProperty('--scale', scale);
+                // Adjust container height to match scaled content height to avoid extra whitespace
+                tableOuter.style.height = (table.scrollHeight * scale) + "px";
+            });
+        }
+
+        // 4. Missing Function: PNG Export
+        async function exportToPNG() {
+            try {
+                const dataUrl = await htmlToImage.toPng(table, {
+                    backgroundColor: '#f0f7ff',
+                    style: { transform: 'scale(1)', margin: '0' } // Export at full resolution
+                });
+                const link = document.createElement('a');
+                link.download = `machine-chart-${monthSelect.value}-2026.png`;
+                link.href = dataUrl;
+                link.click();
+            } catch (error) {
+                console.error("Export failed", error);
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('applyBtn').addEventListener('click', () => {
+            renderChart(monthSelect.value, document.getElementById('yearSelect').value);
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', exportToPNG);
+
+        window.addEventListener('resize', applyAutoScale);
+
+        // Initial Load
+        renderChart(2, 2026);
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEAR MC - Result Chart</title>
+  <style>
+    /* --- CSS Variables (The Toolkit) --- */
+    :root {
+      --header-orange: #ff9e67;
+      --header-green-time: #5cb878;
+      --header-green-banner: #489e62;
+      --text-red: #d32f2f;
+      --border-color: #444;
+      --scale: 1;
+      /* Updated via JS for mobile fit */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0faff;
+      color: #222;
+      overflow-x: hidden;
+    }
+
+    /* --- Sidebar --- */
+    .menu-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 30px;
+      height: 25px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 1100;
+    }
+
+    .menu-icon span {
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: #f8f9fa;
+      box-shadow: 4px 0 12px rgba(0, 0, 0, .1);
+      padding: 60px 20px;
+      transition: left .3s ease;
+      z-index: 1000;
+      border-right: 1px solid #ddd;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px;
+      color: #333;
+      text-decoration: none;
+      margin-bottom: 10px;
+      font-weight: bold;
+      border-bottom: 1px solid #eee;
+    }
+
+    .sidebar .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* --- Toolbar --- */
+    .header-main {
+      text-align: center;
+      color: #8b6eb3;
+      margin: 15px 0;
+      font-weight: 800;
+      font-size: 24px;
+    }
+
+    .toolbar {
+      width: min(1024px, 95vw);
+      margin: 10px auto;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar input,
+    .toolbar select,
+    .toolbar button {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .btn-primary {
+      background: #3498db;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* --- Robust Scaling System --- */
+    .table-outer {
+      width: min(1024px, 95vw);
+      margin: 10px auto;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .table-inner {
+      transform: scale(var(--scale));
+      transform-origin: top left;
+      width: max-content;
+    }
+
+    /* --- Table Design --- */
+    table {
+      border-collapse: collapse;
+      background: #fff;
+      border: 2px solid #000;
+    }
+
+    .chart-banner {
+      background: var(--header-green-banner);
+      color: white;
+      font-size: 22px;
+      padding: 12px;
+      font-weight: bold;
+      border: 1px solid #000;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--border-color);
+      padding: 8px 4px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px;
+      min-width: 85px;
+    }
+
+    .col-date {
+      background: var(--header-orange);
+      color: var(--text-red);
+      width: 100px;
+    }
+
+    .header-top {
+      background: #fff;
+      color: var(--text-red);
+    }
+
+    .header-sub {
+      background: var(--header-orange);
+      color: #000;
+    }
+
+    .time-header {
+      background: var(--header-green-time);
+      color: #fff;
+    }
+
+    .data-cell {
+      color: #000;
+      position: relative;
+    }
+
+    .data-cell::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-top: 6px solid green;
+      border-right: 6px solid transparent;
+    }
+
+    @media (max-width: 600px) {
+
+      th,
+      td {
+        min-width: 70px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  
+  <div class="menu-icon" onclick="document.getElementById('sidebar').classList.add('active')">
+    <span></span><span></span><span></span>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="close-btn" onclick="document.getElementById('sidebar').classList.remove('active')">&times;</div>
+    <a href="index.html">Home</a>
+    <a href="mcchart.html" style="background: #eef2f5; color: var(--blue-dark);">Machine Chart</a>
+    <a href="result chart.html">Results chart </a>
+    <a href="mc.html">mc</a>
+    <a href="results.html">result</a>
+    <a href="mc and result.html">mc and result</a>
+  </div>
+
+  <h1 class="header-main">DEAR - Result Chart</h1>
+
+  <div class="toolbar">
+    <input type="text" id="tableSearch" placeholder="Search Number...">
+    <select id="monthSelect"></select>
+    <select id="yearSelect"></select>
+    <button class="btn-primary" id="applyBtn">Apply</button>
+  </div>
+
+  <div class="table-outer" id="tableOuter">
+    <div class="table-inner" id="tableInner">
+      <table id="resultTable">
+        <thead>
+          <tr>
+            <th colspan="10" class="chart-banner">Dear-MC Result Number Chart</th>
+          </tr>
+          <tr class="header-top">
+            <th class="col-date">c</th>
+            <th>DEAR</th>
+            <th>DEAR</th>
+            <th>DEAR</th>
+            <th>DEAR</th>
+            <th>DEAR</th>
+            <th>DEAR</th>
+            <th>DEAR</th>
+            <th>DEAR</th>
+            <th>DEAR</th>
+          </tr>
+          <tr class="header-sub">
+            <th class="col-date">Date</th>
+            <td class="time-header">10AM</td>
+            <td class="time-header">11AM</td>
+            <td class="time-header">12PM</td>
+            <td class="time-header">01PM</td>
+            <td class="time-header">05PM</td>
+            <td class="time-header">06PM</td>
+            <td class="time-header">07PM</td>
+            <td class="time-header">08PM</td>
+            <td class="time-header">09PM</td>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding: 20px;">
+    <button class="btn-primary" id="downloadBtn" style="padding: 12px 25px;">Download PNG</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+
+  <script>
+    // Configuration
+    const tableBody = document.getElementById('tableBody');
+    const table = document.getElementById('resultTable');
+    const tableOuter = document.getElementById('tableOuter');
+
+    // Sample Data (Easily replaceable with Firebase)
+    const data = [
+      { date: "11/02/26", results: ["75722", "23036", "58625", "50016", "11226", "00750", "54625", "74535", "22341"] },
+      { date: "10/02/26", results: ["29842", "33866", "17805", "40647", "54640", "58740", "93786", "24345", "11928"] }
+    ];
+
+    function renderTable(filterText = "") {
+      tableBody.innerHTML = "";
+      data.forEach(row => {
+        if (filterText && !row.results.some(r => r.includes(filterText)) && !row.date.includes(filterText)) return;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="col-date">${row.date}</td>` +
+          row.results.map(res => `<td class="data-cell">${res}</td>`).join('');
+        tableBody.appendChild(tr);
+      });
+      applyAutoScale();
+    }
+
+    // --- Auto-Scaling Logic ---
+    function applyAutoScale() {
+      const root = document.documentElement;
+      root.style.setProperty('--scale', '1');
+
+      requestAnimationFrame(() => {
+        const naturalWidth = table.scrollWidth;
+        const outerWidth = tableOuter.clientWidth;
+        const scale = outerWidth / naturalWidth;
+
+        if (scale < 1) {
+          root.style.setProperty('--scale', scale);
+          tableOuter.style.height = (table.scrollHeight * scale) + "px";
+        } else {
+          tableOuter.style.height = "auto";
+        }
+      });
+    }
+
+    // --- Search Logic ---
+    document.getElementById('tableSearch').addEventListener('keyup', (e) => {
+      renderTable(e.target.value);
+    });
+
+    // --- PNG Export ---
+    document.getElementById('downloadBtn').addEventListener('click', async () => {
+      const dataUrl = await htmlToImage.toPng(table, { backgroundColor: '#fff' });
+      const link = document.createElement('a');
+      link.download = 'mc-chart.png';
+      link.href = dataUrl;
+      link.click();
+    });
+
+    window.addEventListener('resize', applyAutoScale);
+    renderTable(); // Initial Load
+  </script>
+</body>
+
+</html>

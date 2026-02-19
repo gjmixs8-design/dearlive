@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DEAR MC AND RESULT - Final Unified</title>
+    <style>
+        :root {
+            --blue-light: #a966e7;
+            --blue-dark: #8c40b8;
+            --bg-page: #f4f7f9;
+            --line-color: #333333;
+            --scale: 1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-page);
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar & Header --- */
+        .menu-icon {
+            position: absolute; top: 20px; left: 20px;
+            width: 30px; height: 25px; cursor: pointer;
+            display: flex; flex-direction: column; justify-content: space-between; z-index: 1100;
+        }
+        .menu-icon span { height: 4px; background: #333; border-radius: 2px; }
+
+        .sidebar {
+            position: fixed; top: 0; left: -250px; width: 250px; height: 100%;
+            background: #fff; box-shadow: 4px 0 12px rgba(0,0,0,.1);
+            padding: 60px 20px; transition: left .3s ease; z-index: 1000;
+        }
+        .sidebar.active { left: 0; }
+        .sidebar a { display: block; padding: 12px; color: #333; text-decoration: none; font-weight: bold; border-bottom: 1px solid #eee; }
+        .sidebar .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; }
+
+        .title-main {
+            text-align: center; color: #9d81c3; font-size: 26px;
+            margin: 20px 0 10px; font-weight: 800; text-transform: uppercase;
+        }
+
+        /* --- Toolbar --- */
+        .toolbar {
+            width: min(1200px, 95vw); margin: 10px auto;
+            display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+        }
+        .toolbar select, .toolbar button {
+            padding: 8px 15px; border: 1px solid #ccd6dd; border-radius: 6px;
+            font-size: 14px; font-weight: bold; background: #fff; cursor: pointer;
+        }
+        .btn-blue { background: var(--blue-dark); color: white; border: none; }
+
+        /* --- Table Container & Scaling (Gap Fix) --- */
+        .table-outer {
+            margin: 20px auto;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid var(--line-color);
+            background: white;
+            display: block; 
+            max-width: 95vw;
+        }
+
+        .table-inner {
+            transform: scale(var(--scale));
+            transform-origin: top left;
+            width: max-content;
+        }
+
+        table { border-collapse: collapse; background: #fff; width: auto; }
+
+        .banner {
+            background: var(--blue-light); color: white;
+            font-size: 20px; padding: 15px; font-weight: bold;
+            text-align: center; border-bottom: 2px solid var(--line-color);
+        }
+
+        th {
+            background: var(--blue-light); color: white;
+            padding: 10px; font-size: 13px; border: 1px solid #fff;
+            text-transform: uppercase; line-height: 1.3;
+        }
+
+        td {
+            border: 1px solid var(--line-color);
+            padding: 6px 4px; text-align: center;
+            font-size: 22px; font-weight: 950;
+            min-width: 85px;
+        }
+
+        .date-cell {
+            background: #eee !important; color: #000 !important;
+            font-size: 14px; width: 110px; border-right: 3px solid #000;
+        }
+
+        /* Result Sub-text */
+        .res-sub {
+            display: block; font-size: 13px; font-weight: 800;
+            margin-top: -2px; border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* --- ROW COLORS (Dynamic Patterns) --- */
+        .row-blue { background: #2F5597 !important; color: white !important; }
+        .row-blue .res-sub { color: white !important; }
+
+        .row-red { background: #C00000 !important; color: #FFFF00 !important; }
+        .row-red .res-sub { color: #FFFF00 !important; }
+
+        .row-green { background: #00B050 !important; color: white !important; }
+        .row-green .res-sub { color: white !important; }
+
+        .row-white { background: #ffffff !important; color: #000 !important; }
+        .row-white .res-sub { color: #d00000 !important; }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="menu-icon" onclick="document.getElementById('sidebar').classList.add('active')">
+        <span></span><span></span><span></span>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <div class="close-btn" onclick="document.getElementById('sidebar').classList.remove('active')">&times;</div>
+        <a href="index.html">Home</a>
+        <a href="mcchart.html" class="active">Machine Chart</a>
+        <a href="result chart.html">Results chart</a>
+        <a href="mc.html">MC</a>
+         <a href="results.html">Result</a>
+    </div>
+
+    <h1 class="title-main">DEAR MC AND RESULT</h1>
+
+    <div class="toolbar">
+        <select id="monthSelect"></select>
+        <select id="yearSelect">
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+        </select>
+        <button class="btn-blue" id="applyBtn">Apply Filter</button>
+    </div>
+
+    <div class="table-outer" id="tableOuter">
+        <div class="table-inner" id="tableInner">
+            <table id="machineTable">
+                <thead>
+                    <tr><th colspan="11" class="banner">DEAR MC AND RESULT</th></tr>
+                    <tr>
+                        <th class="date-cell">Date</th>
+                        <th>10:00 AM<br>MC<br><span style="color:yellow">RESULT</span></th>
+                        <th>11:00 AM<br>MC<br><span style="color:yellow">RESULT</span></th>
+                        <th>12:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
+                        <th>01:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
+                        <th>05:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
+                        <th>06:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
+                        <th>07:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
+                        <th>08:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
+                        <th>09:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
+                        <th>10:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
+                    </tr>
+                </thead>
+                <tbody id="chartBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div style="text-align:center; padding: 30px;">
+        <button class="btn-blue" id="downloadBtn" style="padding: 15px 40px; border-radius: 30px; font-size: 16px;">
+            Download Chart (PNG)
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+
+    <script>
+        const chartBody = document.getElementById('chartBody');
+        const table = document.getElementById('machineTable');
+        const tableOuter = document.getElementById('tableOuter');
+        const monthSelect = document.getElementById('monthSelect');
+        const yearSelect = document.getElementById('yearSelect');
+
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        // 1. Initialize Filters
+        monthNames.forEach((name, i) => {
+            let opt = document.createElement('option');
+            opt.value = i + 1;
+            opt.textContent = name;
+            if (i === new Date().getMonth()) opt.selected = true;
+            monthSelect.appendChild(opt);
+        });
+
+        function getRowClass(day) {
+            if (day % 10 === 0) return "row-blue";
+            if (day % 7 === 0) return "row-red";
+            if (day % 5 === 0) return "row-green";
+            return "row-white";
+        }
+
+        // 2. Data Rendering
+        function renderChart(month, year) {
+            chartBody.innerHTML = "";
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const tr = document.createElement('tr');
+                tr.className = getRowClass(day);
+                const dateStr = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+
+                let cells = `<td class="date-cell">${dateStr}</td>`;
+                for (let i = 0; i < 10; i++) {
+                    cells += `<td>88888<span class="res-sub">123</span></td>`;
+                }
+                tr.innerHTML = cells;
+                chartBody.appendChild(tr);
+            }
+            applyAutoScale();
+        }
+
+        // 3. Scaling Engine (Fixes White Gap)
+        function applyAutoScale() {
+            const root = document.documentElement;
+            root.style.setProperty('--scale', '1');
+            tableOuter.style.width = 'auto'; 
+
+            requestAnimationFrame(() => {
+                const naturalWidth = table.offsetWidth;
+                const naturalHeight = table.offsetHeight;
+                const availableWidth = window.innerWidth * 0.95;
+
+                const scale = Math.min(1, availableWidth / naturalWidth);
+                root.style.setProperty('--scale', scale);
+
+                // SNAPS container to the data to remove gap
+                tableOuter.style.width = (naturalWidth * scale) + "px";
+                tableOuter.style.height = (naturalHeight * scale) + "px";
+            });
+        }
+
+        // 4. Advanced PNG Export (Uses Clone Method for best results)
+        async function exportToPNG() {
+            const btn = document.getElementById('downloadBtn');
+            btn.textContent = "Creating PNG...";
+            btn.disabled = true;
+
+            // Create temporary wrapper to hold a full-scale clone
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.top = '-9999px';
+            wrapper.style.left = '-9999px';
+            wrapper.style.width = 'max-content';
+            
+            const clone = table.cloneNode(true);
+            clone.style.transform = 'none';
+            clone.style.margin = '0';
+            
+            document.body.appendChild(wrapper);
+            wrapper.appendChild(clone);
+
+            try {
+                const dataUrl = await htmlToImage.toPng(clone, {
+                    backgroundColor: '#ffffff',
+                    pixelRatio: 2,
+                    width: clone.scrollWidth,
+                    height: clone.scrollHeight
+                });
+                
+                const link = document.createElement('a');
+                link.download = `Dear-Chart-${monthSelect.value}-${yearSelect.value}.png`;
+                link.href = dataUrl;
+                link.click();
+            } catch (error) {
+                alert("Export failed. Try again.");
+            } finally {
+                wrapper.remove();
+                btn.textContent = "Download Chart (PNG)";
+                btn.disabled = false;
+            }
+        }
+
+        // Listeners
+        document.getElementById('applyBtn').addEventListener('click', () => {
+            renderChart(monthSelect.value, yearSelect.value);
+        });
+        document.getElementById('downloadBtn').addEventListener('click', exportToPNG);
+        window.addEventListener('resize', applyAutoScale);
+
+        // Load
+        renderChart(parseInt(monthSelect.value), yearSelect.value);
+    </script>
+</body>
+</html>
