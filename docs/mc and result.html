@@ -19,8 +19,10 @@
             background: #f4f7f9;
             margin: 0;
             padding: 0;
-            /* UPDATED: Changed to auto to allow horizontal movement when zoomed */
             overflow-x: auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         /* --- Sidebar --- */
@@ -76,6 +78,7 @@
             flex-direction: column;
             align-items: center;
             padding-top: 70px;
+            flex-grow: 1;
         }
 
         h1 {
@@ -87,20 +90,20 @@
             text-align: center;
         }
 
+        /* FIX: Center table on desktop & maintain space on mobile */
         .scaler-container {
-            width: 100vw;
+            width: 100%;
             display: flex;
-            justify-content: center;
+            justify-content: center; /* Centers items horizontally */
             align-items: flex-start;
-            /* UPDATED: auto allows the user to swipe left/right when they pinch zoom */
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+            overflow: visible; /* Let scale work naturally */
+            margin-bottom: 20px;
         }
 
         .table-wrapper {
             transform-origin: top center;
             display: inline-block;
-            transition: transform 0.2s ease;
+            transition: transform 0.1s ease;
         }
 
         #captureArea {
@@ -122,7 +125,6 @@
             border-bottom: 2px solid var(--border);
         }
 
-        /* --- Cell Styling --- */
         .col-head td {
             background: #ece363e5;
             color: var(--text-dark);
@@ -174,8 +176,7 @@
             flex-wrap: wrap;
         }
 
-        select,
-        button {
+        select, button {
             padding: 10px;
             border: 1px solid var(--border);
             border-radius: 5px;
@@ -186,13 +187,20 @@
         .btn-download {
             background: var(--text-dark);
             color: white;
-            margin: 20px 0;
+            margin: 20px auto; /* Centers the button */
             padding: 15px 30px;
             width: 90%;
             max-width: 400px;
             border-radius: 30px;
             font-size: 16px;
             border: none;
+            display: block;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-download:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
@@ -244,7 +252,7 @@
             </div>
         </div>
 
-        <button class="btn-download" onclick="exportToPNG()">Download Chart</button>
+        <button class="btn-download" onclick="exportToPNG()">Download Chart Image</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
@@ -263,20 +271,28 @@
             mSel.add(opt);
         });
 
+        // FIX: Improved scaling logic that doesn't break the layout flow
         function autoScale() {
             const wrapper = document.getElementById('scaler');
             const captureArea = document.getElementById('captureArea');
             const outerContainer = document.getElementById('outerContainer');
-            const availableWidth = window.innerWidth - 10;
-            const actualTableWidth = captureArea.offsetWidth;
+            
+            const availableWidth = window.innerWidth - 20;
+            const actualTableWidth = 1006; // Based on min-width + borders
 
-            // This still fits the table to screen width by default
             let scale = availableWidth / actualTableWidth;
-            if (scale > 1) scale = 1;
+            
+            // On Desktop, don't scale up past 100%, just center it
+            if (scale > 1) {
+                scale = 1;
+            }
 
             wrapper.style.transform = `scale(${scale})`;
-            // Dynamically adjust container height so footer buttons don't overlap
-            outerContainer.style.height = (captureArea.offsetHeight * scale) + 20 + "px";
+            
+            // FIX: Adjust container height precisely based on scaled height
+            // This prevents the download button from floating too far away
+            const scaledHeight = captureArea.offsetHeight * scale;
+            outerContainer.style.height = scaledHeight + "px";
         }
 
         function renderChart() {
@@ -306,25 +322,31 @@
                 row += `<td class="day-col">${d}</td></tr>`;
                 body.innerHTML += row;
             }
-            setTimeout(autoScale, 100);
+            // Wait for DOM to update then scale
+            setTimeout(autoScale, 50);
         }
 
         async function exportToPNG() {
             const node = document.getElementById('captureArea');
             const btn = document.querySelector('.btn-download');
-            btn.innerText = "Creating Image...";
+            btn.innerText = "Processing Image...";
+            btn.disabled = true;
+
             try {
-                // Ensure image is captured at full scale (1) regardless of mobile zoom
                 const dataUrl = await htmlToImage.toPng(node, {
                     backgroundColor: '#fff',
-                    pixelRatio: 2
+                    pixelRatio: 2, // High quality
                 });
                 const link = document.createElement('a');
-                link.download = `Dear-MC-Result-${monthNames[mSel.value - 1]}.png`;
+                link.download = `Dear-MC-Result-${monthNames[mSel.value - 1]}-${new Date().getFullYear()}.png`;
                 link.href = dataUrl;
                 link.click();
-            } catch (e) { alert("Download failed."); }
-            finally { btn.innerText = "Download Chart"; }
+            } catch (e) { 
+                alert("Download failed. Please try again."); 
+            } finally { 
+                btn.innerText = "Download Chart Image"; 
+                btn.disabled = false;
+            }
         }
 
         window.addEventListener('resize', autoScale);
