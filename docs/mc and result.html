@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DEAR MC AND RESULT</title>
+    <title>DEAR RESULT AND MC</title>
     <style>
         :root {
             --border: #333333;
@@ -126,11 +126,9 @@
             background: #FFDAB9;
             color: var(--text-dark);
             font-weight: bold;
-            font-size: 13px;
-            /* Slightly increased for readability */
+            font-size: 13px; /* Slightly increased for readability */
             border: 1px solid var(--border);
-            line-height: 1.2;
-            /* Tighter line height for the 3-row header */
+            line-height: 1.2; /* Tighter line height for the 3-row header */
             padding: 8px 4px;
         }
 
@@ -216,7 +214,7 @@
                 <option>2026</option>
                 <option>2025</option>
             </select>
-            <button onclick="renderChart()" style="background: #fff;">Apply Filter</button>
+            <button onclick="renderChart()" style="background: #ffffffd2;">Apply Filter</button>
         </div>
 
         <div class="scaler-container" id="outerContainer">
@@ -225,7 +223,7 @@
                     <table id="targetTable">
                         <thead>
                             <tr>
-                                <th colspan="11" id="tableTitle">DEAR MC AND RESULT CHART</th>
+                                <th colspan="11" id="tableTitle">DEAR RESULT AND MC CHART</th>
                             </tr>
                             <tr class="col-head">
                                 <td>DATE</td>
@@ -247,7 +245,7 @@
             </div>
         </div>
 
-        <button class="btn-download" onclick="exportToPNG()">Download PNG Chart</button>
+        <button class="btn-download" onclick="exportToPNG()">Download Chart</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
@@ -287,7 +285,7 @@
             const body = document.getElementById('chartBody');
             const days = new Date(year, month, 0).getDate();
 
-            document.getElementById('tableTitle').innerText = `DEAR MC AND RESULT CHART ${monthNames[month - 1]} ${year}`;
+            document.getElementById('tableTitle').innerText = `DEAR RESULT AND MC CHART ${monthNames[month - 1]} ${year}`;
             body.innerHTML = "";
 
             for (let d = 1; d <= days; d++) {
