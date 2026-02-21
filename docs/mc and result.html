@@ -7,10 +7,13 @@
     <title>DEAR MC AND RESULT</title>
     <style>
         :root {
-            --border: #D2691E;
+            --border: #333333;
             --header-bg: #E9967A;
+            /* Peach/Salmon */
             --dear-bg: #FFCC99;
+            /* Light Orange */
             --text-dark: #800000;
+            /* Maroon */
             --sidebar-width: 260px;
         }
 
@@ -20,7 +23,6 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
-            /* Prevents side-scrolling */
         }
 
         /* --- Sidebar & Menu --- */
@@ -47,6 +49,7 @@
             color: white;
             text-decoration: none;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
         }
 
         .menu-icon {
@@ -75,28 +78,27 @@
             flex-direction: column;
             align-items: center;
             padding-top: 70px;
-            /* Space for menu icon */
         }
 
         h1 {
             color: var(--text-dark);
             margin-bottom: 10px;
             font-size: 1.5rem;
+            text-transform: uppercase;
+            font-weight: 800;
         }
 
-        /* --- THE RESPONSIVE FIX --- */
+        /* --- Responsive Scaling Fix --- */
         .scaler-container {
             width: 100vw;
             display: flex;
             justify-content: center;
             align-items: flex-start;
             overflow: hidden;
-            /* Clips the invisible overflow of the scaled element */
         }
 
         .table-wrapper {
             transform-origin: top center;
-            /* Scales from the top middle */
             display: inline-block;
             transition: transform 0.2s ease;
         }
@@ -109,43 +111,53 @@
 
         table {
             border-collapse: collapse;
-            min-width: 850px;
+            min-width: 900px;
         }
 
-        /* Keeps table wide for quality */
         th {
             background: var(--header-bg);
             color: var(--text-dark);
             padding: 15px;
-            font-size: 22px;
+            font-size: 24px;
+            border-bottom: 2px solid var(--border);
         }
 
         .col-head td {
             background: #FFDAB9;
+            color: var(--text-dark);
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
+            /* Slightly increased for readability */
             border: 1px solid var(--border);
+            line-height: 1.2;
+            /* Tighter line height for the 3-row header */
+            padding: 8px 4px;
         }
 
         td {
             border: 1px solid var(--border);
-            padding: 8px 4px;
-            font-size: 18px;
+            padding: 6px 2px;
+            font-size: 20px;
             font-weight: 900;
             text-align: center;
+            color: #000;
         }
 
         .day-col {
             background: var(--header-bg);
-            width: 40px;
+            width: 45px;
+            color: var(--text-dark);
         }
 
-        .dear-col {
-            background: var(--dear-bg);
-            color: #B22222;
+        .res-sub {
+            display: block;
+            font-size: 14px;
+            color: #d00000;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            margin-top: 2px;
+            font-weight: 800;
         }
 
-        /* Toolbar & Buttons */
         .toolbar {
             margin: 15px;
             display: flex;
@@ -170,6 +182,9 @@
             padding: 15px 30px;
             width: 90%;
             max-width: 400px;
+            border-radius: 30px;
+            font-size: 16px;
+            border: none;
         }
     </style>
 </head>
@@ -183,17 +198,17 @@
     </div>
 
     <nav class="sidebar" id="sidebar">
-        <a href="#" onclick="toggleSidebar()">Close ×</a>
-         <a href="index.html">Home</a>
-    <a href="mcchart.html">Machine Chart</a>
-    <a href="result chart.html">Results chart </a>
-    <a href="mc.html">mc</a>
-    <a href="results.html">result</a>
-    <a href="mc and result.html">mc and result</a>
+        <a href="#" onclick="toggleSidebar()" style="background: rgba(0,0,0,0.2);">Close ×</a>
+        <a href="index.html">Home</a>
+        <a href="mcchart.html">Machine Chart</a>
+        <a href="result chart.html">Results Chart</a>
+        <a href="mc.html">MC</a>
+        <a href="results.html">Result</a>
+        <a href="mc and result.html">MC and Result</a>
     </nav>
 
     <div class="main-content">
-        <h1>DEAR RESULT AND MC</h1>
+        <h1>DEAR MC AND RESULT</h1>
 
         <div class="toolbar">
             <select id="monthSelect"></select>
@@ -201,7 +216,7 @@
                 <option>2026</option>
                 <option>2025</option>
             </select>
-            <button onclick="renderChart()">Apply</button>
+            <button onclick="renderChart()" style="background: #fff;">Apply Filter</button>
         </div>
 
         <div class="scaler-container" id="outerContainer">
@@ -210,20 +225,20 @@
                     <table id="targetTable">
                         <thead>
                             <tr>
-                                <th colspan="11" id="tableTitle">DEAR RESULT & MC CHART</th>
+                                <th colspan="11" id="tableTitle">DEAR MC AND RESULT CHART</th>
                             </tr>
                             <tr class="col-head">
-                                <td>D</td>
-                                <td>10 AM</td>
-                                <td>11 AM</td>
-                                <td>12 PM</td>
-                                <td>01 PM</td>
-                                <td class="dear-col">DEAR MC</td>
-                                <td>05 PM</td>
-                                <td>06 PM</td>
-                                <td>07 PM</td>
-                                <td>08 PM</td>
-                                <td>D</td>
+                                <td>DATE</td>
+                                <td>10:00 AM<br>MC<br>RESULT</td>
+                                <td>11:00 AM<br>MC<br>RESULT</td>
+                                <td>12:00 PM<br>MC<br>RESULT</td>
+                                <td>01:00 PM<br>MC<br>RESULT</td>
+                                <td>05:00 PM<br>MC<br>RESULT</td>
+                                <td>06:00 PM<br>MC<br>RESULT</td>
+                                <td>07:00 PM<br>MC<br>RESULT</td>
+                                <td>08:00 PM<br>MC<br>RESULT</td>
+                                <td>09:00 PM<br>MC<br>RESULT</td>
+                                <td>DATE</td>
                             </tr>
                         </thead>
                         <tbody id="chartBody"></tbody>
@@ -237,9 +252,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
     <script>
-        const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+        const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
 
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
 
         const mSel = document.getElementById('monthSelect');
         monthNames.forEach((m, i) => {
@@ -248,64 +265,55 @@
             mSel.add(opt);
         });
 
-        // FIX: The auto-scaling logic for exact mobile fit
         function autoScale() {
             const wrapper = document.getElementById('scaler');
             const captureArea = document.getElementById('captureArea');
             const outerContainer = document.getElementById('outerContainer');
 
-            const padding = 20; // Side margins
+            const padding = 10;
             const availableWidth = window.innerWidth - padding;
             const actualTableWidth = captureArea.offsetWidth;
 
-            // Calculate scale ratio
             let scale = availableWidth / actualTableWidth;
-
-            // If the screen is wider than the table (Desktop), don't scale up
             if (scale > 1) scale = 1;
 
-            // Apply transform
             wrapper.style.transform = `scale(${scale})`;
-
-            // FIX: Adjust the height of the outer container because scaled elements 
-            // still take up their original "unscaled" height in the DOM otherwise.
             outerContainer.style.height = (captureArea.offsetHeight * scale) + "px";
         }
 
         function renderChart() {
-            const month = mSel.value, year = document.getElementById('yearSelect').value;
+            const month = mSel.value;
+            const year = document.getElementById('yearSelect').value;
             const body = document.getElementById('chartBody');
             const days = new Date(year, month, 0).getDate();
 
-            document.getElementById('tableTitle').innerText = `DEAR RESULT & MC CHART ${monthNames[month - 1]}-${year}`;
+            document.getElementById('tableTitle').innerText = `DEAR MC AND RESULT CHART ${monthNames[month - 1]} ${year}`;
             body.innerHTML = "";
 
             for (let d = 1; d <= days; d++) {
-                body.innerHTML += `<tr>
-                    <td class="day-col">${d}</td>
-                    <td>888</td><td>888</td><td>888</td><td>888</td>
-                    <td class="dear-col">586417</td>
-                    <td>888</td><td>888</td><td>888</td><td>888</td>
-                    <td class="day-col">${d}</td>
-                </tr>`;
+                let row = `<tr><td class="day-col">${d}</td>`;
+                for (let i = 0; i < 9; i++) {
+                    row += `<td>88888<span class="res-sub">123</span></td>`;
+                }
+                row += `<td class="day-col">${d}</td></tr>`;
+                body.innerHTML += row;
             }
 
-            // Wait for DOM to finish rendering then scale
             setTimeout(autoScale, 50);
         }
 
         async function exportToPNG() {
             const node = document.getElementById('captureArea');
             const btn = document.querySelector('.btn-download');
-            btn.innerText = "Saving...";
+            btn.innerText = "Creating Image...";
 
             try {
                 const dataUrl = await htmlToImage.toPng(node, {
                     backgroundColor: '#fff',
-                    pixelRatio: 3 // Keeps it sharp even though it's scaled down on mobile
+                    pixelRatio: 3
                 });
                 const link = document.createElement('a');
-                link.download = `Dear-Chart-${monthNames[mSel.value - 1]}.png`;
+                link.download = `Dear-MC-Result-${monthNames[mSel.value - 1]}.png`;
                 link.href = dataUrl;
                 link.click();
             } catch (e) {
