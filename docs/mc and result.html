@@ -2,295 +2,322 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DEAR MC AND RESULT - Final Unified</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DEAR MC AND RESULT</title>
     <style>
         :root {
-            --blue-light: #a966e7;
-            --blue-dark: #8c40b8;
-            --bg-page: #f4f7f9;
-            --line-color: #333333;
-            --scale: 1;
+            --border: #D2691E;
+            --header-bg: #E9967A;
+            --dear-bg: #FFCC99;
+            --text-dark: #800000;
+            --sidebar-width: 260px;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-page);
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f7f9;
+            margin: 0;
+            padding: 0;
             overflow-x: hidden;
+            /* Prevents side-scrolling */
         }
 
-        /* --- Sidebar & Header --- */
-        .menu-icon {
-            position: absolute; top: 20px; left: 20px;
-            width: 30px; height: 25px; cursor: pointer;
-            display: flex; flex-direction: column; justify-content: space-between; z-index: 1100;
-        }
-        .menu-icon span { height: 4px; background: #333; border-radius: 2px; }
-
+        /* --- Sidebar & Menu --- */
         .sidebar {
-            position: fixed; top: 0; left: -250px; width: 250px; height: 100%;
-            background: #fff; box-shadow: 4px 0 12px rgba(0,0,0,.1);
-            padding: 60px 20px; transition: left .3s ease; z-index: 1000;
+            position: fixed;
+            left: calc(-1 * var(--sidebar-width));
+            top: 0;
+            height: 100%;
+            width: var(--sidebar-width);
+            background: var(--text-dark);
+            color: white;
+            transition: 0.3s ease;
+            z-index: 3000;
+            padding-top: 60px;
         }
-        .sidebar.active { left: 0; }
-        .sidebar a { display: block; padding: 12px; color: #333; text-decoration: none; font-weight: bold; border-bottom: 1px solid #eee; }
-        .sidebar .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; }
 
-        .title-main {
-            text-align: center; color: #9d81c3; font-size: 26px;
-            margin: 20px 0 10px; font-weight: 800; text-transform: uppercase;
+        .sidebar.active {
+            left: 0;
         }
 
-        /* --- Toolbar --- */
-        .toolbar {
-            width: min(1200px, 95vw); margin: 10px auto;
-            display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+        .sidebar a {
+            padding: 15px 25px;
+            display: block;
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .toolbar select, .toolbar button {
-            padding: 8px 15px; border: 1px solid #ccd6dd; border-radius: 6px;
-            font-size: 14px; font-weight: bold; background: #fff; cursor: pointer;
-        }
-        .btn-blue { background: var(--blue-dark); color: white; border: none; }
 
-        /* --- Table Container & Scaling (Gap Fix) --- */
-        .table-outer {
-            margin: 20px auto;
-            overflow: hidden;
-            position: relative;
-            border: 2px solid var(--line-color);
+        .menu-icon {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            cursor: pointer;
+            z-index: 3100;
             background: white;
-            display: block; 
-            max-width: 95vw;
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
-        .table-inner {
-            transform: scale(var(--scale));
-            transform-origin: top left;
-            width: max-content;
+        .menu-icon div {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            margin: 5px 0;
         }
 
-        table { border-collapse: collapse; background: #fff; width: auto; }
-
-        .banner {
-            background: var(--blue-light); color: white;
-            font-size: 20px; padding: 15px; font-weight: bold;
-            text-align: center; border-bottom: 2px solid var(--line-color);
+        /* --- Main Content Layout --- */
+        .main-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 70px;
+            /* Space for menu icon */
         }
 
+        h1 {
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        /* --- THE RESPONSIVE FIX --- */
+        .scaler-container {
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: hidden;
+            /* Clips the invisible overflow of the scaled element */
+        }
+
+        .table-wrapper {
+            transform-origin: top center;
+            /* Scales from the top middle */
+            display: inline-block;
+            transition: transform 0.2s ease;
+        }
+
+        #captureArea {
+            background: white;
+            border: 3px solid var(--border);
+            display: inline-block;
+        }
+
+        table {
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        /* Keeps table wide for quality */
         th {
-            background: var(--blue-light); color: white;
-            padding: 10px; font-size: 13px; border: 1px solid #fff;
-            text-transform: uppercase; line-height: 1.3;
+            background: var(--header-bg);
+            color: var(--text-dark);
+            padding: 15px;
+            font-size: 22px;
+        }
+
+        .col-head td {
+            background: #FFDAB9;
+            font-weight: bold;
+            font-size: 14px;
+            border: 1px solid var(--border);
         }
 
         td {
-            border: 1px solid var(--line-color);
-            padding: 6px 4px; text-align: center;
-            font-size: 22px; font-weight: 950;
-            min-width: 85px;
+            border: 1px solid var(--border);
+            padding: 8px 4px;
+            font-size: 18px;
+            font-weight: 900;
+            text-align: center;
         }
 
-        .date-cell {
-            background: #eee !important; color: #000 !important;
-            font-size: 14px; width: 110px; border-right: 3px solid #000;
+        .day-col {
+            background: var(--header-bg);
+            width: 40px;
         }
 
-        /* Result Sub-text */
-        .res-sub {
-            display: block; font-size: 13px; font-weight: 800;
-            margin-top: -2px; border-top: 1px solid rgba(0,0,0,0.1);
+        .dear-col {
+            background: var(--dear-bg);
+            color: #B22222;
         }
 
-        /* --- ROW COLORS (Dynamic Patterns) --- */
-        .row-blue { background: #2F5597 !important; color: white !important; }
-        .row-blue .res-sub { color: white !important; }
+        /* Toolbar & Buttons */
+        .toolbar {
+            margin: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
 
-        .row-red { background: #C00000 !important; color: #FFFF00 !important; }
-        .row-red .res-sub { color: #FFFF00 !important; }
+        select,
+        button {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-        .row-green { background: #00B050 !important; color: white !important; }
-        .row-green .res-sub { color: white !important; }
-
-        .row-white { background: #ffffff !important; color: #000 !important; }
-        .row-white .res-sub { color: #d00000 !important; }
-
+        .btn-download {
+            background: var(--text-dark);
+            color: white;
+            margin: 20px 0;
+            padding: 15px 30px;
+            width: 90%;
+            max-width: 400px;
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="menu-icon" onclick="document.getElementById('sidebar').classList.add('active')">
-        <span></span><span></span><span></span>
+    <div class="menu-icon" onclick="toggleSidebar()">
+        <div></div>
+        <div></div>
+        <div></div>
     </div>
 
-    <div id="sidebar" class="sidebar">
-        <div class="close-btn" onclick="document.getElementById('sidebar').classList.remove('active')">&times;</div>
-        <a href="index.html">Home</a>
-        <a href="mcchart.html" class="active">Machine Chart</a>
-        <a href="result chart.html">Results chart</a>
-        <a href="mc.html">MC</a>
-         <a href="results.html">Result</a>
-    </div>
+    <nav class="sidebar" id="sidebar">
+        <a href="#" onclick="toggleSidebar()">Close ×</a>
+         <a href="index.html">Home</a>
+    <a href="mcchart.html">Machine Chart</a>
+    <a href="result chart.html">Results chart </a>
+    <a href="mc.html">mc</a>
+    <a href="results.html">result</a>
+    <a href="mc and result.html">mc and result</a>
+    </nav>
 
-    <h1 class="title-main">DEAR MC AND RESULT</h1>
+    <div class="main-content">
+        <h1>DEAR RESULT AND MC</h1>
 
-    <div class="toolbar">
-        <select id="monthSelect"></select>
-        <select id="yearSelect">
-            <option value="2026">2026</option>
-            <option value="2025">2025</option>
-        </select>
-        <button class="btn-blue" id="applyBtn">Apply Filter</button>
-    </div>
-
-    <div class="table-outer" id="tableOuter">
-        <div class="table-inner" id="tableInner">
-            <table id="machineTable">
-                <thead>
-                    <tr><th colspan="11" class="banner">DEAR MC AND RESULT</th></tr>
-                    <tr>
-                        <th class="date-cell">Date</th>
-                        <th>10:00 AM<br>MC<br><span style="color:yellow">RESULT</span></th>
-                        <th>11:00 AM<br>MC<br><span style="color:yellow">RESULT</span></th>
-                        <th>12:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
-                        <th>01:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
-                        <th>05:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
-                        <th>06:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
-                        <th>07:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
-                        <th>08:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
-                        <th>09:00 PM<br>MC<br><span style="color:yellow">RESULT</span></th>
-                </thead>
-                <tbody id="chartBody"></tbody>
-            </table>
+        <div class="toolbar">
+            <select id="monthSelect"></select>
+            <select id="yearSelect">
+                <option>2026</option>
+                <option>2025</option>
+            </select>
+            <button onclick="renderChart()">Apply</button>
         </div>
-    </div>
 
-    <div style="text-align:center; padding: 30px;">
-        <button class="btn-blue" id="downloadBtn" style="padding: 15px 40px; border-radius: 30px; font-size: 16px;">
-            Download Chart (PNG)
-        </button>
+        <div class="scaler-container" id="outerContainer">
+            <div class="table-wrapper" id="scaler">
+                <div id="captureArea">
+                    <table id="targetTable">
+                        <thead>
+                            <tr>
+                                <th colspan="11" id="tableTitle">DEAR RESULT & MC CHART</th>
+                            </tr>
+                            <tr class="col-head">
+                                <td>D</td>
+                                <td>10 AM</td>
+                                <td>11 AM</td>
+                                <td>12 PM</td>
+                                <td>01 PM</td>
+                                <td class="dear-col">DEAR MC</td>
+                                <td>05 PM</td>
+                                <td>06 PM</td>
+                                <td>07 PM</td>
+                                <td>08 PM</td>
+                                <td>D</td>
+                            </tr>
+                        </thead>
+                        <tbody id="chartBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-download" onclick="exportToPNG()">Download PNG Chart</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
-
     <script>
-        const chartBody = document.getElementById('chartBody');
-        const table = document.getElementById('machineTable');
-        const tableOuter = document.getElementById('tableOuter');
-        const monthSelect = document.getElementById('monthSelect');
-        const yearSelect = document.getElementById('yearSelect');
+        const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
 
-        // 1. Initialize Filters
-        monthNames.forEach((name, i) => {
-            let opt = document.createElement('option');
-            opt.value = i + 1;
-            opt.textContent = name;
+        const mSel = document.getElementById('monthSelect');
+        monthNames.forEach((m, i) => {
+            let opt = new Option(m, i + 1);
             if (i === new Date().getMonth()) opt.selected = true;
-            monthSelect.appendChild(opt);
+            mSel.add(opt);
         });
 
-        function getRowClass(day) {
-            if (day % 10 === 0) return "row-blue";
-            if (day % 7 === 0) return "row-red";
-            if (day % 5 === 0) return "row-green";
-            return "row-white";
+        // FIX: The auto-scaling logic for exact mobile fit
+        function autoScale() {
+            const wrapper = document.getElementById('scaler');
+            const captureArea = document.getElementById('captureArea');
+            const outerContainer = document.getElementById('outerContainer');
+
+            const padding = 20; // Side margins
+            const availableWidth = window.innerWidth - padding;
+            const actualTableWidth = captureArea.offsetWidth;
+
+            // Calculate scale ratio
+            let scale = availableWidth / actualTableWidth;
+
+            // If the screen is wider than the table (Desktop), don't scale up
+            if (scale > 1) scale = 1;
+
+            // Apply transform
+            wrapper.style.transform = `scale(${scale})`;
+
+            // FIX: Adjust the height of the outer container because scaled elements 
+            // still take up their original "unscaled" height in the DOM otherwise.
+            outerContainer.style.height = (captureArea.offsetHeight * scale) + "px";
         }
 
-        // 2. Data Rendering
-        function renderChart(month, year) {
-            chartBody.innerHTML = "";
-            const daysInMonth = new Date(year, month, 0).getDate();
+        function renderChart() {
+            const month = mSel.value, year = document.getElementById('yearSelect').value;
+            const body = document.getElementById('chartBody');
+            const days = new Date(year, month, 0).getDate();
 
-            for (let day = 1; day <= daysInMonth; day++) {
-                const tr = document.createElement('tr');
-                tr.className = getRowClass(day);
-                const dateStr = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+            document.getElementById('tableTitle').innerText = `DEAR RESULT & MC CHART ${monthNames[month - 1]}-${year}`;
+            body.innerHTML = "";
 
-                let cells = `<td class="date-cell">${dateStr}</td>`;
-                for (let i = 0; i < 10; i++) {
-                    cells += `<td>88888<span class="res-sub">123</span></td>`;
-                }
-                tr.innerHTML = cells;
-                chartBody.appendChild(tr);
+            for (let d = 1; d <= days; d++) {
+                body.innerHTML += `<tr>
+                    <td class="day-col">${d}</td>
+                    <td>888</td><td>888</td><td>888</td><td>888</td>
+                    <td class="dear-col">586417</td>
+                    <td>888</td><td>888</td><td>888</td><td>888</td>
+                    <td class="day-col">${d}</td>
+                </tr>`;
             }
-            applyAutoScale();
+
+            // Wait for DOM to finish rendering then scale
+            setTimeout(autoScale, 50);
         }
 
-        // 3. Scaling Engine (Fixes White Gap)
-        function applyAutoScale() {
-            const root = document.documentElement;
-            root.style.setProperty('--scale', '1');
-            tableOuter.style.width = 'auto'; 
-
-            requestAnimationFrame(() => {
-                const naturalWidth = table.offsetWidth;
-                const naturalHeight = table.offsetHeight;
-                const availableWidth = window.innerWidth * 0.95;
-
-                const scale = Math.min(1, availableWidth / naturalWidth);
-                root.style.setProperty('--scale', scale);
-
-                // SNAPS container to the data to remove gap
-                tableOuter.style.width = (naturalWidth * scale) + "px";
-                tableOuter.style.height = (naturalHeight * scale) + "px";
-            });
-        }
-
-        // 4. Advanced PNG Export (Uses Clone Method for best results)
         async function exportToPNG() {
-            const btn = document.getElementById('downloadBtn');
-            btn.textContent = "Creating PNG...";
-            btn.disabled = true;
-
-            // Create temporary wrapper to hold a full-scale clone
-            const wrapper = document.createElement('div');
-            wrapper.style.position = 'absolute';
-            wrapper.style.top = '-9999px';
-            wrapper.style.left = '-9999px';
-            wrapper.style.width = 'max-content';
-            
-            const clone = table.cloneNode(true);
-            clone.style.transform = 'none';
-            clone.style.margin = '0';
-            
-            document.body.appendChild(wrapper);
-            wrapper.appendChild(clone);
+            const node = document.getElementById('captureArea');
+            const btn = document.querySelector('.btn-download');
+            btn.innerText = "Saving...";
 
             try {
-                const dataUrl = await htmlToImage.toPng(clone, {
-                    backgroundColor: '#ffffff',
-                    pixelRatio: 2,
-                    width: clone.scrollWidth,
-                    height: clone.scrollHeight
+                const dataUrl = await htmlToImage.toPng(node, {
+                    backgroundColor: '#fff',
+                    pixelRatio: 3 // Keeps it sharp even though it's scaled down on mobile
                 });
-                
                 const link = document.createElement('a');
-                link.download = `Dear-Chart-${monthSelect.value}-${yearSelect.value}.png`;
+                link.download = `Dear-Chart-${monthNames[mSel.value - 1]}.png`;
                 link.href = dataUrl;
                 link.click();
-            } catch (error) {
-                alert("Export failed. Try again.");
+            } catch (e) {
+                alert("Download failed.");
             } finally {
-                wrapper.remove();
-                btn.textContent = "Download Chart (PNG)";
-                btn.disabled = false;
+                btn.innerText = "Download PNG Chart";
             }
         }
 
-        // Listeners
-        document.getElementById('applyBtn').addEventListener('click', () => {
-            renderChart(monthSelect.value, yearSelect.value);
-        });
-        document.getElementById('downloadBtn').addEventListener('click', exportToPNG);
-        window.addEventListener('resize', applyAutoScale);
-
-        // Load
-        renderChart(parseInt(monthSelect.value), yearSelect.value);
+        window.addEventListener('resize', autoScale);
+        renderChart();
     </script>
 </body>
+
 </html>
