@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spot + Kerala Result Chart</title>
+    <style>
+        :root {
+            --sidebar-maroon: #800000;
+            --header-salmon: #E9967A;
+            --border: #333;
+            --scale: 1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0faff;
+            margin: 0;
+            text-align: center;
+        }
+
+        /* --- Sidebar & Menu --- */
+        .sidebar {
+            position: fixed;
+            left: -260px;
+            top: 0;
+            height: 100%;
+            width: 260px;
+            background: var(--sidebar-maroon);
+            color: white;
+            transition: 0.3s ease;
+            z-index: 3000;
+            padding-top: 60px;
+            text-align: left;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            display: block;
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+        }
+
+        .menu-icon {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            cursor: pointer;
+            z-index: 3100;
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-icon div {
+            width: 25px;
+            height: 3px;
+            background: var(--sidebar-maroon);
+            margin: 5px 0;
+        }
+
+        /* --- Layout --- */
+        h1 {
+            color: var(--sidebar-maroon);
+            margin-top: 70px;
+            font-size: 22px;
+            text-transform: uppercase;
+        }
+
+        .table-outer {
+            width: 95vw;
+            margin: 20px auto;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        .table-inner {
+            transform: scale(var(--scale));
+            transform-origin: top center;
+            display: inline-block;
+        }
+
+        /* --- Table Styling --- */
+        table {
+            border-collapse: collapse;
+            background: #fff;
+            border: 2px solid #000;
+            min-width: 900px;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border);
+            padding: 8px;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .hdr-main {
+            background: #00a859;
+            color: white;
+            font-size: 18px;
+        }
+
+        .hdr-sub {
+            background: #fff8e1;
+            color: #d32f2f;
+        }
+
+        .col-feb {
+            color: #d32f2f;
+            background: #fff;
+            width: 50px;
+        }
+
+        .col-kerala {
+            background: #ffebee;
+            color: #d32f2f;
+            width: 120px;
+        }
+
+        .col-time {
+            background: var(--header-salmon);
+            color: #000;
+        }
+
+        /* --- Buttons --- */
+        .btn-download {
+            background: var(--sidebar-maroon);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="menu-icon" onclick="toggleSidebar()">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <nav id="sidebar" class="sidebar">
+        <div style="text-align: right; padding: 10px;">
+            <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 24px; padding-right:15px;">×</span>
+        </div>
+        <a href="index.html">Home</a>
+        <a href="mcchart.html">Machine Chart</a>
+        <a href="result chart.html">Results Chart</a>
+        <a href="mc.html">MC</a>
+        <a href="results.html">Result</a>
+        <a href="mc and result.html">MC and Result</a>
+    </nav>
+
+    <h1>Spot + Kerala Results</h1>
+
+    <div class="table-outer" id="tableOuter">
+        <div class="table-inner" id="tableInner">
+            <table id="targetTable">
+                <thead>
+                    <tr class="hdr-main">
+                        <td>1CC</td>
+                        <td colspan="4">Spot + Kerala</td>
+                        <td>Kerala</td>
+                        <td colspan="4">Result Times</td>
+                    </tr>
+                    <tr class="hdr-sub">
+                        <td class="col-time">FEB</td>
+                        <td class="col-time">11PM</td>
+                        <td class="col-time">12PM</td>
+                        <td class="col-time">01PM</td>
+                        <td class="col-time">2PM</td>
+                        <td class="col-time" style="background: #ffebee;">Kerala</td>
+                        <td class="col-time">04PM</td>
+                        <td class="col-time">06PM</td>
+                        <td class="col-time">7PM</td>
+                        <td class="col-time">08PM</td>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td class="col-feb">1</td>
+                        <td>814</td>
+                        <td>631</td>
+                        <td>796</td>
+                        <td>510</td>
+                        <td class="col-kerala">390890</td>
+                        <td>687</td>
+                        <td>163</td>
+                        <td>734</td>
+                        <td>218</td>
+                    </tr>
+                    <tr>
+                        <td class="col-feb">2</td>
+                        <td>487</td>
+                        <td>179</td>
+                        <td>516</td>
+                        <td>197</td>
+                        <td class="col-kerala">329983</td>
+                        <td>775</td>
+                        <td>526</td>
+                        <td>863</td>
+                        <td>801</td>
+                    </tr>
+                    <tr>
+                        <td class="col-feb">3</td>
+                        <td>623</td>
+                        <td>965</td>
+                        <td>840</td>
+                        <td>738</td>
+                        <td class="col-kerala">272988</td>
+                        <td>261</td>
+                        <td>356</td>
+                        <td>666</td>
+                        <td>034</td>
+                    </tr>
+                    <tr>
+                        <td class="col-feb">4</td>
+                        <td>347</td>
+                        <td>572</td>
+                        <td>456</td>
+                        <td>579</td>
+                        <td class="col-kerala">314235</td>
+                        <td>693</td>
+                        <td>580</td>
+                        <td>601</td>
+                        <td>574</td>
+                    </tr>
+                    <tr>
+                        <td class="col-feb">5</td>
+                        <td>261</td>
+                        <td>814</td>
+                        <td>598</td>
+                        <td>726</td>
+                        <td class="col-kerala">303206</td>
+                        <td>485</td>
+                        <td>170</td>
+                        <td>952</td>
+                        <td>066</td>
+                    </tr>
+                    <tr>
+                        <td class="col-feb">20</td>
+                        <td>326</td>
+                        <td>867</td>
+                        <td>073</td>
+                        <td>714</td>
+                        <td class="col-kerala">245689</td>
+                        <td>569</td>
+                        <td>891</td>
+                        <td>999</td>
+                        <td>643</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <button class="btn-download" onclick="downloadTable()">Download PNG Chart</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        function applyAutoScale() {
+            const inner = document.getElementById('tableInner');
+            const outer = document.getElementById('tableOuter');
+            const table = document.getElementById('targetTable');
+
+            const availableWidth = window.innerWidth * 0.95;
+            const actualWidth = table.offsetWidth;
+            const scale = availableWidth / actualWidth;
+
+            if (scale < 1) {
+                document.documentElement.style.setProperty('--scale', scale);
+                outer.style.height = (table.offsetHeight * scale) + "px";
+            } else {
+                document.documentElement.style.setProperty('--scale', '1');
+                outer.style.height = "auto";
+            }
+        }
+
+        async function downloadTable() {
+            const node = document.getElementById('targetTable');
+            const dataUrl = await htmlToImage.toPng(node, { backgroundColor: '#fff' });
+            const link = document.createElement('a');
+            link.download = 'Kerala-Spot-Chart.png';
+            link.href = dataUrl;
+            link.click();
+        }
+
+        window.addEventListener('resize', applyAutoScale);
+        window.addEventListener('load', applyAutoScale);
+    </script>
+</body>
+
+</html>
