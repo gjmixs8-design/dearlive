@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DEAR - Result Chart</title>
   <style>
     :root {
@@ -20,10 +20,11 @@
       background: #f4f7f9;
       margin: 0;
       padding: 0;
-      overflow-x: hidden;
+      /* UPDATED: Allows body to scroll both ways when zoomed */
+      overflow-x: auto;
     }
 
-    /* --- Sidebar (Maroon Style) --- */
+    /* --- Sidebar --- */
     .sidebar {
       position: fixed;
       left: calc(-1 * var(--sidebar-width));
@@ -84,6 +85,7 @@
       font-size: 1.5rem;
       text-transform: uppercase;
       font-weight: 800;
+      text-align: center;
     }
 
     .toolbar {
@@ -112,16 +114,20 @@
 
     /* --- Scaling System --- */
     .table-outer {
-      width: 100vw;
+      width: 100%;
       display: flex;
       justify-content: center;
-      overflow: hidden;
+      /* UPDATED: Changed to auto and enabled momentum scrolling for mobile */
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .table-inner {
       transform: scale(var(--scale));
       transform-origin: top center;
       display: inline-block;
+      /* Smooth transition when the initial auto-scale triggers */
+      transition: transform 0.2s ease;
     }
 
     #captureArea {
@@ -138,7 +144,6 @@
     /* --- Table Styling --- */
     .banner {
       background: #ffdd43;
-      /* Green Banner */
       color: rgb(233, 27, 27);
       font-size: 24px;
       padding: 15px;
@@ -154,7 +159,6 @@
 
     .time-header {
       background: #dabc59;
-      /* Green Time Slot */
       color: rgb(231, 11, 11);
       font-size: 16px;
     }
@@ -180,7 +184,6 @@
       position: relative;
     }
 
-    /* The Green Corner from your code */
     .data-cell::after {
       content: '';
       position: absolute;
@@ -215,7 +218,7 @@
 
   <nav class="sidebar" id="sidebar">
     <div style="text-align: right; padding: 10px;">
-      <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 24px;">×</span>
+      <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 24px; color: white;">×</span>
     </div>
     <a href="index.html">Home</a>
     <a href="mcchart.html">Machine Chart</a>
@@ -290,7 +293,6 @@
       document.getElementById('sidebar').classList.toggle('active');
     }
 
-    // Initialize Month Select
     const mSel = document.getElementById('monthSelect');
     monthNames.forEach((m, i) => {
       let opt = new Option(m, i + 1);
@@ -305,10 +307,13 @@
 
       const availableWidth = window.innerWidth - 20;
       const actualWidth = captureArea.offsetWidth;
+
+      // Keep the initial "auto-fit" scale calculation
       let scale = Math.min(1, availableWidth / actualWidth);
 
       document.documentElement.style.setProperty('--scale', scale);
-      outer.style.height = (captureArea.offsetHeight * scale) + "px";
+      // Ensures container expands for the scaled height so the download button is accessible
+      outer.style.height = (captureArea.offsetHeight * scale) + 20 + "px";
     }
 
     function renderChart() {
@@ -322,17 +327,13 @@
 
       for (let d = 1; d <= days; d++) {
         const dateStr = `${d.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year.substring(2)}`;
-
         let rowHtml = `<tr><td class="date-col">${dateStr}</td>`;
-
         let rowData = [];
         for (let i = 0; i < 9; i++) {
-          // Generate Dummy 5-digit result
           const val = Math.floor(10000 + Math.random() * 90000).toString();
           rowData.push(val);
         }
 
-        // Search filtering logic
         if (searchTerm && !rowData.some(r => r.includes(searchTerm)) && !dateStr.includes(searchTerm)) continue;
 
         rowData.forEach(val => {
@@ -343,7 +344,7 @@
         body.innerHTML += rowHtml;
       }
 
-      setTimeout(applyAutoScale, 50);
+      setTimeout(applyAutoScale, 100);
     }
 
     async function exportToPNG() {
@@ -352,7 +353,7 @@
         const dataUrl = await htmlToImage.toPng(node, {
           backgroundColor: '#fff',
           pixelRatio: 2,
-          style: { transform: 'scale(1)' }
+          style: { transform: 'scale(1)' } // Ensure high quality regardless of browser zoom
         });
         const link = document.createElement('a');
         link.download = `Result-Chart-${monthNames[mSel.value - 1]}.png`;
@@ -362,7 +363,7 @@
     }
 
     window.addEventListener('resize', applyAutoScale);
-    renderChart(); // Initial Load
+    renderChart();
   </script>
 </body>
 

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEAR RESULT AND MC CHART</title>
     <style>
         :root {
@@ -19,7 +19,8 @@
             background: #f4f7f9;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            /* UPDATED: Changed to auto to allow horizontal movement when zoomed */
+            overflow-x: auto;
         }
 
         /* --- Sidebar --- */
@@ -83,6 +84,7 @@
             font-size: 1.5rem;
             text-transform: uppercase;
             font-weight: 800;
+            text-align: center;
         }
 
         .scaler-container {
@@ -90,7 +92,9 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            overflow: hidden;
+            /* UPDATED: auto allows the user to swipe left/right when they pinch zoom */
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .table-wrapper {
@@ -128,13 +132,10 @@
             padding: 10px 4px;
         }
 
-        /* Large Time Label */
         .time-label {
             display: block;
             font-size: 18px;
-            /* Bigger size for time */
             color: #0000ff;
-            /* Blue color like the image */
             margin-bottom: 2px;
             font-weight: 900;
         }
@@ -155,12 +156,10 @@
             font-size: 18px;
         }
 
-        /* Result (Bottom 3 digits) */
         .res-sub {
             display: block;
             font-size: 16px;
             color: #d00000;
-            /* Red color for result */
             border-top: 1px solid #ccc;
             margin-top: 4px;
             padding-top: 2px;
@@ -208,13 +207,13 @@
 
     <nav class="sidebar" id="sidebar">
         <a href="#" onclick="toggleSidebar()" style="background: rgba(0,0,0,0.2);">Close ×</a>
-        <a href="home.html" class="nav-link pink"><i class="fas fa-home"></i> Home</a>
-                <a href="index.html" class="nav-link green"><i class="fas fa-star"></i> Dear</a>
-                <a href="mcchart.html" class="nav-link blue"><i class="fas fa-table"></i> MC Chart</a>
-                <a href="mc.html" class="nav-link orange"><i class="fas fa-bolt"></i> MC</a>
-                <a href="result chart.html" class="nav-link blue"><i class="fas fa-chart-bar"></i> Result Chart</a>
-                <a href="results.html" class="nav-link orange"><i class="fas fa-trophy"></i> Result</a>
-                <a href="mc and result.html" class="nav-link orange"><i class="fas fa-link"></i> MC & Result</a>
+        <a href="home.html">Home</a>
+        <a href="index.html">Dear</a>
+        <a href="mcchart.html">MC Chart</a>
+        <a href="mc.html">MC</a>
+        <a href="result chart.html">Result Chart</a>
+        <a href="results.html">Result</a>
+        <a href="mc and result.html">MC & Result</a>
     </nav>
 
     <div class="main-content">
@@ -237,8 +236,7 @@
                             <tr>
                                 <th colspan="11" id="tableTitle">DEAR RESULT AND MC CHART</th>
                             </tr>
-                            <tr class="col-head" id="headerRow">
-                            </tr>
+                            <tr class="col-head" id="headerRow"></tr>
                         </thead>
                         <tbody id="chartBody"></tbody>
                     </table>
@@ -269,12 +267,16 @@
             const wrapper = document.getElementById('scaler');
             const captureArea = document.getElementById('captureArea');
             const outerContainer = document.getElementById('outerContainer');
-            const availableWidth = window.innerWidth - 20;
+            const availableWidth = window.innerWidth - 10;
             const actualTableWidth = captureArea.offsetWidth;
+
+            // This still fits the table to screen width by default
             let scale = availableWidth / actualTableWidth;
             if (scale > 1) scale = 1;
+
             wrapper.style.transform = `scale(${scale})`;
-            outerContainer.style.height = (captureArea.offsetHeight * scale) + "px";
+            // Dynamically adjust container height so footer buttons don't overlap
+            outerContainer.style.height = (captureArea.offsetHeight * scale) + 20 + "px";
         }
 
         function renderChart() {
@@ -286,7 +288,6 @@
 
             document.getElementById('tableTitle').innerText = `DEAR RESULT AND MC CHART ${monthNames[month - 1]} ${year}`;
 
-            // Build Header
             let headHtml = `<td>DATE</td>`;
             times.forEach(t => {
                 headHtml += `<td><span class="time-label">${t}</span>MC<br>RESULT</td>`;
@@ -294,19 +295,18 @@
             headHtml += `<td>DATE</td>`;
             head.innerHTML = headHtml;
 
-            // Build Body
             body.innerHTML = "";
             for (let d = 1; d <= days; d++) {
                 let row = `<tr><td class="day-col">${d}</td>`;
                 for (let i = 0; i < times.length; i++) {
-                    // Top: 5 Digits (MC), Bottom: 3 Digits (Result)
-                    row += `<td>88888<span class="res-sub">123</span></td>`;
+                    const randomMC = Math.floor(10000 + Math.random() * 90000);
+                    const randomRes = Math.floor(100 + Math.random() * 900);
+                    row += `<td>${randomMC}<span class="res-sub">${randomRes}</span></td>`;
                 }
                 row += `<td class="day-col">${d}</td></tr>`;
                 body.innerHTML += row;
             }
-
-            setTimeout(autoScale, 50);
+            setTimeout(autoScale, 100);
         }
 
         async function exportToPNG() {
@@ -314,13 +314,17 @@
             const btn = document.querySelector('.btn-download');
             btn.innerText = "Creating Image...";
             try {
-                const dataUrl = await htmlToImage.toPng(node, { backgroundColor: '#fff', pixelRatio: 3 });
+                // Ensure image is captured at full scale (1) regardless of mobile zoom
+                const dataUrl = await htmlToImage.toPng(node, {
+                    backgroundColor: '#fff',
+                    pixelRatio: 2
+                });
                 const link = document.createElement('a');
                 link.download = `Dear-MC-Result-${monthNames[mSel.value - 1]}.png`;
                 link.href = dataUrl;
                 link.click();
             } catch (e) { alert("Download failed."); }
-            finally { btn.innerText = "Download PNG Chart"; }
+            finally { btn.innerText = "Download Chart"; }
         }
 
         window.addEventListener('resize', autoScale);

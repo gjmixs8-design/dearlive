@@ -32,6 +32,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            /* UPDATED: Allows horizontal scrolling when zoomed in */
+            overflow-x: auto;
+            touch-action: manipulation;
+            /* Optimizes for touch without blocking zoom */
         }
 
         .main-wrapper {
@@ -61,8 +65,10 @@
             width: 100%;
             background: #fff;
             border: 3px solid #222;
-            overflow: hidden;
+            /* UPDATED: Removed overflow:hidden to prevent clipping during zoom */
+            overflow: visible;
             border-radius: 8px;
+            margin-bottom: 20px;
         }
 
         #capture-area {
@@ -159,7 +165,7 @@
             color: #fff;
             border: 1px solid #2e7d32;
             border-radius: 6px;
-            padding: 6px 4px;
+            padding: 8px 4px;
             font-size: 11px;
             font-weight: bold;
             cursor: pointer;
@@ -182,6 +188,7 @@
             gap: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            border-radius: 0 0 5px 5px;
         }
 
         .nav-footer {
@@ -254,7 +261,7 @@
                 </div>
 
                 <div class="banner"><span>Check</span> DEAR Result</div>
-                <div class="grid">
+                <div class="grid" id="result-grid-1">
                     <div class="cell">
                         <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
@@ -315,7 +322,7 @@
                 </div>
 
                 <div class="banner">Dear Lottery Machine Number</div>
-                <div class="grid">
+                <div class="grid" id="result-grid-2">
                     <div class="cell">
                         <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
@@ -334,42 +341,6 @@
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">10AM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">11AM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">12PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">34567</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">5PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">7PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">9PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -381,7 +352,6 @@
                 <a href="home.html" class="nav-link pink"><i class="fas fa-home"></i> Home</a>
                 <a href="index.html" class="nav-link green"><i class="fas fa-star"></i> Dear</a>
                 <a href="mcchart.html" class="nav-link blue"><i class="fas fa-table"></i> MC Chart</a>
-                 <a href="test.html" class="nav-link blue"><i class="fas fa-table"></i> MC Chart</a>
                 <a href="mc.html" class="nav-link orange"><i class="fas fa-bolt"></i> MC</a>
                 <a href="result chart.html" class="nav-link blue"><i class="fas fa-chart-bar"></i> Result Chart</a>
                 <a href="results.html" class="nav-link orange"><i class="fas fa-trophy"></i> Result</a>
@@ -403,43 +373,31 @@
             });
         });
 
-        // AUTOSCALING DOWNLOAD FIX
+        // Download Logic (with high-quality capture)
         async function downloadResults() {
             const captureArea = document.getElementById('capture-area');
             const buttons = document.querySelectorAll('.btn');
 
-            // 1. Hide buttons for a cleaner image
             buttons.forEach(b => b.style.visibility = 'hidden');
 
             try {
                 const canvas = await html2canvas(captureArea, {
-                    scale: 2, // 2x density for clear numbers
+                    scale: 2,
                     useCORS: true,
                     logging: false,
                     backgroundColor: "#ffffff",
-                    // FIX: Force a specific width for the internal render 
-                    // regardless of the actual phone screen size.
                     windowWidth: 800,
                     onclone: (clonedDoc) => {
                         const area = clonedDoc.getElementById('capture-area');
-                        // Ensure the cloned area fills the virtual width
                         area.style.width = '800px';
                         area.style.border = "3px solid #222";
-
-                        // Ensure all borders are rendered in the image
-                        const cells = area.querySelectorAll('.cell');
-                        cells.forEach(cell => {
+                        area.querySelectorAll('.cell').forEach(cell => {
                             cell.style.borderRight = "1px solid #000";
                             cell.style.borderBottom = "1px solid #000";
                         });
-
-                        // Scale text inside the clone so it looks consistent in the image
-                        area.querySelectorAll('.time').forEach(t => t.style.fontSize = '24px');
-                        area.querySelectorAll('.num').forEach(n => n.style.fontSize = '28px');
                     }
                 });
 
-                // 2. Download the Image
                 const link = document.createElement('a');
                 const today = new Date().toISOString().slice(0, 10);
                 link.download = `Dear-Results-${today}.png`;
@@ -450,7 +408,6 @@
                 console.error("Capture Error:", err);
                 alert("Failed to generate image.");
             } finally {
-                // 3. Restore visibility of buttons
                 buttons.forEach(b => b.style.visibility = 'visible');
             }
         }

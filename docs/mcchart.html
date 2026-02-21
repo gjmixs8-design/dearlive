@@ -3,15 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEAR MACHINE CHART</title>
     <style>
         :root {
             --border: #333333;
             --header-bg: #e9d87a;
-            /* Salmon color from first code */
             --sidebar-bg: #db2626;
-            /* Maroon from first code */
             --text-dark: #fa0f0f;
             --sidebar-width: 260px;
             --scale: 1;
@@ -22,10 +20,11 @@
             background: #f4f7f9;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            /* UPDATED: Changed to auto so zoomed content can be scrolled */
+            overflow-x: auto;
         }
 
-        /* --- Sidebar (Maroon Style) --- */
+        /* --- Sidebar --- */
         .sidebar {
             position: fixed;
             left: calc(-1 * var(--sidebar-width));
@@ -86,14 +85,17 @@
             font-size: 1.5rem;
             text-transform: uppercase;
             font-weight: 800;
+            text-align: center;
         }
 
         /* --- Scaling System --- */
         .table-outer {
-            width: 100vw;
+            width: 100%;
             display: flex;
             justify-content: center;
-            overflow: hidden;
+            /* UPDATED: Changed to auto and added touch-scrolling for better mobile feel */
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .table-inner {
@@ -114,7 +116,6 @@
             min-width: 1000px;
         }
 
-        /* --- Table Styling --- */
         th {
             background: var(--header-bg);
             color: var(--text-dark);
@@ -136,7 +137,6 @@
             display: block;
             font-size: 18px;
             color: #0000FF;
-            /* Blue from first code */
             font-weight: 900;
         }
 
@@ -156,7 +156,6 @@
             font-size: 18px;
         }
 
-        /* --- Buttons & Toolbar --- */
         .toolbar {
             margin-bottom: 20px;
             display: flex;
@@ -232,11 +231,9 @@
                             <tr>
                                 <th colspan="11" id="tableHeaderTitle">DEAR MACHINE NUMBER CHART</th>
                             </tr>
-                            <tr id="headerRow">
-                            </tr>
+                            <tr id="headerRow"></tr>
                         </thead>
-                        <tbody id="chartBody">
-                        </tbody>
+                        <tbody id="chartBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -254,7 +251,6 @@
             document.getElementById('sidebar').classList.toggle('active');
         }
 
-        // Initialize Month Dropdown
         const mSel = document.getElementById('monthSelect');
         monthNames.forEach((m, i) => {
             let opt = new Option(m, i + 1);
@@ -269,10 +265,13 @@
 
             const availableWidth = window.innerWidth - 20;
             const actualWidth = captureArea.offsetWidth;
+
+            // Default scale fits to screen, but browser can now override via pinch
             let scale = Math.min(1, availableWidth / actualWidth);
 
             document.documentElement.style.setProperty('--scale', scale);
-            outer.style.height = (captureArea.offsetHeight * scale) + "px";
+            // Ensure container height follows the scale so buttons don't overlap
+            outer.style.height = (captureArea.offsetHeight * scale) + 20 + "px";
         }
 
         function renderChart() {
@@ -284,7 +283,6 @@
 
             document.getElementById('tableHeaderTitle').innerText = `DEAR MACHINE NUMBER CHART ${monthNames[month - 1]} ${year}`;
 
-            // Build Header Row
             let headHtml = `<td class="time-header">DATE</td>`;
             times.forEach(t => {
                 headHtml += `<td class="time-header"><span class="time-label">${t}</span>MC</td>`;
@@ -292,23 +290,19 @@
             headHtml += `<td class="time-header">DATE</td>`;
             head.innerHTML = headHtml;
 
-            // Build Table Body with Dummy Data
             body.innerHTML = "";
             for (let d = 1; d <= days; d++) {
                 const dateStr = `${d.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
                 let row = `<tr><td class="date-col">${dateStr}</td>`;
-
                 for (let i = 0; i < times.length; i++) {
-                    // Generate random 5-digit number for dummy data
                     const dummyMC = Math.floor(10000 + Math.random() * 90000);
                     row += `<td>${dummyMC}</td>`;
                 }
-
                 row += `<td class="date-col">${dateStr}</td></tr>`;
                 body.innerHTML += row;
             }
 
-            setTimeout(applyAutoScale, 50);
+            setTimeout(applyAutoScale, 100);
         }
 
         async function exportToPNG() {
@@ -329,8 +323,6 @@
         }
 
         window.addEventListener('resize', applyAutoScale);
-
-        // Initial Run
         renderChart();
     </script>
 </body>
