@@ -16,6 +16,7 @@
             --green: #2e7d32;
             --gold: #f5deb3;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --deep-blue: #0033cc;
         }
 
         * {
@@ -61,6 +62,12 @@
             background: #fff;
             border: 3px solid #222;
             overflow: hidden;
+            border-radius: 8px;
+        }
+
+        #capture-area {
+            background: white;
+            width: 100%;
         }
 
         .banner {
@@ -108,9 +115,13 @@
         }
 
         .time {
-            font-size: clamp(1rem, 4vw, 1.4rem);
+            font-family: "Arial Black", "Arial", sans-serif;
+            font-size: clamp(1.1rem, 4vw, 2rem);
             font-weight: 900;
-            color: var(--blue);
+            color: var(--deep-blue);
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            line-height: 1.2;
         }
 
         .prize {
@@ -122,7 +133,7 @@
         .c-body {
             padding: 15px 5px;
             flex-grow: 1;
-            min-height: 120px;
+            min-height: 110px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -131,14 +142,14 @@
         }
 
         .num {
-            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            font-size: clamp(1.1rem, 4vw, 1.8rem);
             font-weight: 800;
             color: #000;
             min-height: 1.8rem;
         }
 
         .sub {
-            font-size: 14px;
+            font-size: 13px;
             color: blue;
             font-weight: bold;
         }
@@ -148,23 +159,20 @@
             color: #fff;
             border: 1px solid #2e7d32;
             border-radius: 6px;
-            padding: 8px 5px;
-            font-size: 12px;
+            padding: 6px 4px;
+            font-size: 11px;
             font-weight: bold;
             cursor: pointer;
-            width: 85%;
-            max-width: 120px;
+            width: 90%;
+            max-width: 100px;
             text-transform: uppercase;
         }
 
-        /* Fixed Download Button Style (Bottom) */
         .download-trigger {
             background: #222;
             color: white;
             border: none;
             padding: 15px 20px;
-            border-radius: 0;
-            /* Matches table width */
             font-weight: bold;
             cursor: pointer;
             width: 100%;
@@ -172,19 +180,14 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            border-top: 2px solid #000;
             text-transform: uppercase;
             letter-spacing: 1px;
-        }
-
-        .download-trigger:active {
-            background: #444;
         }
 
         .nav-footer {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 8px;
             padding: 15px;
             background: #fdfbfb;
             border-top: 1px solid #ddd;
@@ -196,12 +199,12 @@
             padding: 12px 5px;
             border-radius: 8px;
             font-weight: 800;
-            font-size: 14px;
+            font-size: 13px;
             text-align: center;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .pink {
@@ -226,12 +229,16 @@
 
         @media (min-width: 600px) {
             .btn {
-                font-size: 14px;
+                font-size: 13px;
                 padding: 10px;
             }
 
             .banner {
                 font-size: 1.5rem;
+            }
+
+            .nav-link {
+                font-size: 14px;
             }
         }
     </style>
@@ -308,7 +315,7 @@
                 </div>
 
                 <div class="banner">Dear Lottery Machine Number</div>
-                <div class="grid">
+                <div class="grid" id="machine-grid">
                     <div class="cell">
                         <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
@@ -330,21 +337,18 @@
                     <div class="cell">
                         <div class="c-head"><span class="time">10AM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
-                            <div class="sub">---</div>
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">11AM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
-                            <div class="sub">&nbsp;</div>
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">12PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
-                            <div class="sub">80 A</div>
                             <div class="num">34567</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
@@ -368,18 +372,19 @@
                     </div>
                 </div>
             </div>
+
             <button class="download-trigger" id="download-btn" onclick="downloadResults()">
                 <i class="fas fa-download"></i> DOWNLOAD RESULTS IMAGE
             </button>
 
             <div class="nav-footer">
-                <a href="home.html" class="nav-link pink"><i class="fas fa-home"></i> Home</a>
-                <a href="index.html" class="nav-link green"><i class="fas fa-star"></i> Dear</a>
-                <a href="mcchart.html" class="nav-link blue"><i class="fas fa-table"></i> MC Chart</a>
-                <a href="mc.html" class="nav-link orange"><i class="fas fa-bolt"></i> MC</a>
-                <a href="result chart.html" class="nav-link blue"><i class="fas fa-chart-bar"></i> Chart</a>
-                <a href="results.html" class="nav-link orange"><i class="fas fa-trophy"></i> Result</a>
-                <a href="mc and result.html" class="nav-link orange"><i class="fas fa-link"></i> MC & Result</a>
+                <a href="#" class="nav-link pink"><i class="fas fa-home"></i> Home</a>
+                <a href="#" class="nav-link green"><i class="fas fa-star"></i> Dear</a>
+                <a href="#" class="nav-link blue"><i class="fas fa-table"></i> MC Chart</a>
+                <a href="#" class="nav-link orange"><i class="fas fa-bolt"></i> MC</a>
+                <a href="#" class="nav-link blue"><i class="fas fa-chart-bar"></i> Chart</a>
+                <a href="#" class="nav-link orange"><i class="fas fa-trophy"></i> Result</a>
+                <a href="#" class="nav-link orange"><i class="fas fa-link"></i> MC & Result</a>
             </div>
         </div>
     </div>
@@ -397,29 +402,60 @@
             });
         });
 
-        // DOWNLOAD FUNCTION
+        // FIXED DOWNLOAD FUNCTION FOR ALL SCREEN SIZES
         async function downloadResults() {
             const captureArea = document.getElementById('capture-area');
             const buttons = document.querySelectorAll('.btn');
+            const originalWidth = captureArea.style.width;
 
-            // Hide "REFRESH" buttons so they don't appear in the saved image
+            // 1. Hide buttons for a clean image
             buttons.forEach(b => b.style.visibility = 'hidden');
 
             try {
+                // 2. AUTO-SCALING FIX: 
+                // We temporarily set a fixed width (800px) during capture so mobile 
+                // browsers don't "squish" the grid into a narrow column.
+                const isMobile = window.innerWidth < 800;
+                if (isMobile) {
+                    captureArea.style.width = '800px';
+                }
+
                 const canvas = await html2canvas(captureArea, {
-                    scale: 2,
+                    scale: 2, // High resolution (2x)
+                    useCORS: true,
+                    logging: false,
                     backgroundColor: "#ffffff",
-                    logging: false
+                    // Ensures the capture starts from the top of the element
+                    scrollY: -window.scrollY,
+                    windowWidth: 850, // Force a desktop-width viewport for the render
+                    onclone: (clonedDoc) => {
+                        const area = clonedDoc.getElementById('capture-area');
+                        area.style.width = '800px';
+                        area.style.border = "3px solid #222";
+
+                        // Force internal borders to be visible in capture
+                        const cells = area.querySelectorAll('.cell');
+                        cells.forEach(cell => {
+                            cell.style.borderRight = "1px solid #000";
+                            cell.style.borderBottom = "1px solid #000";
+                        });
+                    }
                 });
 
+                // 3. Create the download link
                 const link = document.createElement('a');
-                link.download = 'Dear-Results-' + new Date().toLocaleDateString() + '.png';
-                link.href = canvas.toDataURL('image/png');
+                const now = new Date();
+                const dateStr = now.toLocaleDateString().replace(/\//g, '-');
+                link.download = `Dear-Results-${dateStr}.png`;
+                link.href = canvas.toDataURL('image/png', 1.0);
                 link.click();
+
             } catch (err) {
-                console.error("Error generating image", err);
+                console.error("Capture failed:", err);
+                alert("Error saving image. Please try again.");
             } finally {
-                // Restore "REFRESH" buttons visibility
+                // 4. RESET: Restore buttons and original screen width
+                captureArea.style.width = originalWidth;
                 buttons.forEach(b => b.style.visibility = 'visible');
             }
         }
