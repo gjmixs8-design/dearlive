@@ -9,7 +9,6 @@
         :root {
             --border: #333333;
             --header-bg: #faef50;
-            --dear-bg: #f8d84b;
             --text-dark: #f11717;
             --sidebar-width: 260px;
         }
@@ -19,10 +18,8 @@
             background: #f4f7f9;
             margin: 0;
             padding: 0;
-            overflow-x: auto;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            overflow-x: hidden;
+            /* Prevent body shake during scale */
         }
 
         /* --- Sidebar --- */
@@ -78,7 +75,7 @@
             flex-direction: column;
             align-items: center;
             padding-top: 70px;
-            flex-grow: 1;
+            padding-bottom: 120px;
         }
 
         h1 {
@@ -90,18 +87,20 @@
             text-align: center;
         }
 
-        /* FIX: Center table on desktop & maintain space on mobile */
+        /* --- AUTO-ADJUSTING CONTAINER --- */
         .scaler-container {
             width: 100%;
             display: flex;
-            justify-content: center; /* Centers items horizontally */
-            align-items: flex-start;
-            overflow: visible; /* Let scale work naturally */
-            margin-bottom: 20px;
+            justify-content: center;
+            /* Center on Web */
+            overflow-x: auto;
+            /* Scrollable on Mobile */
+            -webkit-overflow-scrolling: touch;
         }
 
         .table-wrapper {
             transform-origin: top center;
+            /* Clean scaling from center */
             display: inline-block;
             transition: transform 0.1s ease;
         }
@@ -114,7 +113,8 @@
 
         table {
             border-collapse: collapse;
-            min-width: 1000px;
+            min-width: 1100px;
+            /* Forces wide data layout */
         }
 
         th {
@@ -126,7 +126,7 @@
         }
 
         .col-head td {
-            background: #ece363e5;
+            background: #ece363;
             color: var(--text-dark);
             font-weight: bold;
             font-size: 14px;
@@ -138,13 +138,12 @@
             display: block;
             font-size: 18px;
             color: #0000ff;
-            margin-bottom: 2px;
             font-weight: 900;
         }
 
         td {
             border: 1px solid var(--border);
-            padding: 8px 2px;
+            padding: 10px 5px;
             font-size: 20px;
             font-weight: 900;
             text-align: center;
@@ -153,54 +152,59 @@
 
         .day-col {
             background: var(--header-bg);
-            width: 50px;
+            width: 60px;
             color: var(--text-dark);
-            font-size: 18px;
         }
 
         .res-sub {
             display: block;
             font-size: 16px;
             color: #d00000;
-            border-top: 1px solid #ccc;
+            border-top: 1px solid #ddd;
             margin-top: 4px;
-            padding-top: 2px;
-            font-weight: 800;
         }
 
         .toolbar {
             margin: 15px;
             display: flex;
-            justify-content: center;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
+            justify-content: center;
         }
 
-        select, button {
-            padding: 10px;
-            border: 1px solid var(--border);
+        select,
+        button {
+            padding: 10px 15px;
+            border: 1px solid #ccc;
             border-radius: 5px;
             font-weight: bold;
-            cursor: pointer;
+        }
+
+        /* --- BOTTOM ACTION BAR --- */
+        .download-action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
         }
 
         .btn-download {
             background: var(--text-dark);
             color: white;
-            margin: 20px auto; /* Centers the button */
-            padding: 15px 30px;
-            width: 90%;
+            padding: 12px 30px;
+            width: 85%;
             max-width: 400px;
             border-radius: 30px;
             font-size: 16px;
             border: none;
-            display: block;
+            font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .btn-download:active {
-            transform: scale(0.98);
         }
     </style>
 </head>
@@ -214,14 +218,10 @@
     </div>
 
     <nav class="sidebar" id="sidebar">
-        <a href="#" onclick="toggleSidebar()" style="background: rgba(0,0,0,0.2);">Close ×</a>
-        <a href="home.html">Home</a>
-        <a href="index.html">Dear</a>
-        <a href="mcchart.html">MC Chart</a>
-        <a href="mc.html">MC</a>
-        <a href="result chart.html">Result Chart</a>
-        <a href="results.html">Result</a>
-        <a href="mc and result.html">MC & Result</a>
+        <a href="#" onclick="toggleSidebar()">Close ×</a>
+        <a href="#">Home</a>
+        <a href="#">Dear Chart</a>
+        <a href="#">MC Chart</a>
     </nav>
 
     <div class="main-content">
@@ -233,7 +233,7 @@
                 <option>2026</option>
                 <option>2025</option>
             </select>
-            <button onclick="renderChart()" style="background: #fff;">Apply Filter</button>
+            <button onclick="renderChart()" style="background: #eee;">Apply Filter</button>
         </div>
 
         <div class="scaler-container" id="outerContainer">
@@ -251,8 +251,10 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <button class="btn-download" onclick="exportToPNG()">Download Chart Image</button>
+    <div class="download-action-bar">
+        <button class="btn-download" id="dlBtn" onclick="exportToPNG()">Download PNG Chart</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
@@ -264,6 +266,7 @@
             document.getElementById('sidebar').classList.toggle('active');
         }
 
+        // Initialize Month Dropdown
         const mSel = document.getElementById('monthSelect');
         monthNames.forEach((m, i) => {
             let opt = new Option(m, i + 1);
@@ -271,28 +274,25 @@
             mSel.add(opt);
         });
 
-        // FIX: Improved scaling logic that doesn't break the layout flow
+        // THE AUTO-ADJUST LOGIC
         function autoScale() {
             const wrapper = document.getElementById('scaler');
             const captureArea = document.getElementById('captureArea');
             const outerContainer = document.getElementById('outerContainer');
-            
+
             const availableWidth = window.innerWidth - 20;
-            const actualTableWidth = 1006; // Based on min-width + borders
+            const actualTableWidth = captureArea.offsetWidth;
 
+            // Calculate Scale
             let scale = availableWidth / actualTableWidth;
-            
-            // On Desktop, don't scale up past 100%, just center it
-            if (scale > 1) {
-                scale = 1;
-            }
+            if (scale > 1) scale = 1; // Don't enlarge on desktop
 
+            // Apply Scale
             wrapper.style.transform = `scale(${scale})`;
-            
-            // FIX: Adjust container height precisely based on scaled height
-            // This prevents the download button from floating too far away
+
+            // Fix Height: Ensures the "Download" bar doesn't cover data or float too far
             const scaledHeight = captureArea.offsetHeight * scale;
-            outerContainer.style.height = scaledHeight + "px";
+            outerContainer.style.height = (scaledHeight + 20) + "px";
         }
 
         function renderChart() {
@@ -306,7 +306,7 @@
 
             let headHtml = `<td>DATE</td>`;
             times.forEach(t => {
-                headHtml += `<td><span class="time-label">${t}</span>MC<br>RESULT</td>`;
+                headHtml += `<td><span class="time-label">${t}</span>MC / RES</td>`;
             });
             headHtml += `<td>DATE</td>`;
             head.innerHTML = headHtml;
@@ -322,30 +322,29 @@
                 row += `<td class="day-col">${d}</td></tr>`;
                 body.innerHTML += row;
             }
-            // Wait for DOM to update then scale
-            setTimeout(autoScale, 50);
+
+            // Small delay to allow browser to calculate table width before scaling
+            setTimeout(autoScale, 100);
         }
 
         async function exportToPNG() {
             const node = document.getElementById('captureArea');
-            const btn = document.querySelector('.btn-download');
-            btn.innerText = "Processing Image...";
-            btn.disabled = true;
+            const btn = document.getElementById('dlBtn');
+            btn.innerText = "Processing...";
 
             try {
                 const dataUrl = await htmlToImage.toPng(node, {
                     backgroundColor: '#fff',
-                    pixelRatio: 2, // High quality
+                    pixelRatio: 2 // High Quality
                 });
                 const link = document.createElement('a');
-                link.download = `Dear-MC-Result-${monthNames[mSel.value - 1]}-${new Date().getFullYear()}.png`;
+                link.download = `Chart-${monthNames[mSel.value - 1]}.png`;
                 link.href = dataUrl;
                 link.click();
-            } catch (e) { 
-                alert("Download failed. Please try again."); 
-            } finally { 
-                btn.innerText = "Download Chart Image"; 
-                btn.disabled = false;
+            } catch (e) {
+                alert("Error generating image.");
+            } finally {
+                btn.innerText = "Download PNG Chart";
             }
         }
 
