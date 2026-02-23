@@ -40,14 +40,14 @@
     input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(1) opacity(.8);}
 
     button{
-      background:#00f0ff;color:#111;font-weight:700;border:none;border-radius:8px;
+      background:#ffe600;color:#111;font-weight:700;border:none;border-radius:8px;
       padding:10px 16px;cursor:pointer;transition:.2s;
     }
-    button:hover{background:#ff0080;color:#fff;}
+    button:hover{background:#ffae00;color:#fff;}
 
     .label-bar{
       display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;
-      padding:10px 0;font-size:16px;font-weight:700;color:#00f0ff;
+      padding:10px 0;font-size:16px;font-weight:700;color:#ffbb00af;
       border-bottom:2px solid rgba(255,255,255,.14);
       margin-top:10px;
     }
@@ -65,7 +65,7 @@
 
     .row::before{
       content:'';position:absolute;inset:0;border-radius:12px;pointer-events:none;
-      padding:2px;background-image:linear-gradient(45deg,#00f0ff,#ff0080,#00f0ff);
+      padding:2px;background-image:linear-gradient(45deg,#ffee00,#ff8800,#fab83c);
       background-size:600% 600%;animation:borderRoll 10s linear infinite;
       -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
       mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
@@ -86,7 +86,7 @@
     }
 
     .dirty{
-      outline:2px solid #00f0ff;
+      outline:2px solid #ffe600;
       box-shadow:0 0 0 3px rgba(0,240,255,.25);
     }
 
