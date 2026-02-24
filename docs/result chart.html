@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DEAR - Result Chart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Protest+Guerrilla&display=swap" rel="stylesheet">
   <style>
     :root {
       --border: #333333;
@@ -12,7 +15,7 @@
       --sidebar-color: #ffc374;
       /* Your preferred color */
       --sidebar-shadow: rgb(245, 199, 113);
-      --text-dark: #e72828;
+      --text-dark: #fa5a2a ;
       --sidebar-width: 260px;
       --scale: 1;
     }
@@ -103,10 +106,10 @@
     h1 {
       color: var(--text-dark);
       margin-bottom: 10px;
-      font-size: 1.5rem;
+      font-size: 2.5rem;
       text-transform: uppercase;
       font-weight: 800;
-      text-align: center;
+      text-align: center;font-family: "Protest Guerrilla", sans-serif;
     }
 
     .toolbar {
@@ -229,6 +232,11 @@
     .btn-download:hover {
       background: #c71212;
     }
+    .gradient-text {
+  background: linear-gradient(90deg, #ee7342, #1e77eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
   </style>
 </head>
 
@@ -252,7 +260,7 @@
   </nav>
 
   <div class="main-content">
-    <h1>DEAR - RESULT CHART</h1>
+    <h1 class="gradient-text">DEAR - RESULT CHART</h1>
 
     <div class="toolbar">
       <input type="text" id="tableSearch" placeholder="Search Number...">
