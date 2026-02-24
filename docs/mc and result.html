@@ -8,22 +8,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Protest+Guerrilla&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
     <style>
         :root {
             --border: #333333;
             --header-bg: #faef50;
             --text-dark: #f11717;
             --sidebar-width: 260px;
-
-
-            /* --- COLOR ADJUSTMENTS FOR SPECIFIC COLUMNS --- */
-            /* You can change these hex codes to adjust the column shades */
             --color-01pm: #ffd2c0;
-            /* Light Yellow shade */
             --color-06pm: #b7f7c7a9;
-            /* Light Blue shade */
             --color-08pm: #faf6bf;
-            /* Light Green shade */
+            --scale: 1;
         }
 
         body {
@@ -31,7 +26,7 @@
             background: #f4f7f9;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            text-align: center;
         }
 
         /* --- Sidebar --- */
@@ -39,11 +34,8 @@
             position: fixed;
             left: 15px;
             top: 15px;
-            height: auto;
-            min-height: 350px;
             width: var(--sidebar-width);
             background: #ffc374;
-            color: white;
             z-index: 3000;
             padding-top: 50px;
             border-radius: 15px;
@@ -53,6 +45,7 @@
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
+            text-align: left;
         }
 
         .sidebar.active {
@@ -70,7 +63,11 @@
             font-weight: bold;
         }
 
-        /* --- Menu Icon --- */
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            padding-left: 35px;
+        }
+
         .menu-icon {
             position: fixed;
             top: 15px;
@@ -85,45 +82,68 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
+        /* --- Layout --- */
         .main-content {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             padding-top: 70px;
             padding-bottom: 120px;
+            width: 100%;
         }
 
-        h1 {
-            color: var(--text-dark);
-            margin-bottom: 10px;
-            font-size: 2.3rem;
-            text-transform: uppercase;
-            font-weight: 800;
-            text-align: center;
+        h1.gradient-text {
+            background: linear-gradient(90deg, #ff0000, #0000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-family: "Protest Guerrilla", sans-serif;
+            font-size: 2.3rem;
+            margin-bottom: 20px;
         }
 
+        .toolbar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        select,
+        .btn-apply {
+            padding: 10px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .btn-apply {
+            background: #eee;
+            cursor: pointer;
+        }
+
+        /* --- Table Logic --- */
         .scaler-container {
             width: 100%;
             display: flex;
             justify-content: center;
-            overflow-x: auto;
+            overflow: hidden;
         }
 
         .table-wrapper {
+            transform: scale(var(--scale));
             transform-origin: top center;
-            display: inline-block;
+            padding: 10px;
+            /* Crucial for border capture */
         }
 
         #captureArea {
             background: white;
-            border: 3px solid var(--border);
+            border: 4px solid var(--border);
+            /* Thick border for high-quality PNG */
             display: inline-block;
+            padding: 2px;
         }
 
         table {
@@ -171,7 +191,7 @@
             color: var(--text-dark);
         }
 
-        /* --- Individual Column Shading --- */
+        /* --- Column Shading --- */
         .col-01pm {
             background-color: var(--color-01pm);
         }
@@ -192,14 +212,7 @@
             margin-top: 4px;
         }
 
-        .toolbar {
-            margin: 15px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
+        /* --- Download Bar --- */
         .download-action-bar {
             position: fixed;
             bottom: 0;
@@ -220,32 +233,27 @@
             width: 85%;
             max-width: 400px;
             border-radius: 30px;
-            font-size: 16px;
+            font-size: 18px;
             border: none;
             font-weight: bold;
             cursor: pointer;
-        }
-
-        .gradient-text {
-            background: linear-gradient(90deg, #ff0000, #0000ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            box-shadow: 0 4px 10px rgba(241, 23, 23, 0.3);
         }
     </style>
 </head>
 
 <body>
 
-    <div class="menu-icon" onclick="toggleSidebar()">
-        <span>📜</span>
-    </div>
+    <div class="menu-icon" onclick="toggleSidebar()"><span>📜</span></div>
 
     <nav class="sidebar" id="sidebar">
-        <a href="#" onclick="toggleSidebar()" style="background: rgba(0,0,0,0.2); border-radius: 15px 15px 0 0;">Close
-            ×</a>
+        <div style="text-align: right; padding: 10px;">
+            <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 28px; color: #333;">&times;</span>
+        </div>
         <a href="index.html">Home</a>
         <a href="mcchart.html">Machine Chart</a>
-        <a href="result chart.html">Results Chart</a>
+        <a href="result_chart.html">Results Chart</a>
+        <a href="mc_and_result.html">MC and Result</a>
         <a href="mc.html">MC</a>
         <a href="results.html">Result</a>
     </nav>
@@ -256,10 +264,10 @@
         <div class="toolbar">
             <select id="monthSelect"></select>
             <select id="yearSelect">
-                <option>2026</option>
-                <option>2025</option>
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
             </select>
-            <button onclick="renderChart()" style="background: #eee; cursor: pointer;">Apply Filter</button>
+            <button class="btn-apply" onclick="renderChart()">Apply Filter</button>
         </div>
 
         <div class="scaler-container" id="outerContainer">
@@ -283,7 +291,6 @@
         <button class="btn-download" id="dlBtn" onclick="exportToPNG()">Download PNG Chart</button>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
     <script>
         const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
         const times = ["10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "05:00 PM", "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM"];
@@ -304,34 +311,31 @@
             const captureArea = document.getElementById('captureArea');
             const outerContainer = document.getElementById('outerContainer');
 
-            const availableWidth = window.innerWidth - 20;
-            const actualTableWidth = captureArea.offsetWidth;
+            const availableWidth = window.innerWidth * 0.98;
+            const actualTableWidth = captureArea.offsetWidth + 20;
 
-            let scale = availableWidth / actualTableWidth;
-            if (scale > 1) scale = 1;
-
-            wrapper.style.transform = `scale(${scale})`;
+            let scale = Math.min(1, availableWidth / actualTableWidth);
+            document.documentElement.style.setProperty('--scale', scale);
 
             const scaledHeight = captureArea.offsetHeight * scale;
-            outerContainer.style.height = (scaledHeight + 20) + "px";
+            outerContainer.style.height = (scaledHeight + 40) + "px";
         }
 
         function renderChart() {
-            const month = mSel.value;
+            const month = parseInt(mSel.value);
             const year = document.getElementById('yearSelect').value;
             const body = document.getElementById('chartBody');
             const head = document.getElementById('headerRow');
             const banner = document.getElementById('tableTitle');
             const days = new Date(year, month, 0).getDate();
 
-            // Dynamic Banner Update
             banner.innerText = `DEAR RESULT AND MC CHART - ${monthNames[month - 1]} ${year}`;
 
-            let headHtml = `<td>DATE</td>`;
+            let headHtml = `<td class="day-col">DATE</td>`;
             times.forEach(t => {
                 headHtml += `<td><span class="time-label">${t}</span>MC / RES</td>`;
             });
-            headHtml += `<td>DATE</td>`;
+            headHtml += `<td class="day-col">DATE</td>`;
             head.innerHTML = headHtml;
 
             body.innerHTML = "";
@@ -341,7 +345,6 @@
                     const randomMC = Math.floor(10000 + Math.random() * 90000);
                     const randomRes = Math.floor(100 + Math.random() * 900);
 
-                    // Logic to apply specific shading for 1PM (index 3), 6PM (index 5), 8PM (index 7)
                     let extraClass = "";
                     if (i === 3) extraClass = "col-01pm";
                     if (i === 5) extraClass = "col-06pm";
@@ -359,16 +362,19 @@
         async function exportToPNG() {
             const node = document.getElementById('captureArea');
             const btn = document.getElementById('dlBtn');
-            btn.innerText = "Processing...";
+            btn.innerText = "Capturing Image...";
 
             try {
                 const dataUrl = await htmlToImage.toPng(node, {
                     backgroundColor: '#fff',
                     pixelRatio: 2,
-                    style: { transform: 'scale(1)' } // Export at full size
+                    style: {
+                        transform: 'scale(1)',
+                        transformOrigin: 'top left'
+                    }
                 });
                 const link = document.createElement('a');
-                link.download = `Result-MC-Chart-${monthNames[mSel.value - 1]}.png`;
+                link.download = `Result-MC-Chart-${monthNames[mSel.value - 1]}-${yearSelect.value}.png`;
                 link.href = dataUrl;
                 link.click();
             } catch (e) {

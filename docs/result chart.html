@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Protest+Guerrilla&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
   <style>
     :root {
       --border: #333333;
@@ -17,15 +18,9 @@
       --text-dark: #fa5a2a;
       --sidebar-width: 260px;
       --scale: 1;
-
-      /* --- COLOR ADJUSTMENTS FOR SPECIFIC COLUMNS --- */
-      /* You can change these hex codes to adjust the column shades */
       --color-01pm: #ffd2c0;
-      /* Light Yellow shade */
       --color-06pm: #b7f7c7a9;
-      /* Light Blue shade */
       --color-08pm: #faf6bf;
-      /* Light Green shade */
     }
 
     body {
@@ -33,18 +28,16 @@
       background: #f4f7f9;
       margin: 0;
       padding: 0;
-      overflow-x: auto;
+      text-align: center;
     }
 
+    /* --- Sidebar & Menu --- */
     .sidebar {
       position: fixed;
       left: 15px;
       top: 15px;
-      height: auto;
-      min-height: 350px;
       width: var(--sidebar-width);
       background: var(--sidebar-color);
-      color: #333;
       z-index: 3000;
       padding-top: 50px;
       border-radius: 15px;
@@ -54,6 +47,7 @@
       opacity: 0;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: none;
+      text-align: left;
     }
 
     .sidebar.active {
@@ -69,7 +63,6 @@
       text-decoration: none;
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       font-weight: bold;
-      transition: 0.3s;
     }
 
     .sidebar a:hover {
@@ -91,34 +84,30 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
+    /* --- Main Content --- */
     .main-content {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       padding-top: 70px;
+      width: 100%;
     }
 
-    h1 {
-      color: var(--text-dark);
-      margin-bottom: 10px;
-      font-size: 2.5rem;
-      text-transform: uppercase;
-      font-weight: 800;
-      text-align: center;
+    h1.gradient-text {
+      background: linear-gradient(90deg, #ee7342, #1e77eb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       font-family: "Protest Guerrilla", sans-serif;
+      font-size: 2.5rem;
+      margin: 10px 0;
     }
 
     .toolbar {
       margin-bottom: 20px;
       display: flex;
       gap: 8px;
-      flex-wrap: wrap;
       justify-content: center;
+      flex-wrap: wrap;
     }
 
     input,
@@ -137,23 +126,27 @@
       border: none;
     }
 
+    /* --- Table Styling --- */
     .table-outer {
       width: 100%;
       display: flex;
       justify-content: center;
-      overflow-x: auto;
+      overflow: hidden;
     }
 
     .table-inner {
       transform: scale(var(--scale));
       transform-origin: top center;
-      display: inline-block;
+      padding: 10px;
+      /* Space to prevent border clipping in image */
     }
 
     #captureArea {
       background: white;
-      border: 3px solid var(--border);
+      border: 4px solid var(--border);
+      /* Thick border for PNG */
       display: inline-block;
+      padding: 2px;
     }
 
     table {
@@ -166,12 +159,12 @@
       color: rgb(233, 27, 27);
       font-size: 24px;
       padding: 15px;
-      text-align: center;
-      border: 1px solid var(--border);
+      border-bottom: 2px solid var(--border);
       text-transform: uppercase;
+      font-weight: 900;
     }
 
-    .col-head-main {
+    .col-head-main td {
       background: white;
       color: #ff1212;
       font-weight: 900;
@@ -187,7 +180,6 @@
       background: var(--header-salmon);
       color: var(--text-dark);
       width: 60px;
-      /* Narrower for single numbers */
       font-size: 18px;
     }
 
@@ -205,7 +197,16 @@
       position: relative;
     }
 
-    /* Column Specific Highlighting */
+    /* Corner Indicator */
+    .data-cell::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-top: 8px solid green;
+      border-right: 8px solid transparent;
+    }
+
     .col-01pm {
       background-color: var(--color-01pm);
     }
@@ -218,52 +219,34 @@
       background-color: var(--color-08pm);
     }
 
-    .data-cell::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      border-top: 8px solid green;
-      border-right: 8px solid transparent;
-    }
-
     .btn-download {
       background: #e91616;
       color: white;
-      margin: 20px 0;
+      margin: 30px 0;
       padding: 15px 30px;
       width: 90%;
       max-width: 400px;
       border-radius: 30px;
-      font-size: 16px;
+      font-size: 18px;
       border: none;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .gradient-text {
-      background: linear-gradient(90deg, #ee7342, #1e77eb);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      box-shadow: 0 4px 15px rgba(233, 22, 22, 0.4);
     }
   </style>
 </head>
 
 <body>
 
-  <div class="menu-icon" onclick="toggleSidebar()">
-    <span>📜</span>
-  </div>
+  <div class="menu-icon" onclick="toggleSidebar()"><span>📜</span></div>
 
   <nav class="sidebar" id="sidebar">
     <div style="text-align: right; padding: 10px;">
-      <span onclick="toggleSidebar()"
-        style="cursor:pointer; font-size: 24px; color: #333; padding-right: 10px;">×</span>
+      <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 28px;">&times;</span>
     </div>
     <a href="index.html">Home</a>
     <a href="mcchart.html">Machine Chart</a>
-    <a href="result chart.html">Results Chart</a>
-    <a href="mc and result.html">MC and Result</a>
+    <a href="result_chart.html">Results Chart</a>
+    <a href="mc_and_result.html">MC and Result</a>
     <a href="mc.html">MC</a>
     <a href="results.html">Result</a>
   </nav>
@@ -272,7 +255,7 @@
     <h1 class="gradient-text">DEAR - RESULT CHART</h1>
 
     <div class="toolbar">
-      <input type="text" id="tableSearch" placeholder="Search Number...">
+      <input type="text" id="tableSearch" placeholder="Search Number..." onkeyup="renderChart()">
       <select id="monthSelect"></select>
       <select id="yearSelect">
         <option value="2026">2026</option>
@@ -325,7 +308,6 @@
     <button class="btn-download" onclick="exportToPNG()">Download PNG Chart</button>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
   <script>
     const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
 
@@ -345,12 +327,12 @@
       const outer = document.getElementById('tableOuter');
       const captureArea = document.getElementById('captureArea');
 
-      const availableWidth = window.innerWidth - 20;
-      const actualWidth = captureArea.offsetWidth;
+      const availableWidth = window.innerWidth * 0.95;
+      const actualWidth = captureArea.offsetWidth + 20;
       let scale = Math.min(1, availableWidth / actualWidth);
 
       document.documentElement.style.setProperty('--scale', scale);
-      outer.style.height = (captureArea.offsetHeight * scale) + 20 + "px";
+      outer.style.height = (captureArea.offsetHeight * scale) + 50 + "px";
     }
 
     function renderChart() {
@@ -361,54 +343,52 @@
       const days = new Date(year, month, 0).getDate();
       const searchTerm = document.getElementById('tableSearch').value;
 
-      // Update Banner with Month Name
       banner.innerText = `Dear Result Number Chart - ${monthNames[month - 1]} ${year}`;
-
       body.innerHTML = "";
 
       for (let d = 1; d <= days; d++) {
-        let rowHtml = `<tr><td class="date-col">${d}</td>`;
         let rowData = [];
-
-        // Generate 9 random numbers
         for (let i = 0; i < 9; i++) {
-          const val = Math.floor(10000 + Math.random() * 90000).toString();
-          rowData.push(val);
+          rowData.push(Math.floor(10000 + Math.random() * 90000).toString());
         }
 
-        // Search logic
+        // Filter logic
         if (searchTerm && !rowData.some(r => r.includes(searchTerm)) && !d.toString().includes(searchTerm)) continue;
 
-        // Populate row with column-specific classes for 01PM (index 3), 06PM (index 5), 08PM (index 7)
+        let rowHtml = `<tr><td class="date-col">${d}</td>`;
         rowData.forEach((val, index) => {
           let extraClass = "";
           if (index === 3) extraClass = "col-01pm";
           if (index === 5) extraClass = "col-06pm";
           if (index === 7) extraClass = "col-08pm";
-
           rowHtml += `<td class="data-cell ${extraClass}">${val}</td>`;
         });
-
         rowHtml += `<td class="date-col">${d}</td></tr>`;
         body.innerHTML += rowHtml;
       }
-
       setTimeout(applyAutoScale, 100);
     }
 
     async function exportToPNG() {
       const node = document.getElementById('captureArea');
+      const btn = document.querySelector('.btn-download');
+      btn.innerText = "Capturing...";
+
       try {
         const dataUrl = await htmlToImage.toPng(node, {
           backgroundColor: '#fff',
           pixelRatio: 2,
-          style: { transform: 'scale(1)' }
+          style: { transform: 'scale(1)', transformOrigin: 'top left' }
         });
         const link = document.createElement('a');
-        link.download = `Result-Chart-${monthNames[mSel.value - 1]}.png`;
+        link.download = `Result-Chart-${monthNames[mSel.value - 1]}-${yearSelect.value}.png`;
         link.href = dataUrl;
         link.click();
-      } catch (e) { alert("Export failed"); }
+      } catch (e) {
+        alert("Download failed.");
+      } finally {
+        btn.innerText = "Download PNG Chart";
+      }
     }
 
     window.addEventListener('resize', applyAutoScale);
