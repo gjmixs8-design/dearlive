@@ -4,11 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spot + Kerala Result Chart</title>
+    <title>Kerala Yearly MC Chart</title>
     <style>
         :root {
             --sidebar-maroon: #800000;
             --header-salmon: #E9967A;
+            --header-green: #e69b11;
             --border: #333;
             --scale: 1;
         }
@@ -20,61 +21,14 @@
             text-align: center;
         }
 
-        /* --- Sidebar & Menu --- */
-        .sidebar {
-            position: fixed;
-            left: -260px;
-            top: 0;
-            height: 100%;
-            width: 260px;
-            background: var(--sidebar-maroon);
-            color: white;
-            transition: 0.3s ease;
-            z-index: 3000;
-            padding-top: 60px;
-            text-align: left;
-        }
-
-        .sidebar.active {
-            left: 0;
-        }
-
-        .sidebar a {
-            padding: 15px 25px;
-            display: block;
-            color: white;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-weight: bold;
-        }
-
-        .menu-icon {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            cursor: pointer;
-            z-index: 3100;
-            background: white;
-            padding: 8px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .menu-icon div {
-            width: 25px;
-            height: 3px;
-            background: var(--sidebar-maroon);
-            margin: 5px 0;
-        }
-
-        /* --- Layout --- */
         h1 {
             color: var(--sidebar-maroon);
-            margin-top: 70px;
+            margin-top: 20px;
             font-size: 22px;
             text-transform: uppercase;
         }
 
+        /* --- Layout & Scaling --- */
         .table-outer {
             width: 95vw;
             margin: 20px auto;
@@ -89,24 +43,26 @@
             display: inline-block;
         }
 
-        /* --- Table Styling --- */
+        /* --- Table Styling (Merged Styles) --- */
         table {
             border-collapse: collapse;
             background: #fff;
             border: 2px solid #000;
-            min-width: 900px;
+            min-width: 1200px;
+            /* Adjusted for yearly columns */
         }
 
         th,
         td {
             border: 1px solid var(--border);
-            padding: 8px;
+            padding: 6px 4px;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 13px;
+            text-align: center;
         }
 
         .hdr-main {
-            background: #00a859;
+            background: var(--header-green);
             color: white;
             font-size: 18px;
         }
@@ -116,24 +72,27 @@
             color: #d32f2f;
         }
 
-        .col-feb {
-            color: #d32f2f;
-            background: #fff;
-            width: 50px;
-        }
-
-        .col-kerala {
+        .date-col {
             background: #ffebee;
             color: #d32f2f;
-            width: 120px;
+            width: 50px;
+            border-right: 2px solid #000;
         }
 
-        .col-time {
-            background: var(--header-salmon);
-            color: #000;
+        .col-right {
+            border-right: 2px solid #000;
         }
 
-        /* --- Buttons --- */
+        .highlight-row {
+            background-color: #fff0f0;
+        }
+
+        .stars {
+            color: #ccc;
+            font-style: italic;
+        }
+
+        /* --- Button --- */
         .btn-download {
             background: var(--sidebar-maroon);
             color: white;
@@ -143,141 +102,81 @@
             font-weight: bold;
             cursor: pointer;
             margin: 20px;
+            transition: 0.3s;
+        }
+
+        .btn-download:hover {
+            background: #a00000;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- <div class="menu-icon" onclick="toggleSidebar()">
-        <div></div>
-        <div></div>
-        <div></div>
-    </div>
-
-    <nav id="sidebar" class="sidebar">
-        <div style="text-align: right; padding: 10px;">
-            <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 24px; padding-right:15px;">×</span>
-        </div>
-        <a href="index.html">Home</a>
-        <a href="mcchart.html">Machine Chart</a>
-        <a href="result chart.html">Results Chart</a>
-        <a href="mc.html">MC</a>
-        <a href="results.html">Result</a>
-        <a href="mc and result.html">MC and Result</a>
-    </nav> -->
-
-    <h1>Spot + Kerala Results</h1>
+    <h1>Kerala MC Chart Yearly (2025-2026)</h1>
 
     <div class="table-outer" id="tableOuter">
         <div class="table-inner" id="tableInner">
             <table id="targetTable">
                 <thead>
                     <tr class="hdr-main">
-                        <td>1CC</td>
-                        <td colspan="4">Spot + Kerala</td>
-                        <td>Kerala</td>
-                        <td colspan="4">Result Times</td>
+                        <td colspan="13">Kerala MC Chart Yearly (2025-2026)</td>
                     </tr>
                     <tr class="hdr-sub">
-                        <td class="col-time">FEB</td>
-                        <td class="col-time">11PM</td>
-                        <td class="col-time">12PM</td>
-                        <td class="col-time">01PM</td>
-                        <td class="col-time">2PM</td>
-                        <td class="col-time" style="background: #ffebee;">Kerala</td>
-                        <td class="col-time">04PM</td>
-                        <td class="col-time">06PM</td>
-                        <td class="col-time">7PM</td>
-                        <td class="col-time">08PM</td>
+                        <td class="date-col">DATE</td>
+                        <td>FEB</td>
+                        <td>MAR</td>
+                        <td>APR</td>
+                        <td>MAY</td>
+                        <td>JUN</td>
+                        <td>JUL</td>
+                        <td>AUG</td>
+                        <td>SEP</td>
+                        <td>OCT</td>
+                        <td>NOV</td>
+                        <td>DEC</td>
+                        <td>JAN</td>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr>
-                        <td class="col-feb">1</td>
-                        <td>814</td>
-                        <td>631</td>
-                        <td>796</td>
-                        <td>510</td>
-                        <td class="col-kerala">390890</td>
-                        <td>687</td>
-                        <td>163</td>
-                        <td>734</td>
-                        <td>218</td>
-                    </tr>
-                    <tr>
-                        <td class="col-feb">2</td>
-                        <td>487</td>
-                        <td>179</td>
-                        <td>516</td>
-                        <td>197</td>
-                        <td class="col-kerala">329983</td>
-                        <td>775</td>
-                        <td>526</td>
-                        <td>863</td>
-                        <td>801</td>
-                    </tr>
-                    <tr>
-                        <td class="col-feb">3</td>
-                        <td>623</td>
-                        <td>965</td>
-                        <td>840</td>
-                        <td>738</td>
-                        <td class="col-kerala">272988</td>
-                        <td>261</td>
-                        <td>356</td>
-                        <td>666</td>
-                        <td>034</td>
-                    </tr>
-                    <tr>
-                        <td class="col-feb">4</td>
-                        <td>347</td>
-                        <td>572</td>
-                        <td>456</td>
-                        <td>579</td>
-                        <td class="col-kerala">314235</td>
-                        <td>693</td>
-                        <td>580</td>
-                        <td>601</td>
-                        <td>574</td>
-                    </tr>
-                    <tr>
-                        <td class="col-feb">5</td>
-                        <td>261</td>
-                        <td>814</td>
-                        <td>598</td>
-                        <td>726</td>
-                        <td class="col-kerala">303206</td>
-                        <td>485</td>
-                        <td>170</td>
-                        <td>952</td>
-                        <td>066</td>
-                    </tr>
-                    <tr>
-                        <td class="col-feb">20</td>
-                        <td>326</td>
-                        <td>867</td>
-                        <td>073</td>
-                        <td>714</td>
-                        <td class="col-kerala">245689</td>
-                        <td>569</td>
-                        <td>891</td>
-                        <td>999</td>
-                        <td>643</td>
-                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <button class="btn-download" onclick="downloadTable()">Download PNG Chart</button>
+    <button class="btn-download" onclick="downloadTable()" id="dlBtn">Download PNG Chart</button>
 
     <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
     <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
+        // 1. Generate Table Rows (6-digit Numbers)
+        function populateTable() {
+            const tbody = document.getElementById('tableBody');
+            let rows = '';
+
+            for (let day = 1; day <= 31; day++) {
+                let rowClass = (day % 2 === 0) ? 'class="highlight-row"' : '';
+                rows += `<tr ${rowClass}>`;
+                rows += `<td class="date-col">${day}</td>`;
+
+                for (let month = 0; month < 12; month++) {
+                    // Logic for months with fewer than 31 days
+                    const isFebEnd = (day > 28 && month === 0);
+                    const isShortMonthEnd = (day > 30 && [2, 4, 7, 9].includes(month));
+
+                    if (isFebEnd || isShortMonthEnd) {
+                        rows += `<td class="stars">---</td>`;
+                    } else {
+                        // Generating 6-digit random numbers
+                        let result = Math.floor(100000 + Math.random() * 900000);
+                        rows += `<td>${result}</td>`;
+                    }
+                }
+                rows += `</tr>`;
+            }
+            tbody.innerHTML = rows;
         }
 
+        // 2. Mobile Responsive Scaling Logic (From Code 1)
         function applyAutoScale() {
             const inner = document.getElementById('tableInner');
             const outer = document.getElementById('tableOuter');
@@ -296,17 +195,34 @@
             }
         }
 
+        // 3. Export to Image Logic
         async function downloadTable() {
+            const btn = document.getElementById('dlBtn');
             const node = document.getElementById('targetTable');
-            const dataUrl = await htmlToImage.toPng(node, { backgroundColor: '#fff' });
-            const link = document.createElement('a');
-            link.download = 'Kerala-Spot-Chart.png';
-            link.href = dataUrl;
-            link.click();
+            btn.innerText = "Processing...";
+
+            try {
+                const dataUrl = await htmlToImage.toPng(node, {
+                    backgroundColor: '#fff',
+                    style: { transform: 'scale(1)' } // Export at full resolution
+                });
+                const link = document.createElement('a');
+                link.download = 'Yearly-Kerala-MC-Chart.png';
+                link.href = dataUrl;
+                link.click();
+            } catch (error) {
+                console.error("Oops, something went wrong!", error);
+            } finally {
+                btn.innerText = "Download PNG Chart";
+            }
         }
 
+        // Initialize
         window.addEventListener('resize', applyAutoScale);
-        window.addEventListener('load', applyAutoScale);
+        window.addEventListener('load', () => {
+            populateTable();
+            setTimeout(applyAutoScale, 100);
+        });
     </script>
 </body>
 

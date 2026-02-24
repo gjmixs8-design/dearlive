@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +31,7 @@
             text-align: center;
             padding-bottom: 20px;
             box-sizing: border-box;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         /* Header Styles */
@@ -52,6 +53,9 @@
         /* KR Chart List Styles */
         .result-item {
             margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .result-link-top {
@@ -61,13 +65,21 @@
             text-decoration: underline;
             cursor: pointer;
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
-        .placeholder-dashes {
-            font-size: 1.5rem;
-            font-weight: bold;
+        /* The 3-Digit Result Box Styling */
+        .digit-box {
+            display: inline-block;
+            width: 80px;
+            padding: 5px;
+            border: 2px solid var(--green-border);
+            background-color: #f9f9f9;
             color: #333;
+            font-size: 1.6rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            border-radius: 4px;
         }
 
         /* KL Jackpot Section Styles */
@@ -126,12 +138,12 @@
             font-weight: bold;
             cursor: pointer;
             margin: 20px 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .button-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; 
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
             padding: 0 10px;
             margin-top: 20px;
@@ -149,51 +161,80 @@
             justify-content: center;
         }
 
-        .btn-pink { background-color: #e91e63; }
-        .btn-green { background-color: #4caf50; }
-        .btn-blue { background-color: #2196f3; }
-        .btn-orange { background-color: #ff9800; }
+        .btn-pink {
+            background-color: #e91e63;
+        }
+
+        .btn-green {
+            background-color: #4caf50;
+        }
+
+        .btn-blue {
+            background-color: #2196f3;
+        }
+
+        .btn-orange {
+            background-color: #ff9800;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="wrapper">
-    <div class="header-title">-Jackpot + KR-Chart-Guessing</div>
-    <div class="cyan-divider"></div>
+    <div class="wrapper">
+        <div class="header-title">-Jackpot + KR-Chart-Guessing</div>
+        <div class="cyan-divider"></div>
 
-    <div class="result-item"><span class="result-link-top">11 AM Result</span><div class="placeholder-dashes">--</div></div>
-    <div class="result-item"><span class="result-link-top">12 PM Result</span><div class="placeholder-dashes">--</div></div>
-    <div class="result-item"><span class="result-link-top">1 PM Result</span><div class="placeholder-dashes">--</div></div>
-    <div class="result-item"><span class="result-link-top">2 PM Result</span><div class="placeholder-dashes">--</div></div>
-    <div class="result-item"><span class="result-link-top">4 PM Result</span><div class="placeholder-dashes">--</div></div>
-    <div class="result-item"><span class="result-link-top">6 PM Result</span><div class="placeholder-dashes">--</div></div>
-    <div class="result-item"><span class="result-link-top">7 PM Result</span><div class="placeholder-dashes">--</div></div>
-    <div class="result-item"><span class="result-link-top">8 PM Result</span><div class="placeholder-dashes">--</div></div>
+        <div class="result-item"><span class="result-link-top">11 AM Result</span>
+            <div class="digit-box">000</div>
+        </div>
+        <div class="result-item"><span class="result-link-top">12 PM Result</span>
+            <div class="digit-box">000</div>
+        </div>
+        <div class="result-item"><span class="result-link-top">1 PM Result</span>
+            <div class="digit-box">000</div>
+        </div>
+        <div class="result-item"><span class="result-link-top">2 PM Result</span>
+            <div class="digit-box">000</div>
+        </div>
+        <div class="result-item"><span class="result-link-top">4 PM Result</span>
+            <div class="digit-box">000</div>
+        </div>
+        <div class="result-item"><span class="result-link-top">6 PM Result</span>
+            <div class="digit-box">000</div>
+        </div>
+        <div class="result-item"><span class="result-link-top">7 PM Result</span>
+            <div class="digit-box">000</div>
+        </div>
+        <div class="result-item"><span class="result-link-top">8 PM Result</span>
+            <div class="digit-box">000</div>
+        </div>
 
-    <button class="refresh-btn" onclick="location.reload()">Refresh Chart</button>
+        <button class="refresh-btn" onclick="location.reload()">Refresh Chart</button>
 
-    <div class="cyan-divider"></div>
+        <div class="cyan-divider"></div>
 
-    <div class="title-red">2pm KL Guessing Time</div>
-    <div class="guessing-num">3 r 6</div>
+        <div class="title-red">2pm KL Guessing Time</div>
+        <div class="guessing-num">3 r 6</div>
 
-    <div class="box-header">2.30 KL Machine Number</div>
-    <div class="number-display">490427</div>
+        <div class="box-header">2.30 KL Machine Number</div>
+        <div class="number-display">490427</div>
 
-    <div class="box-header" style="font-size: 1.4rem;">3pm Kerala Jackpot Result</div>
+        <div class="box-header" style="font-size: 1.4rem;">3pm Kerala Jackpot Result</div>
 
-    <div class="result-container">
-        <div class="result-code">DW 809210</div>
-        <button class="refresh-btn" onclick="location.reload()">Refresh Result</button>
+        <div class="result-container">
+            <div class="result-code">DW 809210</div>
+            <button class="refresh-btn" onclick="location.reload()">Refresh Result</button>
+        </div>
+
+        <div class="button-grid">
+            <a href="home.html" class="btn btn-pink">🎉 Kerala Jackpot</a>
+            <a href="index.html" class="btn btn-green">💰 Dear Jackpot</a>
+            <a href="kl result page.html" class="btn btn-blue">📊 Kerala Lottery Chart</a>
+            <a href="jackpot result.html" class="btn btn-orange">📊 Jackpot and kl</a>
+        </div>
     </div>
-
-    <div class="button-grid">
-        <a href="home.html" class="btn btn-pink">🎉 Kerala Jackpot</a>
-        <a href="index.html" class="btn btn-green">💰 Dear Jackpot</a>
-        <a href="kl result page.html" class="btn btn-blue">📊 Kerala Lottery Chart</a>
-        <a href="jackpot result.html" class="btn btn-orange">📊 Jackpot and kl</a>
-    </div>
-</div>
 
 </body>
+
 </html>
