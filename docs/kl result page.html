@@ -5,15 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kerala Yearly MC Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Young+Serif&display=swap" rel="stylesheet">
     <style>
         :root {
             --sidebar-maroon: #800000;
-            --header-salmon: #E9967A;
-            --header-green: #e69b11;
-            --border: #333;
+            --header-salmon: #f7bf58;
+            --main-red: #b22222;
+            --border-heavy: #333;
             --scale: 1;
         }
 
@@ -22,19 +23,67 @@
             background: #f0faff;
             margin: 0;
             text-align: center;
+            overflow-x: hidden;
         }
 
+        /* --- Sidebar & Menu --- */
+        .sidebar {
+            position: fixed;
+            left: -260px;
+            top: 0;
+            height: 100%;
+            width: 260px;
+            background: var(--sidebar-maroon);
+            color: white;
+            transition: 0.3s ease;
+            z-index: 3000;
+            padding-top: 60px;
+            text-align: left;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            display: block;
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+        }
+
+        .menu-icon {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            cursor: pointer;
+            z-index: 3100;
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-icon div {
+            width: 25px;
+            height: 3px;
+            background: var(--sidebar-maroon);
+            margin: 5px 0;
+        }
+
+        /* --- Table Layout --- */
         h1 {
             color: var(--sidebar-maroon);
-            margin-top: 20px;
+            margin-top: 70px;
             font-size: 22px;
             text-transform: uppercase;
-            font-family: "Chango", sans-serif;
+            font-family: "Young Serif", serif;
         }
 
-        /* --- Layout & Scaling --- */
         .table-outer {
-            width: 95vw;
+            width: 98vw;
             margin: 20px auto;
             overflow: hidden;
             display: flex;
@@ -47,53 +96,58 @@
             display: inline-block;
         }
 
-        /* --- Table Styling (Merged Styles) --- */
         table {
             border-collapse: collapse;
             background: #fff;
             border: 2px solid #000;
-            min-width: 1200px;
-            /* Adjusted for yearly columns */
+            width: 1500px;
+            /* Fixed width for yearly data consistency */
         }
 
         th,
         td {
-            border: 1px solid var(--border);
-            padding: 6px 4px;
+            border: 1px solid #999;
+            padding: 6px 2px;
             font-weight: bold;
             font-size: 13px;
             text-align: center;
         }
 
         .hdr-main {
-            background: var(--header-green);
+            background: #e99d11;
             color: white;
-            font-size: 18px;
+            font-size: 20px;
         }
 
         .hdr-sub {
-            background: #fff8e1;
+            background: #f8d256;
             color: #d32f2f;
         }
 
         .date-col {
-            background: #ffebee;
-            color: #d32f2f;
+            background: #fcbb67;
             width: 50px;
-            border-right: 2px solid #000;
+            border-right: 2px solid var(--border-heavy);
+        }
+
+        .month-header {
+            background: var(--header-salmon);
+            color: #000;
+            border-right: 2px solid var(--border-heavy);
         }
 
         .col-right {
-            border-right: 2px solid #000;
-        }
-
-        .highlight-row {
-            background-color: #fff0f0;
+            border-right: 2px solid var(--border-heavy);
         }
 
         .stars {
-            color: #ccc;
-            font-style: italic;
+            color: #d32f2f;
+            background: #eee;
+        }
+
+        .highlight-red {
+            color: #d32f2f;
+            background-color: #ffebee;
         }
 
         /* --- Button --- */
@@ -117,29 +171,42 @@
 
 <body>
 
-    <h1>Kerala MC Chart Yearly (2025-2026)</h1>
+    <!-- <div class="menu-icon" onclick="toggleSidebar()">
+        <div></div><div></div><div></div>
+    </div>
+
+    <nav id="sidebar" class="sidebar">
+        <div style="text-align: right; padding: 10px;">
+            <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 24px; padding-right:15px;">×</span>
+        </div>
+        <a href="#">Home</a>
+        <a href="#">Yearly Chart</a>
+        <a href="#">Results</a>
+    </nav> -->
+
+    <h1>Kerala Yearly Result Chart (2025 -26)</h1>
 
     <div class="table-outer" id="tableOuter">
         <div class="table-inner" id="tableInner">
             <table id="targetTable">
                 <thead>
                     <tr class="hdr-main">
-                        <td colspan="13">Kerala MC Chart Yearly (2025-2026)</td>
+                        <th colspan="25">Kerala Yearly Result Chart (2025 -26)</th>
                     </tr>
                     <tr class="hdr-sub">
-                        <td class="date-col">DATE</td>
-                        <td>FEB</td>
-                        <td>MAR</td>
-                        <td>APR</td>
-                        <td>MAY</td>
-                        <td>JUN</td>
-                        <td>JUL</td>
-                        <td>AUG</td>
-                        <td>SEP</td>
-                        <td>OCT</td>
-                        <td>NOV</td>
-                        <td>DEC</td>
-                        <td>JAN</td>
+                        <th class="date-col">DATE</th>
+                        <th colspan="2" class="month-header">FEB</th>
+                        <th colspan="2" class="month-header">MAR</th>
+                        <th colspan="2" class="month-header">APR</th>
+                        <th colspan="2" class="month-header">MAY</th>
+                        <th colspan="2" class="month-header">JUN</th>
+                        <th colspan="2" class="month-header">JUL</th>
+                        <th colspan="2" class="month-header">AUG</th>
+                        <th colspan="2" class="month-header">SEP</th>
+                        <th colspan="2" class="month-header">OCT</th>
+                        <th colspan="2" class="month-header">NOV</th>
+                        <th colspan="2" class="month-header">DEC</th>
+                        <th colspan="2" class="month-header">JAN</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -148,46 +215,49 @@
         </div>
     </div>
 
-    <button class="btn-download" onclick="downloadTable()" id="dlBtn">Download PNG Chart</button>
+    <button class="btn-download" id="dlBtn" onclick="downloadTable()">Download Chart</button>
 
-    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
     <script>
-        // 1. Generate Table Rows (6-digit Numbers)
-        function populateTable() {
-            const tbody = document.getElementById('tableBody');
-            let rows = '';
-
-            for (let day = 1; day <= 31; day++) {
-                let rowClass = (day % 2 === 0) ? 'class="highlight-row"' : '';
-                rows += `<tr ${rowClass}>`;
-                rows += `<td class="date-col">${day}</td>`;
-
-                for (let month = 0; month < 12; month++) {
-                    // Logic for months with fewer than 31 days
-                    const isFebEnd = (day > 28 && month === 0);
-                    const isShortMonthEnd = (day > 30 && [2, 4, 7, 9].includes(month));
-
-                    if (isFebEnd || isShortMonthEnd) {
-                        rows += `<td class="stars">---</td>`;
-                    } else {
-                        // Generating 6-digit random numbers
-                        let result = Math.floor(100000 + Math.random() * 900000);
-                        rows += `<td>${result}</td>`;
-                    }
-                }
-                rows += `</tr>`;
-            }
-            tbody.innerHTML = rows;
+        // 1. Sidebar Toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
         }
 
-        // 2. Mobile Responsive Scaling Logic (From Code 1)
+        // 2. Generate Data (6-Digit Numbers)
+        function generateTableData() {
+            const body = document.getElementById('tableBody');
+            let html = '';
+
+            for (let d = 1; d <= 31; d++) {
+                html += `<tr><td class="date-col">${d}</td>`;
+                for (let m = 0; m < 12; m++) {
+                    // Handle months shorter than 31 days
+                    const isFebEnd = (d > 28 && m === 0);
+                    const isShortMonthEnd = (d > 30 && [2, 4, 7, 9].includes(m));
+
+                    if (isFebEnd || isShortMonthEnd) {
+                        html += `<td class="stars">***</td><td class="col-right stars">***</td>`;
+                    } else {
+                        // Generate 6-digit random numbers
+                        let val1 = Math.floor(100000 + Math.random() * 900000);
+                        let val2 = Math.floor(100000 + Math.random() * 900000);
+                        let cls = (d % 5 === 0) ? 'highlight-red' : '';
+                        html += `<td class="${cls}">${val1}</td><td class="col-right ${cls}">${val2}</td>`;
+                    }
+                }
+                html += `</tr>`;
+            }
+            body.innerHTML = html;
+        }
+
+        // 3. Mobile Responsive Scaling
         function applyAutoScale() {
             const inner = document.getElementById('tableInner');
             const outer = document.getElementById('tableOuter');
             const table = document.getElementById('targetTable');
 
-            const availableWidth = window.innerWidth * 0.95;
-            const actualWidth = table.offsetWidth;
+            const availableWidth = window.innerWidth * 0.96;
+            const actualWidth = 1500; // Match the CSS table width
             const scale = availableWidth / actualWidth;
 
             if (scale < 1) {
@@ -199,7 +269,7 @@
             }
         }
 
-        // 3. Export to Image Logic
+        // 4. PNG Export
         async function downloadTable() {
             const btn = document.getElementById('dlBtn');
             const node = document.getElementById('targetTable');
@@ -208,24 +278,24 @@
             try {
                 const dataUrl = await htmlToImage.toPng(node, {
                     backgroundColor: '#fff',
-                    style: { transform: 'scale(1)' } // Export at full resolution
+                    style: { transform: 'scale(1)' } // Export at full size
                 });
                 const link = document.createElement('a');
-                link.download = 'Yearly-Kerala-MC-Chart.png';
+                link.download = 'Kerala-Yearly-Chart.png';
                 link.href = dataUrl;
                 link.click();
             } catch (error) {
-                console.error("Oops, something went wrong!", error);
+                alert("Download failed. Please try again.");
             } finally {
-                btn.innerText = "Download PNG Chart";
+                btn.innerText = "Download Full PNG Chart";
             }
         }
 
         // Initialize
         window.addEventListener('resize', applyAutoScale);
         window.addEventListener('load', () => {
-            populateTable();
-            setTimeout(applyAutoScale, 100);
+            generateTableData();
+            applyAutoScale();
         });
     </script>
 </body>
