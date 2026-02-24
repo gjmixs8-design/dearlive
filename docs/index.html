@@ -35,16 +35,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* UPDATED: Allows horizontal scrolling when zoomed in */
-            overflow-x: auto;
-            touch-action: manipulation;
-            /* Optimizes for touch without blocking zoom */
         }
 
         .main-wrapper {
             width: 100%;
             max-width: 800px;
-            margin: 0 auto;
         }
 
         .header-top {
@@ -69,10 +64,9 @@
             width: 100%;
             background: #fff;
             border: 3px solid #222;
-            /* UPDATED: Removed overflow:hidden to prevent clipping during zoom */
-            overflow: visible;
             border-radius: 8px;
             margin-bottom: 20px;
+            overflow: hidden;
         }
 
         #capture-area {
@@ -125,43 +119,35 @@
         }
 
         .time {
-            font-family: "Arial Black", "Arial", sans-serif;
-            font-size: clamp(1.1rem, 4vw, 2rem);
+            font-family: "Arial Black", sans-serif;
+            font-size: clamp(1rem, 4vw, 1.8rem);
             font-weight: 900;
             color: var(--deep-blue);
-            letter-spacing: -1px;
-            text-transform: uppercase;
             line-height: 1.2;
         }
 
         .prize {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             color: var(--green);
+            text-transform: uppercase;
         }
 
         .c-body {
             padding: 15px 5px;
             flex-grow: 1;
-            min-height: 110px;
+            min-height: 100px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .num {
             font-size: clamp(1.1rem, 4vw, 1.8rem);
             font-weight: 800;
             color: #000;
-            min-height: 1.8rem;
-        }
-
-        .sub {
-            font-size: 13px;
-            color: blue;
-            font-weight: bold;
         }
 
         .btn {
@@ -169,13 +155,12 @@
             color: #fff;
             border: 1px solid #2e7d32;
             border-radius: 6px;
-            padding: 8px 4px;
+            padding: 6px 4px;
             font-size: 11px;
             font-weight: bold;
             cursor: pointer;
-            width: 90%;
-            max-width: 100px;
-            text-transform: uppercase;
+            width: 85%;
+            max-width: 90px;
         }
 
         .download-trigger {
@@ -191,8 +176,6 @@
             justify-content: center;
             gap: 10px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 0 0 5px 5px;
         }
 
         .nav-footer {
@@ -201,7 +184,6 @@
             gap: 8px;
             padding: 15px;
             background: #fdfbfb;
-            border-top: 1px solid #ddd;
         }
 
         .nav-link {
@@ -241,15 +223,10 @@
         @media (min-width: 600px) {
             .btn {
                 font-size: 13px;
-                padding: 10px;
             }
 
             .banner {
                 font-size: 1.5rem;
-            }
-
-            .nav-link {
-                font-size: 14px;
             }
         }
     </style>
@@ -265,9 +242,33 @@
                 </div>
 
                 <div class="banner"><span>Check</span> DEAR Result</div>
-                <div class="grid" id="result-grid-1">
+                <div class="grid">
+                    <div class="cell">
+                        <div class="c-head"><span class="time">10AM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">11AM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">12PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">5PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
@@ -279,40 +280,13 @@
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">10AM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="sub">---</div>
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">11AM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="sub">&nbsp;</div>
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">12PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="sub">80 A</div>
-                            <div class="num">34567</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">5PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
                         <div class="c-head"><span class="time">7PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
@@ -326,9 +300,33 @@
                 </div>
 
                 <div class="banner">Dear Lottery Machine Number</div>
-                <div class="grid" id="result-grid-2">
+                <div class="grid">
+                    <div class="cell">
+                        <div class="c-head"><span class="time">10AM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">11AM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">12PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">5PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
@@ -340,7 +338,19 @@
                         </div>
                     </div>
                     <div class="cell">
+                        <div class="c-head"><span class="time">7PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
                         <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">9PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
@@ -348,7 +358,7 @@
                 </div>
             </div>
 
-            <button class="download-trigger" id="download-btn" onclick="downloadResults()">
+            <button class="download-trigger" onclick="downloadResults()">
                 <i class="fas fa-download"></i> DOWNLOAD RESULTS IMAGE
             </button>
 
@@ -377,29 +387,23 @@
             });
         });
 
-        // Download Logic (with high-quality capture)
+        // Smart Download Logic for Mobile & Web
         async function downloadResults() {
             const captureArea = document.getElementById('capture-area');
             const buttons = document.querySelectorAll('.btn');
 
+            // Hide buttons for clean image
             buttons.forEach(b => b.style.visibility = 'hidden');
 
             try {
                 const canvas = await html2canvas(captureArea, {
-                    scale: 2,
+                    scale: 2, // Sharpness
                     useCORS: true,
                     logging: false,
                     backgroundColor: "#ffffff",
-                    windowWidth: 800,
-                    onclone: (clonedDoc) => {
-                        const area = clonedDoc.getElementById('capture-area');
-                        area.style.width = '800px';
-                        area.style.border = "3px solid #222";
-                        area.querySelectorAll('.cell').forEach(cell => {
-                            cell.style.borderRight = "1px solid #000";
-                            cell.style.borderBottom = "1px solid #000";
-                        });
-                    }
+                    // This ensures the image captures the full design even if the screen is small
+                    windowWidth: captureArea.scrollWidth,
+                    windowHeight: captureArea.scrollHeight
                 });
 
                 const link = document.createElement('a');
@@ -407,10 +411,8 @@
                 link.download = `Dear-Results-${today}.png`;
                 link.href = canvas.toDataURL('image/png', 1.0);
                 link.click();
-
             } catch (err) {
                 console.error("Capture Error:", err);
-                alert("Failed to generate image.");
             } finally {
                 buttons.forEach(b => b.style.visibility = 'visible');
             }
