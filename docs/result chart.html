@@ -9,7 +9,9 @@
     :root {
       --border: #333333;
       --header-salmon: #e9d87a;
-      --sidebar-maroon: #e91616;
+      --sidebar-color: #ffc374;
+      /* Your preferred color */
+      --sidebar-shadow: rgb(245, 199, 113);
       --text-dark: #e72828;
       --sidebar-width: 260px;
       --scale: 1;
@@ -20,37 +22,56 @@
       background: #f4f7f9;
       margin: 0;
       padding: 0;
-      /* UPDATED: Allows body to scroll both ways when zoomed */
       overflow-x: auto;
     }
 
-    /* --- Sidebar --- */
+    /* --- Sidebar: Updated with your #ffc374 Color --- */
     .sidebar {
       position: fixed;
-      left: calc(-1 * var(--sidebar-width));
-      top: 0;
-      height: 100%;
+      left: 15px;
+      top: 15px;
+      height: auto;
+      min-height: 350px;
       width: var(--sidebar-width);
-      background: var(--sidebar-maroon);
-      color: white;
-      transition: 0.3s ease;
+      background: var(--sidebar-color);
+      color: #333;
+      /* Dark text for better contrast */
       z-index: 3000;
-      padding-top: 60px;
+      padding-top: 50px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px var(--sidebar-shadow);
+
+      /* Animation Logic */
+      transform: scale(0);
+      transform-origin: top left;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
     }
 
     .sidebar.active {
-      left: 0;
+      transform: scale(1);
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .sidebar a {
       padding: 15px 25px;
       display: block;
-      color: white;
+      color: #ebe8e8;
+      /* Darker text for readability */
       text-decoration: none;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       font-weight: bold;
+      transition: 0.3s;
     }
 
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      padding-left: 35px;
+    }
+
+    /* --- 📜 Scroll Menu Icon --- */
     .menu-icon {
       position: fixed;
       top: 15px;
@@ -58,16 +79,16 @@
       cursor: pointer;
       z-index: 3100;
       background: white;
-      padding: 8px;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-
-    .menu-icon div {
-      width: 25px;
-      height: 3px;
-      background: var(--sidebar-maroon);
-      margin: 5px 0;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      border: 2px solid #ffd700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
     }
 
     /* --- Header & Toolbar --- */
@@ -106,28 +127,25 @@
     }
 
     .btn-apply {
-      background: var(--sidebar-maroon);
+      background: #e91616;
+      /* Keeping red for "Apply" */
       color: white;
       cursor: pointer;
       border: none;
     }
 
-    /* --- Scaling System --- */
+    /* --- Table Styling --- */
     .table-outer {
       width: 100%;
       display: flex;
       justify-content: center;
-      /* UPDATED: Changed to auto and enabled momentum scrolling for mobile */
       overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
     }
 
     .table-inner {
       transform: scale(var(--scale));
       transform-origin: top center;
       display: inline-block;
-      /* Smooth transition when the initial auto-scale triggers */
-      transition: transform 0.2s ease;
     }
 
     #captureArea {
@@ -141,7 +159,6 @@
       min-width: 1000px;
     }
 
-    /* --- Table Styling --- */
     .banner {
       background: #ffdd43;
       color: rgb(233, 27, 27);
@@ -193,8 +210,9 @@
       border-right: 8px solid transparent;
     }
 
+    /* --- Download Button: Restored Styles --- */
     .btn-download {
-      background: var(--sidebar-maroon);
+      background: #e91616;
       color: white;
       margin: 20px 0;
       padding: 15px 30px;
@@ -204,6 +222,12 @@
       font-size: 16px;
       border: none;
       cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s;
+    }
+
+    .btn-download:hover {
+      background: #c71212;
     }
   </style>
 </head>
@@ -211,21 +235,20 @@
 <body>
 
   <div class="menu-icon" onclick="toggleSidebar()">
-    <div></div>
-    <div></div>
-    <div></div>
+    <span>📜</span>
   </div>
 
   <nav class="sidebar" id="sidebar">
     <div style="text-align: right; padding: 10px;">
-      <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 24px; color: white;">×</span>
+      <span onclick="toggleSidebar()"
+        style="cursor:pointer; font-size: 24px; color: #333; padding-right: 10px;">×</span>
     </div>
     <a href="index.html">Home</a>
     <a href="mcchart.html">Machine Chart</a>
     <a href="result chart.html">Results Chart</a>
+    <a href="mc and result.html">MC and Result</a>
     <a href="mc.html">MC</a>
     <a href="results.html">Result</a>
-    <a href="mc and result.html">MC and Result</a>
   </nav>
 
   <div class="main-content">
@@ -307,12 +330,9 @@
 
       const availableWidth = window.innerWidth - 20;
       const actualWidth = captureArea.offsetWidth;
-
-      // Keep the initial "auto-fit" scale calculation
       let scale = Math.min(1, availableWidth / actualWidth);
 
       document.documentElement.style.setProperty('--scale', scale);
-      // Ensures container expands for the scaled height so the download button is accessible
       outer.style.height = (captureArea.offsetHeight * scale) + 20 + "px";
     }
 
@@ -353,7 +373,7 @@
         const dataUrl = await htmlToImage.toPng(node, {
           backgroundColor: '#fff',
           pixelRatio: 2,
-          style: { transform: 'scale(1)' } // Ensure high quality regardless of browser zoom
+          style: { transform: 'scale(1)' }
         });
         const link = document.createElement('a');
         link.download = `Result-Chart-${monthNames[mSel.value - 1]}.png`;

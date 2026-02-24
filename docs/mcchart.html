@@ -9,10 +9,12 @@
         :root {
             --border: #333333;
             --header-bg: #e9d87a;
-            --sidebar-bg: #db2626;
             --text-dark: #fa0f0f;
             --sidebar-width: 260px;
             --scale: 1;
+            /* Your custom color variables updated */
+            --sidebar-custom-bg: #ffc374;
+            --sidebar-shadow: rgba(245, 199, 113, 0.8);
         }
 
         body {
@@ -20,37 +22,60 @@
             background: #f4f7f9;
             margin: 0;
             padding: 0;
-            /* UPDATED: Changed to auto so zoomed content can be scrolled */
             overflow-x: auto;
         }
 
-        /* --- Sidebar --- */
+        /* --- Sidebar: Refined with your custom color --- */
         .sidebar {
             position: fixed;
-            left: calc(-1 * var(--sidebar-width));
-            top: 0;
-            height: 100%;
+            left: 15px;
+            top: 15px;
+            height: auto;
+            min-height: 300px;
             width: var(--sidebar-width);
-            background: var(--sidebar-bg);
-            color: white;
-            transition: 0.3s ease;
+            background: var(--sidebar-custom-bg);
+            color: #333;
+            /* Darker text for better contrast on peach */
             z-index: 3000;
             padding-top: 60px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--sidebar-shadow);
+
+            /* Animation Logic */
+            transform: scale(0);
+            transform-origin: top left;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            overflow: hidden;
         }
 
         .sidebar.active {
-            left: 0;
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .sidebar a {
             padding: 15px 25px;
             display: block;
-            color: white;
+            color: #e7e7e7;
+            /* Darker text for readability */
             text-decoration: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             font-weight: bold;
+            transition: 0.3s;
         }
 
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.4);
+            /* Brighter hover highlight */
+            color: #000;
+            padding-left: 35px;
+            /* Nice sliding effect */
+        }
+
+        /* --- Scroll Icon Style --- */
         .menu-icon {
             position: fixed;
             top: 15px;
@@ -58,19 +83,23 @@
             cursor: pointer;
             z-index: 3100;
             background: white;
-            padding: 8px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #ffd700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
         }
 
-        .menu-icon div {
-            width: 25px;
-            height: 3px;
-            background: var(--text-dark);
-            margin: 5px 0;
+        .menu-icon:active {
+            transform: scale(0.9);
         }
 
-        /* --- Layout --- */
+        /* --- Layout & Table Styles --- */
         .main-content {
             width: 100%;
             display: flex;
@@ -88,12 +117,10 @@
             text-align: center;
         }
 
-        /* --- Scaling System --- */
         .table-outer {
             width: 100%;
             display: flex;
             justify-content: center;
-            /* UPDATED: Changed to auto and added touch-scrolling for better mobile feel */
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -174,13 +201,13 @@
         }
 
         .btn-apply {
-            background: var(--sidebar-bg);
+            background: #db2626;
             color: white;
             border: none;
         }
 
         .btn-download {
-            background: var(--sidebar-bg);
+            background: #db2626;
             color: white;
             margin: 20px 0;
             padding: 15px 30px;
@@ -197,22 +224,21 @@
 <body>
 
     <div class="menu-icon" onclick="toggleSidebar()">
-        <div></div>
-        <div></div>
-        <div></div>
+        <span>📜</span>
     </div>
 
     <nav class="sidebar" id="sidebar">
-        <a href="#" onclick="toggleSidebar()" style="background: rgba(0,0,0,0.2);">Close ×</a>
+        <a href="#" onclick="toggleSidebar()" style="background: rgba(0,0,0,0.08); text-align: center;">Close ×</a>
         <a href="index.html">Home</a>
         <a href="mcchart.html">Machine Chart</a>
         <a href="result chart.html">Results Chart</a>
+        <a href="mc and result.html">Mc and Result chart</a>
         <a href="mc.html">MC</a>
         <a href="results.html">Result</a>
     </nav>
 
     <div class="main-content">
-        <h1 id="pageTitle">DEAR MACHINE NUMBER CHART</h1>
+        <h1 id="pageTitle">𝔻𝔼𝔸ℝ 𝕄𝔸ℂℍ𝕀ℕ𝔼 ℕ𝕌𝕄𝔹𝔼ℝ ℂℍ𝔸ℝ𝕋</h1>
 
         <div class="toolbar">
             <select id="monthSelect"></select>
@@ -266,11 +292,9 @@
             const availableWidth = window.innerWidth - 20;
             const actualWidth = captureArea.offsetWidth;
 
-            // Default scale fits to screen, but browser can now override via pinch
             let scale = Math.min(1, availableWidth / actualWidth);
 
             document.documentElement.style.setProperty('--scale', scale);
-            // Ensure container height follows the scale so buttons don't overlap
             outer.style.height = (captureArea.offsetHeight * scale) + 20 + "px";
         }
 

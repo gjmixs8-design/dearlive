@@ -19,25 +19,39 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
-            /* Prevent body shake during scale */
         }
 
-        /* --- Sidebar --- */
+        /* --- Sidebar: Expanding from the Icon --- */
         .sidebar {
             position: fixed;
-            left: calc(-1 * var(--sidebar-width));
-            top: 0;
-            height: 100%;
+            left: 15px;
+            /* Starts at icon position */
+            top: 15px;
+            /* Starts at icon position */
+            height: auto;
+            min-height: 300px;
             width: var(--sidebar-width);
             background: var(--text-dark);
             color: white;
-            transition: 0.3s ease;
             z-index: 3000;
             padding-top: 60px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+            /* Animation Logic */
+            transform: scale(0);
+            /* Hidden by default */
+            transform-origin: top left;
+            /* Expands from the icon */
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
         }
 
         .sidebar.active {
-            left: 0;
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .sidebar a {
@@ -49,6 +63,7 @@
             font-weight: bold;
         }
 
+        /* --- 📜 Scroll Menu Icon --- */
         .menu-icon {
             position: fixed;
             top: 15px;
@@ -56,16 +71,21 @@
             cursor: pointer;
             z-index: 3100;
             background: white;
-            padding: 8px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #ffd700;
+            /* Gold Lottery Border */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
         }
 
-        .menu-icon div {
-            width: 25px;
-            height: 3px;
-            background: var(--text-dark);
-            margin: 5px 0;
+        .menu-icon:active {
+            transform: scale(0.9);
         }
 
         /* --- Layout --- */
@@ -92,15 +112,12 @@
             width: 100%;
             display: flex;
             justify-content: center;
-            /* Center on Web */
             overflow-x: auto;
-            /* Scrollable on Mobile */
             -webkit-overflow-scrolling: touch;
         }
 
         .table-wrapper {
             transform-origin: top center;
-            /* Clean scaling from center */
             display: inline-block;
             transition: transform 0.1s ease;
         }
@@ -114,7 +131,6 @@
         table {
             border-collapse: collapse;
             min-width: 1100px;
-            /* Forces wide data layout */
         }
 
         th {
@@ -206,22 +222,48 @@
             font-weight: bold;
             cursor: pointer;
         }
+        /* --- Sidebar: Updated Color --- */
+.sidebar {
+    position: fixed;
+    left: 15px; 
+    top: 15px;  
+    height: auto;
+    min-height: 350px;
+    width: var(--sidebar-width);
+    
+    /* CHANGE THIS LINE TO YOUR PREFERRED COLOR */
+    background: #ffc374; /* Example: Deep Charcoal Black */
+    
+    color: white;
+    z-index: 3000;
+    padding-top: 50px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgb(245, 199, 113);
+    
+    /* Animation Logic */
+    transform: scale(0);
+    transform-origin: top left;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+}
     </style>
 </head>
 
 <body>
 
     <div class="menu-icon" onclick="toggleSidebar()">
-        <div></div>
-        <div></div>
-        <div></div>
+        <span>📜</span>
     </div>
 
     <nav class="sidebar" id="sidebar">
-        <a href="#" onclick="toggleSidebar()">Close ×</a>
-        <a href="#">Home</a>
-        <a href="#">Dear Chart</a>
-        <a href="#">MC Chart</a>
+        <a href="#" onclick="toggleSidebar()" style="background: rgba(0,0,0,0.2); border-radius: 15px 15px 0 0;">Close
+            ×</a>
+        <a href="index.html">Home</a>
+        <a href="mcchart.html">Machine Chart</a>
+        <a href="result chart.html">Results Chart</a>
+        <a href="mc.html">MC</a>
+        <a href="results.html">Result</a>
     </nav>
 
     <div class="main-content">
@@ -266,7 +308,6 @@
             document.getElementById('sidebar').classList.toggle('active');
         }
 
-        // Initialize Month Dropdown
         const mSel = document.getElementById('monthSelect');
         monthNames.forEach((m, i) => {
             let opt = new Option(m, i + 1);
@@ -274,7 +315,6 @@
             mSel.add(opt);
         });
 
-        // THE AUTO-ADJUST LOGIC
         function autoScale() {
             const wrapper = document.getElementById('scaler');
             const captureArea = document.getElementById('captureArea');
@@ -283,14 +323,11 @@
             const availableWidth = window.innerWidth - 20;
             const actualTableWidth = captureArea.offsetWidth;
 
-            // Calculate Scale
             let scale = availableWidth / actualTableWidth;
-            if (scale > 1) scale = 1; // Don't enlarge on desktop
+            if (scale > 1) scale = 1;
 
-            // Apply Scale
             wrapper.style.transform = `scale(${scale})`;
 
-            // Fix Height: Ensures the "Download" bar doesn't cover data or float too far
             const scaledHeight = captureArea.offsetHeight * scale;
             outerContainer.style.height = (scaledHeight + 20) + "px";
         }
@@ -323,7 +360,6 @@
                 body.innerHTML += row;
             }
 
-            // Small delay to allow browser to calculate table width before scaling
             setTimeout(autoScale, 100);
         }
 
@@ -335,7 +371,7 @@
             try {
                 const dataUrl = await htmlToImage.toPng(node, {
                     backgroundColor: '#fff',
-                    pixelRatio: 2 // High Quality
+                    pixelRatio: 2
                 });
                 const link = document.createElement('a');
                 link.download = `Chart-${monthNames[mSel.value - 1]}.png`;
