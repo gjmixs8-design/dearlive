@@ -3,34 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Kerala Jackpot</title>
+    <title>KR Chart & Kerala Jackpot</title>
     <style>
         :root {
             --green-border: #2e7d32;
-            --header-bg: #ffefdb; /* Light peach/cream */
+            --header-bg: #fdc279;
             --text-red: #d32f2f;
             --link-blue: #0000ee;
+            --cyan-divider: #4dd0e1;
         }
 
         body {
             font-family: Arial, sans-serif;
-            background-color: #ffffff;
+            background-color: #f0f2f5;
             margin: 0;
             padding: 10px;
             display: flex;
             justify-content: center;
         }
 
-        /* Responsive Container */
         .wrapper {
             width: 100%;
-            max-width: 500px; /* Limit width on desktop */
+            max-width: 500px;
             border: 2px solid var(--green-border);
+            background-color: #ffffff;
             text-align: center;
             padding-bottom: 20px;
             box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
+        /* Header Styles */
+        .header-title {
+            color: var(--text-red);
+            font-size: 1.6rem;
+            font-weight: bold;
+            text-decoration: underline;
+            margin: 20px 0;
+        }
+
+        .cyan-divider {
+            width: 100%;
+            height: 4px;
+            background-color: var(--cyan-divider);
+            margin-bottom: 20px;
+        }
+
+        /* KR Chart List Styles */
+        .result-item {
+            margin: 15px 0;
+        }
+
+        .result-link-top {
+            color: #0000ff;
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-decoration: underline;
+            cursor: pointer;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .placeholder-dashes {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* KL Jackpot Section Styles */
         .title-red {
             color: var(--text-red);
             font-size: 1.5rem;
@@ -45,7 +85,6 @@
             margin-bottom: 10px;
         }
 
-        /* Box Sections */
         .box-header {
             background-color: var(--header-bg);
             border: 1px solid var(--green-border);
@@ -64,7 +103,6 @@
             letter-spacing: 3px;
         }
 
-        /* Result Section */
         .result-container {
             border: 1px solid var(--green-border);
             margin: 15px 10px;
@@ -77,99 +115,83 @@
             margin-bottom: 15px;
         }
 
+        /* Buttons */
         .refresh-btn {
             background-color: #008000;
             color: white;
             border: none;
-            padding: 10px 35px;
+            padding: 12px 45px;
             border-radius: 25px;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             cursor: pointer;
-            margin-bottom: 20px;
+            margin: 20px 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            transition: transform 0.1s;
-        }
-        
-        .refresh-btn:active { transform: scale(0.95); }
-
-        .link-text {
-            color: black;
-            font-weight: bold;
-            line-height: 1.5;
-            font-size: 1rem;
         }
 
-        .blue-link { color: var(--link-blue); cursor: pointer; }
-
-        /* Grid Buttons */
         .button-grid {
             display: grid;
             grid-template-columns: 1fr 1fr; 
             gap: 12px;
             padding: 0 10px;
+            margin-top: 20px;
         }
 
-        /* Link Button Styling */
         .btn {
             color: white;
             padding: 12px 5px;
             border-radius: 6px;
             font-weight: bold;
-            text-decoration: none; /* Removes underline */
+            text-decoration: none;
             font-size: 0.9rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.2s;
         }
-
-        .btn:hover { opacity: 0.9; }
 
         .btn-pink { background-color: #e91e63; }
         .btn-green { background-color: #4caf50; }
         .btn-blue { background-color: #2196f3; }
         .btn-orange { background-color: #ff9800; }
-
-        /* Desktop specific tweaks */
-        @media (min-width: 768px) {
-            body { background-color: #f0f2f5; padding: 40px; }
-            .wrapper { box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: white; }
-        }
     </style>
 </head>
 <body>
 
 <div class="wrapper">
+    <div class="header-title">-Jackpot + KR-Chart-Guessing</div>
+    <div class="cyan-divider"></div>
+
+    <div class="result-item"><span class="result-link-top">11 AM Result</span><div class="placeholder-dashes">--</div></div>
+    <div class="result-item"><span class="result-link-top">12 PM Result</span><div class="placeholder-dashes">--</div></div>
+    <div class="result-item"><span class="result-link-top">1 PM Result</span><div class="placeholder-dashes">--</div></div>
+    <div class="result-item"><span class="result-link-top">2 PM Result</span><div class="placeholder-dashes">--</div></div>
+    <div class="result-item"><span class="result-link-top">4 PM Result</span><div class="placeholder-dashes">--</div></div>
+    <div class="result-item"><span class="result-link-top">6 PM Result</span><div class="placeholder-dashes">--</div></div>
+    <div class="result-item"><span class="result-link-top">7 PM Result</span><div class="placeholder-dashes">--</div></div>
+    <div class="result-item"><span class="result-link-top">8 PM Result</span><div class="placeholder-dashes">--</div></div>
+
+    <button class="refresh-btn" onclick="location.reload()">Refresh Chart</button>
+
+    <div class="cyan-divider"></div>
+
     <div class="title-red">2pm KL Guessing Time</div>
     <div class="guessing-num">3 r 6</div>
 
     <div class="box-header">2.30 KL Machine Number</div>
     <div class="number-display">490427</div>
 
-    <div class="box-header" style="font-size: 1.4rem;">
-        3pm Kerala Jackpot Result
-    </div>
+    <div class="box-header" style="font-size: 1.4rem;">3pm Kerala Jackpot Result</div>
 
     <div class="result-container">
         <div class="result-code">DW 809210</div>
-        <button class="refresh-btn" onclick="location.reload()">Refresh</button>
-        
-        <div class="link-text">
-            Check <span class="blue-link">Kerala Lottery Result Today</span><br>
-            18-02-2026<br>
-            Check <span class="blue-link">Dear Lottery Result 18-02-2026</span><br>
-            – Lottery Sambad<br>
-            Check <span class="blue-link">lottery sambad today 18-02-2026</span><br>
-            – nagaland state lottery
-        </div>
+        <button class="refresh-btn" onclick="location.reload()">Refresh Result</button>
     </div>
 
     <div class="button-grid">
         <a href="home.html" class="btn btn-pink">🎉 Kerala Jackpot</a>
         <a href="index.html" class="btn btn-green">💰 Dear Jackpot</a>
         <a href="kl result page.html" class="btn btn-blue">Kerala Lottery Chart</a>
-        <a href="kolkata-ff.html" class="btn btn-orange">Kolkata Fatafat</a>
+        <a href="jackpot result.html" class="btn btn-orange">Jackpot and kl</a>
     </div>
 </div>
 
