@@ -35,6 +35,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            overflow-x: hidden;
         }
 
         .main-wrapper {
@@ -77,12 +78,17 @@
         .banner {
             background: var(--red);
             color: #fff;
-            padding: 15px;
+            padding: 12px;
             font-weight: 800;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             border-bottom: 2px solid #000;
+            border-top: 2px solid #000;
             text-transform: uppercase;
+        }
+
+        #capture-area .banner:first-child {
+            border-top: none;
         }
 
         .banner span {
@@ -109,10 +115,10 @@
 
         .c-head {
             background: var(--gold);
-            padding: 10px 5px;
+            padding: 8px 5px;
             text-align: center;
             border-bottom: 1px solid #000;
-            min-height: 55px;
+            min-height: 50px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -120,10 +126,10 @@
 
         .time {
             font-family: "Arial Black", sans-serif;
-            font-size: clamp(1rem, 4vw, 1.8rem);
+            font-size: clamp(1rem, 3.5vw, 1.8rem);
             font-weight: 900;
             color: var(--deep-blue);
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         .prize {
@@ -136,27 +142,28 @@
         .c-body {
             padding: 15px 5px;
             flex-grow: 1;
-            min-height: 100px;
+            min-height: 90px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .num {
             font-size: clamp(1.1rem, 4vw, 1.8rem);
             font-weight: 800;
             color: #000;
+            letter-spacing: 1px;
         }
 
         .btn {
             background: var(--green);
             color: #fff;
             border: 1px solid #2e7d32;
-            border-radius: 6px;
-            padding: 6px 4px;
-            font-size: 11px;
+            border-radius: 4px;
+            padding: 6px 2px;
+            font-size: 10px;
             font-weight: bold;
             cursor: pointer;
             width: 85%;
@@ -167,7 +174,7 @@
             background: #222;
             color: white;
             border: none;
-            padding: 15px 20px;
+            padding: 15px;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
@@ -175,7 +182,7 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            text-transform: uppercase;
+            border-radius: 0 0 5px 5px;
         }
 
         .nav-footer {
@@ -219,16 +226,6 @@
         .nav-link:last-child {
             grid-column: span 2;
         }
-
-        @media (min-width: 600px) {
-            .btn {
-                font-size: 13px;
-            }
-
-            .banner {
-                font-size: 1.5rem;
-            }
-        }
     </style>
 </head>
 
@@ -242,7 +239,25 @@
                 </div>
 
                 <div class="banner"><span>Check</span> DEAR Result</div>
-                <div class="grid">
+                <div class="grid" id="grid-results">
+                    <div class="cell">
+                        <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">6PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">10AM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
@@ -262,31 +277,13 @@
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
                         <div class="c-head"><span class="time">5PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">6PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
                         <div class="c-head"><span class="time">7PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
@@ -300,7 +297,25 @@
                 </div>
 
                 <div class="banner">Dear Lottery Machine Number</div>
-                <div class="grid">
+                <div class="grid" id="grid-machine">
+                    <div class="cell">
+                        <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">6PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">10AM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
@@ -320,31 +335,13 @@
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
                         <div class="c-head"><span class="time">5PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">6PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
                         <div class="c-head"><span class="time">7PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
@@ -358,7 +355,7 @@
                 </div>
             </div>
 
-            <button class="download-trigger" onclick="downloadResults()">
+            <button class="download-trigger" id="download-btn" onclick="downloadResults()">
                 <i class="fas fa-download"></i> DOWNLOAD RESULTS IMAGE
             </button>
 
@@ -387,33 +384,33 @@
             });
         });
 
-        // Smart Download Logic for Mobile & Web
+        // High Quality Download Logic for Mobile & Web
         async function downloadResults() {
             const captureArea = document.getElementById('capture-area');
             const buttons = document.querySelectorAll('.btn');
 
-            // Hide buttons for clean image
+            // Hide buttons for a clean image
             buttons.forEach(b => b.style.visibility = 'hidden');
 
             try {
                 const canvas = await html2canvas(captureArea, {
-                    scale: 2, // Sharpness
+                    scale: 3, // High quality
                     useCORS: true,
                     logging: false,
                     backgroundColor: "#ffffff",
-                    // This ensures the image captures the full design even if the screen is small
-                    windowWidth: captureArea.scrollWidth,
-                    windowHeight: captureArea.scrollHeight
+                    windowWidth: captureArea.scrollWidth // Ensures web/mobile width is captured correctly
                 });
 
                 const link = document.createElement('a');
-                const today = new Date().toISOString().slice(0, 10);
-                link.download = `Dear-Results-${today}.png`;
+                const date = new Date().toISOString().slice(0, 10);
+                link.download = `Dear-Results-${date}.png`;
                 link.href = canvas.toDataURL('image/png', 1.0);
                 link.click();
             } catch (err) {
-                console.error("Capture Error:", err);
+                console.error("Download failed", err);
+                alert("Could not generate image.");
             } finally {
+                // Show buttons again
                 buttons.forEach(b => b.style.visibility = 'visible');
             }
         }
