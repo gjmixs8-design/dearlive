@@ -14,6 +14,16 @@
             --header-bg: #faef50;
             --text-dark: #f11717;
             --sidebar-width: 260px;
+
+
+            /* --- COLOR ADJUSTMENTS FOR SPECIFIC COLUMNS --- */
+            /* You can change these hex codes to adjust the column shades */
+            --color-01pm: #ffd2c0;
+            /* Light Yellow shade */
+            --color-06pm: #b7f7c7a9;
+            /* Light Blue shade */
+            --color-08pm: #faf6bf;
+            /* Light Green shade */
         }
 
         body {
@@ -24,28 +34,22 @@
             overflow-x: hidden;
         }
 
-        /* --- Sidebar: Expanding from the Icon --- */
+        /* --- Sidebar --- */
         .sidebar {
             position: fixed;
             left: 15px;
-            /* Starts at icon position */
             top: 15px;
-            /* Starts at icon position */
             height: auto;
-            min-height: 300px;
+            min-height: 350px;
             width: var(--sidebar-width);
-            background: var(--text-dark);
+            background: #ffc374;
             color: white;
             z-index: 3000;
-            padding-top: 60px;
+            padding-top: 50px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-
-            /* Animation Logic */
+            box-shadow: 0 10px 30px rgb(245, 199, 113);
             transform: scale(0);
-            /* Hidden by default */
             transform-origin: top left;
-            /* Expands from the icon */
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
@@ -66,7 +70,7 @@
             font-weight: bold;
         }
 
-        /* --- 📜 Scroll Menu Icon --- */
+        /* --- Menu Icon --- */
         .menu-icon {
             position: fixed;
             top: 15px;
@@ -78,20 +82,13 @@
             height: 45px;
             border-radius: 50%;
             border: 2px solid #ffd700;
-            /* Gold Lottery Border */
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 22px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s ease;
         }
 
-        .menu-icon:active {
-            transform: scale(0.9);
-        }
-
-        /* --- Layout --- */
         .main-content {
             width: 100%;
             display: flex;
@@ -111,19 +108,16 @@
             font-family: "Protest Guerrilla", sans-serif;
         }
 
-        /* --- AUTO-ADJUSTING CONTAINER --- */
         .scaler-container {
             width: 100%;
             display: flex;
             justify-content: center;
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         .table-wrapper {
             transform-origin: top center;
             display: inline-block;
-            transition: transform 0.1s ease;
         }
 
         #captureArea {
@@ -143,6 +137,7 @@
             padding: 15px;
             font-size: 24px;
             border-bottom: 2px solid var(--border);
+            text-transform: uppercase;
         }
 
         .col-head td {
@@ -176,6 +171,19 @@
             color: var(--text-dark);
         }
 
+        /* --- Individual Column Shading --- */
+        .col-01pm {
+            background-color: var(--color-01pm);
+        }
+
+        .col-06pm {
+            background-color: var(--color-06pm);
+        }
+
+        .col-08pm {
+            background-color: var(--color-08pm);
+        }
+
         .res-sub {
             display: block;
             font-size: 16px;
@@ -192,15 +200,6 @@
             justify-content: center;
         }
 
-        select,
-        button {
-            padding: 10px 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-
-        /* --- BOTTOM ACTION BAR --- */
         .download-action-bar {
             position: fixed;
             bottom: 0;
@@ -226,36 +225,12 @@
             font-weight: bold;
             cursor: pointer;
         }
-        /* --- Sidebar: Updated Color --- */
-.sidebar {
-    position: fixed;
-    left: 15px; 
-    top: 15px;  
-    height: auto;
-    min-height: 350px;
-    width: var(--sidebar-width);
-    
-    /* CHANGE THIS LINE TO YOUR PREFERRED COLOR */
-    background: #ffc374; /* Example: Deep Charcoal Black */
-    
-    color: white;
-    z-index: 3000;
-    padding-top: 50px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgb(245, 199, 113);
-    
-    /* Animation Logic */
-    transform: scale(0);
-    transform-origin: top left;
-    opacity: 0;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    pointer-events: none;
-}
-.gradient-text {
-  background: linear-gradient(90deg, #ff0000, #0000ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+
+        .gradient-text {
+            background: linear-gradient(90deg, #ff0000, #0000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
 
@@ -284,7 +259,7 @@
                 <option>2026</option>
                 <option>2025</option>
             </select>
-            <button onclick="renderChart()" style="background: #eee;">Apply Filter</button>
+            <button onclick="renderChart()" style="background: #eee; cursor: pointer;">Apply Filter</button>
         </div>
 
         <div class="scaler-container" id="outerContainer">
@@ -346,9 +321,11 @@
             const year = document.getElementById('yearSelect').value;
             const body = document.getElementById('chartBody');
             const head = document.getElementById('headerRow');
+            const banner = document.getElementById('tableTitle');
             const days = new Date(year, month, 0).getDate();
 
-            document.getElementById('tableTitle').innerText = `DEAR RESULT AND MC CHART ${monthNames[month - 1]} ${year}`;
+            // Dynamic Banner Update
+            banner.innerText = `DEAR RESULT AND MC CHART - ${monthNames[month - 1]} ${year}`;
 
             let headHtml = `<td>DATE</td>`;
             times.forEach(t => {
@@ -363,7 +340,14 @@
                 for (let i = 0; i < times.length; i++) {
                     const randomMC = Math.floor(10000 + Math.random() * 90000);
                     const randomRes = Math.floor(100 + Math.random() * 900);
-                    row += `<td>${randomMC}<span class="res-sub">${randomRes}</span></td>`;
+
+                    // Logic to apply specific shading for 1PM (index 3), 6PM (index 5), 8PM (index 7)
+                    let extraClass = "";
+                    if (i === 3) extraClass = "col-01pm";
+                    if (i === 5) extraClass = "col-06pm";
+                    if (i === 7) extraClass = "col-08pm";
+
+                    row += `<td class="${extraClass}">${randomMC}<span class="res-sub">${randomRes}</span></td>`;
                 }
                 row += `<td class="day-col">${d}</td></tr>`;
                 body.innerHTML += row;
@@ -380,10 +364,11 @@
             try {
                 const dataUrl = await htmlToImage.toPng(node, {
                     backgroundColor: '#fff',
-                    pixelRatio: 2
+                    pixelRatio: 2,
+                    style: { transform: 'scale(1)' } // Export at full size
                 });
                 const link = document.createElement('a');
-                link.download = `Chart-${monthNames[mSel.value - 1]}.png`;
+                link.download = `Result-MC-Chart-${monthNames[mSel.value - 1]}.png`;
                 link.href = dataUrl;
                 link.click();
             } catch (e) {

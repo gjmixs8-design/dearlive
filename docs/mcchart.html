@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEAR MACHINE CHART</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Protest+Guerrilla&display=swap" rel="stylesheet">
     <style>
         :root {
             --border: #333333;
@@ -12,9 +15,18 @@
             --text-dark: #fa0f0f;
             --sidebar-width: 260px;
             --scale: 1;
-            /* Your custom color variables updated */
             --sidebar-custom-bg: #ffc374;
             --sidebar-shadow: rgba(245, 199, 113, 0.8);
+
+
+            /* --- COLOR ADJUSTMENTS FOR SPECIFIC COLUMNS --- */
+            /* You can change these hex codes to adjust the column shades */
+            --color-01pm: #ffd2c0;
+            /* Light Yellow shade */
+            --color-06pm: #b7f7c7a9;
+            /* Light Blue shade */
+            --color-08pm: #faf6bf;
+            /* Light Green shade */
         }
 
         body {
@@ -25,29 +37,25 @@
             overflow-x: auto;
         }
 
-        /* --- Sidebar: Refined with your custom color --- */
+        /* --- Sidebar --- */
         .sidebar {
             position: fixed;
             left: 15px;
             top: 15px;
             height: auto;
-            min-height: 300px;
+            min-height: 350px;
             width: var(--sidebar-width);
             background: var(--sidebar-custom-bg);
             color: #333;
-            /* Darker text for better contrast on peach */
             z-index: 3000;
-            padding-top: 60px;
+            padding-top: 50px;
             border-radius: 15px;
             box-shadow: 0 10px 30px var(--sidebar-shadow);
-
-            /* Animation Logic */
             transform: scale(0);
             transform-origin: top left;
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
-            overflow: hidden;
         }
 
         .sidebar.active {
@@ -59,8 +67,7 @@
         .sidebar a {
             padding: 15px 25px;
             display: block;
-            color: #e7e7e7;
-            /* Darker text for readability */
+            color: #ebe8e8;
             text-decoration: none;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             font-weight: bold;
@@ -68,14 +75,11 @@
         }
 
         .sidebar a:hover {
-            background: rgba(255, 255, 255, 0.4);
-            /* Brighter hover highlight */
-            color: #000;
+            background: rgba(255, 255, 255, 0.3);
             padding-left: 35px;
-            /* Nice sliding effect */
         }
 
-        /* --- Scroll Icon Style --- */
+        /* --- Menu Icon --- */
         .menu-icon {
             position: fixed;
             top: 15px;
@@ -92,14 +96,9 @@
             justify-content: center;
             font-size: 22px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s ease;
         }
 
-        .menu-icon:active {
-            transform: scale(0.9);
-        }
-
-        /* --- Layout & Table Styles --- */
+        /* --- Layout --- */
         .main-content {
             width: 100%;
             display: flex;
@@ -115,21 +114,44 @@
             text-transform: uppercase;
             font-weight: 800;
             text-align: center;
+            font-family: "Protest Guerrilla", sans-serif;
         }
 
+        .toolbar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        select,
+        .btn-apply {
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .btn-apply {
+            background: #e91616;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* --- Table Styling --- */
         .table-outer {
             width: 100%;
             display: flex;
             justify-content: center;
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         .table-inner {
             transform: scale(var(--scale));
             transform-origin: top center;
             display: inline-block;
-            transition: transform 0.2s ease;
         }
 
         #captureArea {
@@ -143,11 +165,12 @@
             min-width: 1000px;
         }
 
-        th {
-            background: var(--header-bg);
-            color: var(--text-dark);
+        .banner {
+            background: #ffdd43;
+            color: rgb(233, 27, 27);
+            font-size: 24px;
             padding: 15px;
-            font-size: 22px;
+            text-align: center;
             border: 1px solid var(--border);
             text-transform: uppercase;
         }
@@ -156,7 +179,6 @@
             background: #faee83;
             color: var(--text-dark);
             font-size: 14px;
-            padding: 10px 5px;
             border: 1px solid var(--border);
         }
 
@@ -167,47 +189,38 @@
             font-weight: 900;
         }
 
-        td {
-            border: 1px solid var(--border);
-            padding: 12px 5px;
-            font-size: 20px;
-            font-weight: 900;
-            text-align: center;
-            color: #000;
-        }
-
         .date-col {
             background: var(--header-bg);
-            width: 130px;
             color: var(--text-dark);
+            width: 60px;
+            /* Narrow width for single numbers */
             font-size: 18px;
-        }
-
-        .toolbar {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        select,
-        .btn-apply {
-            padding: 10px 20px;
             border: 1px solid var(--border);
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
         }
 
-        .btn-apply {
-            background: #db2626;
-            color: white;
-            border: none;
+        td,
+        th {
+            border: 1px solid var(--border);
+            padding: 10px 5px;
+            text-align: center;
+            font-weight: 800;
+        }
+
+        /* Column Specific Classes */
+        .col-01pm {
+            background-color: var(--color-01pm);
+        }
+
+        .col-06pm {
+            background-color: var(--color-06pm);
+        }
+
+        .col-08pm {
+            background-color: var(--color-08pm);
         }
 
         .btn-download {
-            background: #db2626;
+            background: #e91616;
             color: white;
             margin: 20px 0;
             padding: 15px 30px;
@@ -217,6 +230,12 @@
             font-size: 16px;
             border: none;
             cursor: pointer;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #ee7342, #1e77eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
@@ -228,7 +247,10 @@
     </div>
 
     <nav class="sidebar" id="sidebar">
-        <a href="#" onclick="toggleSidebar()" style="background: rgba(0,0,0,0.08); text-align: center;">Close ×</a>
+        <div style="text-align: right; padding: 10px;">
+            <span onclick="toggleSidebar()"
+                style="cursor:pointer; font-size: 24px; color: #333; padding-right: 10px;">×</span>
+        </div>
         <a href="index.html">Home</a>
         <a href="mcchart.html">Machine Chart</a>
         <a href="result chart.html">Results Chart</a>
@@ -238,7 +260,7 @@
     </nav>
 
     <div class="main-content">
-        <h1 id="pageTitle">𝔻𝔼𝔸ℝ 𝕄𝔸ℂℍ𝕀ℕ𝔼 ℕ𝕌𝕄𝔹𝔼ℝ ℂℍ𝔸ℝ𝕋</h1>
+        <h1 class="gradient-text">𝔻𝔼𝔸ℝ 𝕄𝔸ℂℍ𝕀ℕ𝔼 ℕ𝕌𝕄𝔹𝔼ℝ ℂℍ𝔸ℝ𝕋</h1>
 
         <div class="toolbar">
             <select id="monthSelect"></select>
@@ -255,7 +277,7 @@
                     <table id="targetTable">
                         <thead>
                             <tr>
-                                <th colspan="11" id="tableHeaderTitle">DEAR MACHINE NUMBER CHART</th>
+                                <th colspan="11" class="banner" id="tableBannerTitle">DEAR MACHINE NUMBER CHART</th>
                             </tr>
                             <tr id="headerRow"></tr>
                         </thead>
@@ -291,7 +313,6 @@
 
             const availableWidth = window.innerWidth - 20;
             const actualWidth = captureArea.offsetWidth;
-
             let scale = Math.min(1, availableWidth / actualWidth);
 
             document.documentElement.style.setProperty('--scale', scale);
@@ -303,26 +324,37 @@
             const year = document.getElementById('yearSelect').value;
             const body = document.getElementById('chartBody');
             const head = document.getElementById('headerRow');
+            const banner = document.getElementById('tableBannerTitle');
             const days = new Date(year, month, 0).getDate();
 
-            document.getElementById('tableHeaderTitle').innerText = `DEAR MACHINE NUMBER CHART ${monthNames[month - 1]} ${year}`;
+            // Update Dynamic Banner with Month Name
+            banner.innerText = `DEAR MACHINE NUMBER CHART - ${monthNames[month - 1]} ${year}`;
 
-            let headHtml = `<td class="time-header">DATE</td>`;
+            // Create Headers
+            let headHtml = `<td class="time-header">Date</td>`;
             times.forEach(t => {
                 headHtml += `<td class="time-header"><span class="time-label">${t}</span>MC</td>`;
             });
-            headHtml += `<td class="time-header">DATE</td>`;
+            headHtml += `<td class="time-header">Date</td>`;
             head.innerHTML = headHtml;
 
             body.innerHTML = "";
             for (let d = 1; d <= days; d++) {
-                const dateStr = `${d.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
-                let row = `<tr><td class="date-col">${dateStr}</td>`;
+                let row = `<tr><td class="date-col">${d}</td>`;
+
                 for (let i = 0; i < times.length; i++) {
                     const dummyMC = Math.floor(10000 + Math.random() * 90000);
-                    row += `<td>${dummyMC}</td>`;
+
+                    // Assign classes for specific columns: 01PM(index 3), 06PM(index 5), 08PM(index 7)
+                    let extraClass = "";
+                    if (i === 3) extraClass = "col-01pm";
+                    if (i === 5) extraClass = "col-06pm";
+                    if (i === 7) extraClass = "col-08pm";
+
+                    row += `<td class="${extraClass}">${dummyMC}</td>`;
                 }
-                row += `<td class="date-col">${dateStr}</td></tr>`;
+
+                row += `<td class="date-col">${d}</td></tr>`;
                 body.innerHTML += row;
             }
 
