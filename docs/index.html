@@ -54,7 +54,6 @@
             box-shadow: var(--shadow);
         }
 
-        /* Capture Area: Results and Machine Numbers */
         #capture-area {
             background: white;
             width: 100%;
@@ -166,7 +165,6 @@
             transform: scale(0.95);
         }
 
-        /* Guessing Section Styles */
         .guessing-section {
             padding: 20px;
             text-align: center;
@@ -206,7 +204,6 @@
             margin: 15px auto;
         }
 
-        /* New Guessing Box Styles */
         .guess-card-container {
             display: flex;
             flex-direction: column;
@@ -307,6 +304,28 @@
                 </div>
 
                 <div class="banner"><span>Check</span> DEAR Result</div>
+
+                <div class="grid">
+                    <div class="cell">
+                        <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">6PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid">
                     <div class="cell">
                         <div class="c-head"><span class="time">10AM</span><span class="prize">1st Prize</span></div>
@@ -327,31 +346,13 @@
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
                         <div class="c-head"><span class="time">5PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">6PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
                         <div class="c-head"><span class="time">7PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
@@ -365,7 +366,27 @@
                 </div>
 
                 <div class="banner">Dear Lottery Machine Number</div>
+
                 <div class="grid">
+                    <div class="cell">
+                        <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">6PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-body">
+                            <div class="num">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+
                     <div class="cell">
                         <div class="c-head"><span class="time">10AM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
@@ -385,31 +406,13 @@
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
                         <div class="c-head"><span class="time">5PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">6PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
                         <div class="c-head"><span class="time">7PM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-                    <div class="cell">
-                        <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
                             <div class="num">===</div><button class="btn">REFRESH</button>
                         </div>
@@ -422,8 +425,9 @@
                     </div>
                 </div>
             </div>
+
             <button class="download-trigger" onclick="downloadResults()">
-                <i class="fas fa-download"></i> DOWNLOAD RESULTS 
+                <i class="fas fa-download"></i> DOWNLOAD RESULTS
             </button>
 
             <div class="guessing-section">
@@ -441,22 +445,13 @@
                     <div class="num-box">25</div>
                 </div>
                 <div class="arrow-down"></div>
-
                 <div class="guess-card-container">
-                    <div class="guess-card">
-                        <span class="title-red">1pm Dear Guessing </span>
-                        <span class="guessing-num">3 r 6</span>
-                    </div>
-
-                    <div class="guess-card">
-                        <span class="title-red">6pm Dear Guessing </span>
-                        <span class="guessing-num">3 r 6</span>
-                    </div>
-
-                    <div class="guess-card">
-                        <span class="title-red">8pm Dear Guessing </span>
-                        <span class="guessing-num">3 r 6</span>
-                    </div>
+                    <div class="guess-card"><span class="title-red">1pm Dear Guessing </span><span
+                            class="guessing-num">3 r 6</span></div>
+                    <div class="guess-card"><span class="title-red">6pm Dear Guessing </span><span
+                            class="guessing-num">3 r 6</span></div>
+                    <div class="guess-card"><span class="title-red">8pm Dear Guessing </span><span
+                            class="guessing-num">3 r 6</span></div>
                 </div>
             </div>
 
@@ -473,7 +468,6 @@
     </div>
 
     <script>
-        // Logic to Refresh Random Numbers
         document.querySelectorAll('.btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const numDisplay = e.target.parentElement.querySelector('.num');
@@ -484,11 +478,9 @@
             });
         });
 
-        // High-Quality Download Logic
         async function downloadResults() {
             const captureArea = document.getElementById('capture-area');
             const btns = document.querySelectorAll('.btn');
-
             btns.forEach(b => b.style.display = 'none');
 
             try {
@@ -498,7 +490,6 @@
                     logging: false,
                     backgroundColor: "#ffffff"
                 });
-
                 const link = document.createElement('a');
                 const date = new Date().toISOString().slice(0, 10);
                 link.download = `Dear-Result-MC-${date}.png`;
