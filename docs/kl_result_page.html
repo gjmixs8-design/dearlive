@@ -26,57 +26,9 @@
             overflow-x: hidden;
         }
 
-        /* --- Sidebar & Menu --- */
-        .sidebar {
-            position: fixed;
-            left: -260px;
-            top: 0;
-            height: 100%;
-            width: 260px;
-            background: var(--sidebar-maroon);
-            color: white;
-            transition: 0.3s ease;
-            z-index: 3000;
-            padding-top: 60px;
-            text-align: left;
-        }
-
-        .sidebar.active {
-            left: 0;
-        }
-
-        .sidebar a {
-            padding: 15px 25px;
-            display: block;
-            color: white;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-weight: bold;
-        }
-
-        .menu-icon {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            cursor: pointer;
-            z-index: 3100;
-            background: white;
-            padding: 8px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .menu-icon div {
-            width: 25px;
-            height: 3px;
-            background: var(--sidebar-maroon);
-            margin: 5px 0;
-        }
-
-        /* --- Table Layout --- */
         h1 {
             color: var(--sidebar-maroon);
-            margin-top: 70px;
+            margin-top: 30px;
             font-size: 22px;
             text-transform: uppercase;
             font-family: "Young Serif", serif;
@@ -100,8 +52,8 @@
             border-collapse: collapse;
             background: #fff;
             border: 2px solid #000;
-            width: 1500px;
-            /* Fixed width for yearly data consistency */
+            width: 1600px;
+            /* Slightly wider to accommodate labels */
         }
 
         th,
@@ -109,7 +61,8 @@
             border: 1px solid #999;
             padding: 6px 2px;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 11px;
+            /* Smaller font to fit labels */
             text-align: center;
         }
 
@@ -122,6 +75,12 @@
         .hdr-sub {
             background: #f8d256;
             color: #d32f2f;
+        }
+
+        .hdr-labels {
+            background: #fff3e0;
+            color: #555;
+            font-size: 10px;
         }
 
         .date-col {
@@ -150,7 +109,6 @@
             background-color: #ffebee;
         }
 
-        /* --- Button --- */
         .btn-download {
             background: var(--sidebar-maroon);
             color: white;
@@ -171,30 +129,17 @@
 
 <body>
 
-    <!-- <div class="menu-icon" onclick="toggleSidebar()">
-        <div></div><div></div><div></div>
-    </div>
-
-    <nav id="sidebar" class="sidebar">
-        <div style="text-align: right; padding: 10px;">
-            <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 24px; padding-right:15px;">×</span>
-        </div>
-        <a href="#">Home</a>
-        <a href="#">Yearly Chart</a>
-        <a href="#">Results</a>
-    </nav> -->
-
-    <h1>Kerala Yearly Result Chart (2025 -26)</h1>
+    <h1>Kerala Yearly Result Chart (2025 - 26)</h1>
 
     <div class="table-outer" id="tableOuter">
         <div class="table-inner" id="tableInner">
             <table id="targetTable">
                 <thead>
                     <tr class="hdr-main">
-                        <th colspan="25">Kerala Yearly Result Chart (2025 -26)</th>
+                        <th colspan="25">Kerala Yearly Result Chart (2025 - 26)</th>
                     </tr>
                     <tr class="hdr-sub">
-                        <th class="date-col">DATE</th>
+                        <th class="date-col" rowspan="2">DATE</th>
                         <th colspan="2" class="month-header">FEB</th>
                         <th colspan="2" class="month-header">MAR</th>
                         <th colspan="2" class="month-header">APR</th>
@@ -208,6 +153,32 @@
                         <th colspan="2" class="month-header">DEC</th>
                         <th colspan="2" class="month-header">JAN</th>
                     </tr>
+                    <tr class="hdr-labels">
+                        <th>MACHINE</th>
+                        <th class="col-right">RESULT</th>
+                        <th>MACHINE</th>
+                        <th class="col-right">RESULT</th>
+                        <th>MACHINE</th>
+                        <th class="col-right">RESULT</th>
+                        <th>MACHINE</th>
+                        <th class="col-right">RESULT</th>
+                        <th>MACHINE</th>
+                        <th class="col-right">RESULT</th>
+                        <th>MACHINE</th>
+                        <th class="col-right">RESULT</th>
+                        <th>MACHINE</th>
+                        <th class="col-right">RESULT</th>
+                        <th>MACHINE</th>
+                        <th class="col-right">RESULT</th>
+                        <th>MACHINE</th>
+                        <th class="col-right">RESULT</th>
+                        <th>MACHINE</th>
+                        <th class="col-right">RESULT</th>
+                        <th>MACHINE</th>
+                        <th class="col-right">RESULT</th>
+                        <th>MACHINE</th>
+                        <th class="col-right">RESULT</th>
+                    </tr>
                 </thead>
                 <tbody id="tableBody">
                 </tbody>
@@ -218,12 +189,7 @@
     <button class="btn-download" id="dlBtn" onclick="downloadTable()">Download Chart</button>
 
     <script>
-        // 1. Sidebar Toggle
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-        }
-
-        // 2. Generate Data (6-Digit Numbers)
+        // 1. Generate Data (6-Digit Numbers)
         function generateTableData() {
             const body = document.getElementById('tableBody');
             let html = '';
@@ -231,14 +197,12 @@
             for (let d = 1; d <= 31; d++) {
                 html += `<tr><td class="date-col">${d}</td>`;
                 for (let m = 0; m < 12; m++) {
-                    // Handle months shorter than 31 days
                     const isFebEnd = (d > 28 && m === 0);
                     const isShortMonthEnd = (d > 30 && [2, 4, 7, 9].includes(m));
 
                     if (isFebEnd || isShortMonthEnd) {
                         html += `<td class="stars">***</td><td class="col-right stars">***</td>`;
                     } else {
-                        // Generate 6-digit random numbers
                         let val1 = Math.floor(100000 + Math.random() * 900000);
                         let val2 = Math.floor(100000 + Math.random() * 900000);
                         let cls = (d % 5 === 0) ? 'highlight-red' : '';
@@ -250,14 +214,14 @@
             body.innerHTML = html;
         }
 
-        // 3. Mobile Responsive Scaling
+        // 2. Mobile Responsive Scaling
         function applyAutoScale() {
             const inner = document.getElementById('tableInner');
             const outer = document.getElementById('tableOuter');
             const table = document.getElementById('targetTable');
 
-            const availableWidth = window.innerWidth * 0.96;
-            const actualWidth = 1500; // Match the CSS table width
+            const availableWidth = window.innerWidth * 0.98;
+            const actualWidth = 1600;
             const scale = availableWidth / actualWidth;
 
             if (scale < 1) {
@@ -269,7 +233,7 @@
             }
         }
 
-        // 4. PNG Export
+        // 3. PNG Export
         async function downloadTable() {
             const btn = document.getElementById('dlBtn');
             const node = document.getElementById('targetTable');
@@ -278,7 +242,7 @@
             try {
                 const dataUrl = await htmlToImage.toPng(node, {
                     backgroundColor: '#fff',
-                    style: { transform: 'scale(1)' } // Export at full size
+                    style: { transform: 'scale(1)' }
                 });
                 const link = document.createElement('a');
                 link.download = 'Kerala-Yearly-Chart.png';
