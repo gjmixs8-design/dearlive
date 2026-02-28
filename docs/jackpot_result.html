@@ -4,7 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jackpot + Kerala Result Chart</title>
+    <title>Jackpot + Kerala Result Chart 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Protest+Guerrilla&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
     <style>
         :root {
             --jackpot-gold: #FFD700;
@@ -13,32 +17,39 @@
             --header-gold: #f4c430;
             --border: #222;
             --scale: 1;
+            --sidebar-width: 260px;
         }
 
         body {
-            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', sans-serif;
-            background: #fffdf0; /* Slight parchment feel */
+            font-family: 'Trebuchet MS', sans-serif;
+            background: #fffdf0;
             margin: 0;
             text-align: center;
         }
 
-        /* --- Sidebar & Menu --- */
+        /* --- Sidebar --- */
         .sidebar {
             position: fixed;
-            left: -260px;
-            top: 0;
-            height: 100%;
-            width: 260px;
+            left: 15px;
+            top: 15px;
+            width: var(--sidebar-width);
             background: var(--sidebar-maroon);
-            color: white;
-            transition: 0.3s ease;
             z-index: 3000;
-            padding-top: 60px;
+            padding-top: 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: scale(0);
+            transform-origin: top left;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
             text-align: left;
         }
 
         .sidebar.active {
-            left: 0;
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .sidebar a {
@@ -46,8 +57,8 @@
             display: block;
             color: white;
             text-decoration: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             font-weight: bold;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .menu-icon {
@@ -57,31 +68,51 @@
             cursor: pointer;
             z-index: 3100;
             background: var(--jackpot-gold);
-            padding: 8px;
-            border-radius: 5px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .menu-icon div {
-            width: 25px;
-            height: 3px;
-            background: var(--jackpot-deep-red);
-            margin: 5px 0;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 24px;
         }
 
         /* --- Layout --- */
-        h1 {
-            color: var(--jackpot-deep-red);
+        .gradient-text {
+            background: linear-gradient(90deg, var(--jackpot-deep-red), #1e77eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: "Protest Guerrilla", sans-serif;
+            font-size: 2.2rem;
             margin-top: 70px;
-            font-size: 28px;
-            text-transform: uppercase;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            letter-spacing: 2px;
         }
 
+        .toolbar {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        select,
+        .btn-apply {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-weight: bold;
+        }
+
+        .btn-apply {
+            background: var(--jackpot-deep-red);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* --- Table Styling --- */
         .table-outer {
-            width: 95vw;
-            margin: 20px auto;
+            width: 100%;
             overflow: hidden;
             display: flex;
             justify-content: center;
@@ -90,30 +121,28 @@
         .table-inner {
             transform: scale(var(--scale));
             transform-origin: top center;
-            display: inline-block;
+            padding: 10px;
         }
 
-        /* --- Table Styling --- */
+        #captureArea {
+            background: white;
+            display: inline-block;
+            border: 4px solid #000;
+        }
+
         table {
             border-collapse: collapse;
-            background: #fff;
-            border: 3px solid #000;
-            min-width: 950px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            min-width: 1050px;
         }
 
-        th, td {
-            border: 1px solid var(--border);
-            padding: 10px;
-            font-weight: 900;
-            font-size: 17px;
-        }
-
-        .hdr-main {
+        .banner-row {
             background: var(--jackpot-deep-red);
             color: var(--jackpot-gold);
-            font-size: 22px;
-            letter-spacing: 1px;
+            font-size: 28px;
+            padding: 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border-bottom: 2px solid #000;
         }
 
         .hdr-sub {
@@ -121,59 +150,63 @@
             color: #fff;
         }
 
-        .col-date {
-            color: #fff;
-            background: #444;
-            width: 60px;
+        .col-time {
+            background: var(--header-gold);
+            color: #000;
+            font-size: 14px;
         }
 
-        /* The "Jackpot" Column Styling */
+        .time-label {
+            display: block;
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .col-date {
+            background: #c74b4b;
+            color: #fff;
+            width: 55px;
+            font-size: 18px;
+        }
+
         .col-jackpot {
-            background: #fff9c4; /* Soft Gold */
+            background: #fff9c4;
             color: #000;
             width: 130px;
             border-left: 3px solid #000;
             border-right: 3px solid #000;
-            font-size: 19px;
+            font-size: 20px;
         }
 
-        .col-time {
-            background: var(--header-gold);
-            color: #000;
+        td,
+        th {
+            border: 1px solid var(--border);
+            padding: 10px 5px;
+            font-weight: 800;
         }
 
-        /* --- Buttons --- */
         .btn-download {
             background: var(--jackpot-deep-red);
             color: var(--jackpot-gold);
+            margin: 30px 0;
             padding: 15px 40px;
-            border: 2px solid var(--jackpot-gold);
             border-radius: 30px;
-            font-weight: bold;
-            font-size: 16px;
+            font-size: 18px;
+            border: 2px solid var(--jackpot-gold);
             cursor: pointer;
-            margin: 20px;
-            transition: 0.2s;
-        }
-
-        .btn-download:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(178, 34, 34, 0.4);
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(178, 34, 34, 0.4);
         }
     </style>
 </head>
 
 <body>
+<!-- 
+    <div class="menu-icon" onclick="toggleSidebar()">📜</div>
 
-    <!-- <div class="menu-icon" onclick="toggleSidebar()">
-        <div></div>
-        <div></div>
-        <div></div>
-    </div>
-
-    <nav id="sidebar" class="sidebar">
+    <nav class="sidebar" id="sidebar">
         <div style="text-align: right; padding: 10px;">
-            <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 24px; padding-right:15px;">×</span>
+            <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 28px; color:white;">&times;</span>
         </div>
         <a href="#">Home</a>
         <a href="#">Jackpot Chart</a>
@@ -181,71 +214,69 @@
         <a href="#">Old Results</a>
     </nav> -->
 
-    <h1>Jackpot + Kerala Results</h1>
+    <div class="main-content">
+        <h1 class="gradient-text">JACKPOT + KERALA RESULT CHART</h1>
 
-    <div class="table-outer" id="tableOuter">
-        <div class="table-inner" id="tableInner">
-            <table id="targetTable">
-                <thead>
-                    <tr class="hdr-main">
-                        <td>FEB</td>
-                        <td colspan="4">Jackpot Results</td>
-                        <td>Kerala State</td>
-                        <td colspan="4">Evening Times</td>
-                    </tr>
-                    <tr class="hdr-sub">
-                        <td class="col-time" style="background:#000; color:gold;">DATE</td>
-                        <td class="col-time">11 AM</td>
-                        <td class="col-time">12 PM</td>
-                        <td class="col-time">01 PM</td>
-                        <td class="col-time">02 PM</td>
-                        <td class="col-jackpot" style="background: gold; color: #000;">JACKPOT</td>
-                        <td class="col-time">04 PM</td>
-                        <td class="col-time">06 PM</td>
-                        <td class="col-time">07 PM</td>
-                        <td class="col-time">08 PM</td>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr>
-                        <td class="col-date">1</td>
-                        <td>814</td><td>631</td><td>796</td><td>510</td>
-                        <td class="col-jackpot">390890</td>
-                        <td>687</td><td>163</td><td>734</td><td>218</td>
-                    </tr>
-                    <tr>
-                        <td class="col-date">2</td>
-                        <td>487</td><td>179</td><td>516</td><td>197</td>
-                        <td class="col-jackpot">329983</td>
-                        <td>775</td><td>526</td><td>863</td><td>801</td>
-                    </tr>
-                    <tr>
-                        <td class="col-date">3</td>
-                        <td>623</td><td>965</td><td>840</td><td>738</td>
-                        <td class="col-jackpot">272988</td>
-                        <td>261</td><td>356</td><td>666</td><td>034</td>
-                    </tr>
-                    <tr>
-                        <td class="col-date">4</td>
-                        <td>347</td><td>572</td><td>456</td><td>579</td>
-                        <td class="col-jackpot">314235</td>
-                        <td>693</td><td>580</td><td>601</td><td>574</td>
-                    </tr>
-                    <tr>
-                        <td class="col-date">5</td>
-                        <td>261</td><td>814</td><td>598</td><td>726</td>
-                        <td class="col-jackpot">303206</td>
-                        <td>485</td><td>170</td><td>952</td><td>066</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="toolbar">
+            <select id="monthSelect"></select>
+            <select id="yearSelect">
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+            </select>
+            <button class="btn-apply" onclick="renderChart()">Apply Filter</button>
         </div>
+
+        <div class="table-outer" id="tableOuter">
+            <div class="table-inner" id="tableInner">
+                <div id="captureArea">
+                    <table id="targetTable">
+                        <thead>
+                            <tr>
+                                <th colspan="11" class="banner-row" id="tableBannerTitle">JACKPOT + KERALA RESULT CHART
+                                </th>
+                            </tr>
+                            <tr class="hdr-sub">
+                                <td class="col-time" style="background:#cc4e4e; color:gold;">DATE</td>
+                                <td class="col-time"><span class="time-label">11 AM</span></td>
+                                <td class="col-time"><span class="time-label">12 PM</span></td>
+                                <td class="col-time"><span class="time-label">01 PM</span></td>
+                                <td class="col-time"><span class="time-label">02 PM</span></td>
+                                <td class="col-jackpot" style="background: gold;">KERALA</td>
+                                <td class="col-time"><span class="time-label">04 PM</span></td>
+                                <td class="col-time"><span class="time-label">06 PM</span></td>
+                                <td class="col-time"><span class="time-label">07 PM</span></td>
+                                <td class="col-time"><span class="time-label">08 PM</span></td>
+                                <td class="col-time" style="background:#cc4e4e; color:gold;">DATE</td>
+                            </tr>
+                        </thead>
+                        <tbody id="chartBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-download" onclick="exportToPNG()">Download PNG Chart</button>
     </div>
 
-    <button class="btn-download" onclick="downloadTable()">Download Jackpot Chart</button>
-
-    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
     <script>
+        const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+
+        // YOUR DATA PRESERVED
+        const jackpotData = {
+            1: ["814", "631", "796", "510", "390890", "687", "163", "734", "218"],
+            2: ["487", "179", "516", "197", "329983", "775", "526", "863", "801"],
+            3: ["623", "965", "840", "738", "272988", "261", "356", "666", "034"],
+            4: ["347", "572", "456", "579", "314235", "693", "580", "601", "574"],
+            5: ["261", "814", "598", "726", "303206", "485", "170", "952", "066"]
+        };
+
+        const mSel = document.getElementById('monthSelect');
+        monthNames.forEach((m, i) => {
+            let opt = new Option(m, i + 1);
+            if (i === new Date().getMonth()) opt.selected = true;
+            mSel.add(opt);
+        });
+
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
         }
@@ -253,32 +284,65 @@
         function applyAutoScale() {
             const inner = document.getElementById('tableInner');
             const outer = document.getElementById('tableOuter');
-            const table = document.getElementById('targetTable');
+            const captureArea = document.getElementById('captureArea');
+            const availableWidth = window.innerWidth * 0.98;
+            const actualWidth = captureArea.offsetWidth;
+            let scale = Math.min(1, availableWidth / actualWidth);
+            document.documentElement.style.setProperty('--scale', scale);
+            outer.style.height = (captureArea.offsetHeight * scale) + 40 + "px";
+        }
 
-            const availableWidth = window.innerWidth * 0.95;
-            const actualWidth = table.offsetWidth;
-            const scale = availableWidth / actualWidth;
+        function renderChart() {
+            const month = parseInt(mSel.value);
+            const year = document.getElementById('yearSelect').value;
+            const body = document.getElementById('chartBody');
+            const banner = document.getElementById('tableBannerTitle');
+            const daysInMonth = new Date(year, month, 0).getDate();
 
-            if (scale < 1) {
-                document.documentElement.style.setProperty('--scale', scale);
-                outer.style.height = (table.offsetHeight * scale) + "px";
-            } else {
-                document.documentElement.style.setProperty('--scale', '1');
-                outer.style.height = "auto";
+            banner.innerText = `JACKPOT + KERALA RESULT CHART - ${monthNames[month - 1]} ${year}`;
+
+            let bodyHtml = "";
+            for (let d = 1; d <= daysInMonth; d++) {
+                // Use existing data if available, otherwise empty
+                const data = (month === 2 && jackpotData[d]) ? jackpotData[d] : ["-", "-", "-", "-", "-", "-", "-", "-", "-"];
+
+                bodyHtml += `
+                    <tr>
+                        <td class="col-date">${d}</td>
+                        <td>${data[0]}</td><td>${data[1]}</td><td>${data[2]}</td><td>${data[3]}</td>
+                        <td class="col-jackpot">${data[4]}</td>
+                        <td>${data[5]}</td><td>${data[6]}</td><td>${data[7]}</td><td>${data[8]}</td>
+                        <td class="col-date">${d}</td>
+                    </tr>`;
+            }
+            body.innerHTML = bodyHtml;
+            setTimeout(applyAutoScale, 100);
+        }
+
+        async function exportToPNG() {
+            const node = document.getElementById('captureArea');
+            const btn = document.querySelector('.btn-download');
+            btn.innerText = "Capturing Image...";
+
+            try {
+                const dataUrl = await htmlToImage.toPng(node, {
+                    backgroundColor: '#ffffff',
+                    pixelRatio: 2,
+                    style: { transform: 'scale(1)', transformOrigin: 'top left' }
+                });
+                const link = document.createElement('a');
+                link.download = `Jackpot-Kerala-Chart-${monthNames[mSel.value - 1]}-${yearSelect.value}.png`;
+                link.href = dataUrl;
+                link.click();
+            } catch (e) {
+                alert("Capture failed.");
+            } finally {
+                btn.innerText = "Download PNG Chart";
             }
         }
 
-        async function downloadTable() {
-            const node = document.getElementById('targetTable');
-            const dataUrl = await htmlToImage.toPng(node, { backgroundColor: '#fff' });
-            const link = document.createElement('a');
-            link.download = 'Jackpot-Kerala-Chart.png';
-            link.href = dataUrl;
-            link.click();
-        }
-
         window.addEventListener('resize', applyAutoScale);
-        window.addEventListener('load', applyAutoScale);
+        renderChart();
     </script>
 </body>
 
