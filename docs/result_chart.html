@@ -31,7 +31,7 @@
       text-align: center;
     }
 
-    /* --- Sidebar & Menu --- */
+    /* Sidebar & menu */
     .sidebar {
       position: fixed;
       left: 15px;
@@ -87,7 +87,6 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    /* --- Main Content --- */
     .main-content {
       padding-top: 70px;
       width: 100%;
@@ -126,7 +125,6 @@
       border: none;
     }
 
-    /* --- Table Styling --- */
     .table-outer {
       width: 100%;
       display: flex;
@@ -138,13 +136,11 @@
       transform: scale(var(--scale));
       transform-origin: top center;
       padding: 10px;
-      /* Space to prevent border clipping in image */
     }
 
     #captureArea {
       background: white;
       border: 4px solid var(--border);
-      /* Thick border for PNG */
       display: inline-block;
       padding: 2px;
     }
@@ -197,16 +193,6 @@
       position: relative;
     }
 
-    /* Corner Indicator */
-    .data-cell::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      border-top: 8px solid green;
-      border-right: 8px solid transparent;
-    }
-
     .col-01pm {
       background-color: var(--color-01pm);
     }
@@ -237,12 +223,10 @@
 
 <body>
 
-  <div class="menu-icon" onclick="toggleSidebar()"><span>📜</span></div>
-
+  <div class="menu-icon" onclick="toggleSidebar()">📜</div>
   <nav class="sidebar" id="sidebar">
-    <div style="text-align: right; padding: 10px;">
-      <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 28px;">&times;</span>
-    </div>
+    <div style="text-align:right; padding:10px;"><span onclick="toggleSidebar()"
+        style="cursor:pointer; font-size:28px;">&times;</span></div>
     <a href="index.html">Home</a>
     <a href="mcchart.html">Machine Chart</a>
     <a href="result_chart.html">Results Chart</a>
@@ -253,21 +237,20 @@
 
   <div class="main-content">
     <h1 class="gradient-text">DEAR - RESULT CHART</h1>
-
     <div class="toolbar">
-      <input type="text" id="tableSearch" placeholder="Search Number..." onkeyup="renderChart()">
+      <input type="text" id="tableSearch" placeholder="Search Number...">
       <select id="monthSelect"></select>
       <select id="yearSelect">
-        <option value="2026">2026</option>
         <option value="2025">2025</option>
+        <option value="2026">2026</option>
       </select>
-      <button class="btn-apply" onclick="renderChart()">Apply Filter</button>
+      <button class="btn-apply">Apply Filter</button>
     </div>
 
     <div class="table-outer" id="tableOuter">
       <div class="table-inner" id="tableInner">
         <div id="captureArea">
-          <table id="resultTable">
+          <table>
             <thead>
               <tr>
                 <th colspan="11" class="banner" id="tableBanner">Dear Result Number Chart</th>
@@ -308,92 +291,103 @@
     <button class="btn-download" onclick="exportToPNG()">Download PNG Chart</button>
   </div>
 
-  <script>
-    const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+ <script type="module">
+  import { db } from './firebase-init.js';
+  import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js';
 
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('active');
+  const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+  
+  // These MUST match your Firebase keys exactly (including the space and colon)
+  const timeSlots = ["10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "05:00 PM", "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM"];
+
+  const mSel = document.getElementById('monthSelect');
+  const yearSelect = document.getElementById('yearSelect');
+  const tableBody = document.getElementById('tableBody');
+  const tableBanner = document.getElementById('tableBanner');
+  const searchInput = document.getElementById('tableSearch');
+
+  let allLotteryData = {}; 
+
+  // Initialize Month Dropdown
+  monthNames.forEach((m, i) => {
+    const opt = new Option(m, i + 1);
+    if (i === new Date().getMonth()) opt.selected = true;
+    mSel.add(opt);
+  });
+
+  window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('active');
+
+  window.applyAutoScale = () => {
+    const inner = document.getElementById('tableInner');
+    const outer = document.getElementById('tableOuter');
+    const captureArea = document.getElementById('captureArea');
+    const availableWidth = window.innerWidth * 0.95;
+    const actualWidth = captureArea.offsetWidth + 20;
+    const scale = Math.min(1, availableWidth / actualWidth);
+    document.documentElement.style.setProperty('--scale', scale);
+    if(outer) outer.style.height = (captureArea.offsetHeight * scale) + 50 + "px";
+  };
+
+  function renderTable() {
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    const month = String(mSel.value).padStart(2, '0');
+    const year = yearSelect.value;
+    const daysInMonth = new Date(year, parseInt(month), 0).getDate();
+    
+    tableBanner.innerText = `Dear Result Number Chart - ${monthNames[mSel.value - 1]} ${year}`;
+    tableBody.innerHTML = "";
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const day = String(d).padStart(2, '0');
+      const dateKey = `${year}-${month}-${day}`; // Matches "2026-03-02"
+      const dayData = allLotteryData[dateKey] || {};
+      
+      let rowHtml = `<tr><td class="date-col">${d}</td>`;
+      let rowMatch = false;
+      let tempCells = "";
+
+      timeSlots.forEach((slot, index) => {
+        // Accessing the "result" field specifically from your screenshot
+        let value = (dayData[slot] && dayData[slot].result) ? dayData[slot].result : "-";
+
+        if (searchTerm && String(value).toLowerCase().includes(searchTerm)) rowMatch = true;
+
+        let cls = "";
+        if (slot.includes("01:00 PM")) cls = "col-01pm";
+        if (slot.includes("06:00 PM")) cls = "col-06pm";
+        if (slot.includes("08:00 PM")) cls = "col-08pm";
+
+        tempCells += `<td class="data-cell ${cls}">${value}</td>`;
+      });
+
+      if (searchTerm && String(d).includes(searchTerm)) rowMatch = true;
+
+      if (!searchTerm || rowMatch) {
+        rowHtml += tempCells + `<td class="date-col">${d}</td></tr>`;
+        tableBody.innerHTML += rowHtml;
+      }
     }
+    setTimeout(applyAutoScale, 50);
+  }
 
-    const mSel = document.getElementById('monthSelect');
-    monthNames.forEach((m, i) => {
-      let opt = new Option(m, i + 1);
-      if (i === new Date().getMonth()) opt.selected = true;
-      mSel.add(opt);
+  // Listener for the "lottery" node
+  function connectToFirebase() {
+    const lotteryRef = ref(db, 'lottery');
+    tableBody.innerHTML = "<tr><td colspan='11'>Loading Results...</td></tr>";
+
+    onValue(lotteryRef, (snapshot) => {
+      allLotteryData = snapshot.exists() ? snapshot.val() : {};
+      renderTable();
     });
+  }
 
-    function applyAutoScale() {
-      const inner = document.getElementById('tableInner');
-      const outer = document.getElementById('tableOuter');
-      const captureArea = document.getElementById('captureArea');
+  mSel.addEventListener('change', renderTable);
+  yearSelect.addEventListener('change', renderTable);
+  searchInput.addEventListener('input', renderTable);
+  window.addEventListener('resize', applyAutoScale);
 
-      const availableWidth = window.innerWidth * 0.95;
-      const actualWidth = captureArea.offsetWidth + 20;
-      let scale = Math.min(1, availableWidth / actualWidth);
-
-      document.documentElement.style.setProperty('--scale', scale);
-      outer.style.height = (captureArea.offsetHeight * scale) + 50 + "px";
-    }
-
-    function renderChart() {
-      const body = document.getElementById('tableBody');
-      const banner = document.getElementById('tableBanner');
-      const month = parseInt(mSel.value);
-      const year = document.getElementById('yearSelect').value;
-      const days = new Date(year, month, 0).getDate();
-      const searchTerm = document.getElementById('tableSearch').value;
-
-      banner.innerText = `Dear Result Number Chart - ${monthNames[month - 1]} ${year}`;
-      body.innerHTML = "";
-
-      for (let d = 1; d <= days; d++) {
-        let rowData = [];
-        for (let i = 0; i < 9; i++) {
-          rowData.push(Math.floor(10000 + Math.random() * 90000).toString());
-        }
-
-        // Filter logic
-        if (searchTerm && !rowData.some(r => r.includes(searchTerm)) && !d.toString().includes(searchTerm)) continue;
-
-        let rowHtml = `<tr><td class="date-col">${d}</td>`;
-        rowData.forEach((val, index) => {
-          let extraClass = "";
-          if (index === 3) extraClass = "col-01pm";
-          if (index === 5) extraClass = "col-06pm";
-          if (index === 7) extraClass = "col-08pm";
-          rowHtml += `<td class="data-cell ${extraClass}">${val}</td>`;
-        });
-        rowHtml += `<td class="date-col">${d}</td></tr>`;
-        body.innerHTML += rowHtml;
-      }
-      setTimeout(applyAutoScale, 100);
-    }
-
-    async function exportToPNG() {
-      const node = document.getElementById('captureArea');
-      const btn = document.querySelector('.btn-download');
-      btn.innerText = "Capturing...";
-
-      try {
-        const dataUrl = await htmlToImage.toPng(node, {
-          backgroundColor: '#fff',
-          pixelRatio: 2,
-          style: { transform: 'scale(1)', transformOrigin: 'top left' }
-        });
-        const link = document.createElement('a');
-        link.download = `Result-Chart-${monthNames[mSel.value - 1]}-${yearSelect.value}.png`;
-        link.href = dataUrl;
-        link.click();
-      } catch (e) {
-        alert("Download failed.");
-      } finally {
-        btn.innerText = "Download PNG Chart";
-      }
-    }
-
-    window.addEventListener('resize', applyAutoScale);
-    renderChart();
-  </script>
+  connectToFirebase();
+</script>
 </body>
 
 </html>

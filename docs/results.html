@@ -157,25 +157,25 @@
     }
 
     #d1 {
-      --left: 34.4%;
+      --left: 34.2%;
       --top: 45.5%;
       --rot: -0.2deg;
     }
 
     #d2 {
-      --left: 43.8%;
+      --left: 43.3%;
       --top: 45.5%;
       --rot: 0deg;
     }
 
     #d3 {
-      --left: 53.2%;
+      --left: 52.5%;
       --top: 45.5%;
       --rot: 0.2deg;
     }
 
     #d4 {
-      --left: 62.6%;
+      --left: 61.7%;
       --top: 45.5%;
       --rot: 0.6deg;
     }
@@ -190,11 +190,12 @@
       font-size: 30px;
       color: #EACF46;
       text-shadow: 0 2px 6px rgba(0, 0, 0, .8);
+      margin: -5px 0px;
     }
 
     .info-bar2 {
       position: absolute;
-      top: 77.9%;
+      top: 77.5%;
       left: 70.5%;
       transform: translateX(-50%);
       font-weight: 800;
@@ -207,9 +208,10 @@
       position: absolute;
       top: 29.9%;
       left: -0.8%;
+      margin: 11px 5px;
       transform: rotate(270deg);
       font-weight: 800;
-      font-size: 35px;
+      font-size: 32px;
       color: #EACF46;
     }
 
@@ -254,16 +256,18 @@
       .info-bar1 {
         font-size: 10px;
         top: 77.9%;
+        margin: 0px 0px;
       }
 
       .info-bar2 {
         font-size: 10px;
-        top: 77.9%;
+        top: 77.5%;
       }
 
       .info-bar3 {
-        font-size: 11px;
+        font-size: 9px;
         font-weight: 750;
+        margin: 5px 5px;
       }
 
       .banner-live {
@@ -299,24 +303,6 @@
 
 <body>
 
-  <!-- <div class="menu-icon" onclick="toggleSidebar()">
-    <div></div>
-    <div></div>
-    <div></div>
-  </div>
-
-  <nav id="sidebar" class="sidebar">
-    <div style="text-align: right; padding: 10px;">
-      <span onclick="toggleSidebar()" style="cursor:pointer; font-size: 24px; padding-right:15px;">×</span>
-    </div>
-    <a href="index.html">Home</a>
-    <a href="mcchart.html">Machine Chart</a>
-    <a href="result chart.html">Results Chart</a>
-    <a href="mc.html">MC</a>
-    <a href="results.html">Result</a>
-    <a href="mc and result.html">MC and Result</a>
-  </nav> -->
-
   <div class="stage">
     <div class="frame" id="capture-area">
       <img src="./images/result.png" alt="Lottery Frame" crossorigin="anonymous" />
@@ -347,115 +333,160 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+  <<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getDatabase, ref, onValue, off } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
 
-    // Sidebar Toggle Function
-    window.toggleSidebar = function () {
-      document.getElementById('sidebar').classList.toggle('active');
+/* =======================
+    FIREBASE CONFIG
+   ======================= */
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCVIGlYqFf1AktnPXflEFjewAl7oNJQXrE",
+    authDomain: "dearlive-97ef5.firebaseapp.com",
+    projectId: "dearlive-97ef5",
+    storageBucket: "dearlive-97ef5.firebasestorage.app",
+    messagingSenderId: "28322305982",
+    appId: "1:28322305982:web:aeb257a85ff8213436cbef"
+  };
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* =======================
+    DOM ELEMENTS
+   ======================= */
+
+const digits = ["d0", "d1", "d2", "d3", "d4"].map(id => document.getElementById(id));
+const drawDateEl = document.getElementById("draw-date");
+const drawTimeEl = document.getElementById("draw-time");
+const drawTimeLeftEl = document.getElementById("draw-time-left");
+const countdownEl = document.getElementById("countdown");
+const liveEl = document.getElementById("banner-live");
+const weeklyEl = document.getElementById("banner-weekly");
+
+/* =======================
+    TIME SETTINGS
+   ======================= */
+
+const TIMEZONE = "Asia/Kolkata";
+const SLOTS = ['10:00 AM','11:00 AM','12:00 PM','01:00 PM','05:00 PM','06:00 PM','07:00 PM','08:00 PM'];
+
+const pad2 = n => String(n).padStart(2, '0');
+const nowIST = () => new Date(new Date().toLocaleString("en-US", { timeZone: TIMEZONE }));
+const ymd = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+
+function parseSlot(dateYMD, label){
+  const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label);
+  let H = (parseInt(m[1]) % 12) + (m[3].toUpperCase()==='PM'?12:0);
+  return new Date(`${dateYMD}T${pad2(H)}:${m[2]}:00`);
+}
+
+function getSchedule(now){
+  const today = ymd(now);
+  const todaySlots = SLOTS.map(s=>({label:s,time:parseSlot(today,s),date:today}));
+
+  const future = todaySlots.find(s=>s.time>now);
+  if(future){
+    const prev = todaySlots.filter(s=>s.time<=now).at(-1);
+    return {next:future, prev:prev};
+  }
+
+  const tomorrow = new Date(now); tomorrow.setDate(now.getDate()+1);
+  return {
+    next:{label:SLOTS[0], time:parseSlot(ymd(tomorrow),SLOTS[0]), date:ymd(tomorrow)},
+    prev:todaySlots.at(-1)
+  };
+}
+
+const msToHMS = ms=>{
+  if(ms<0) ms=0;
+  const h=Math.floor(ms/3600000);
+  const m=Math.floor((ms%3600000)/60000);
+  const s=Math.floor((ms%60000)/1000);
+  return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+};
+
+/* =======================
+    RESULT LISTENER
+   ======================= */
+
+let currentRef = null;
+
+function attachResultListener(date,label){
+
+  if(currentRef){
+    off(currentRef);
+  }
+
+  const path = `lottery/${date}/${label}/result`;
+  currentRef = ref(db, path);
+
+  onValue(currentRef, snap=>{
+    if(!snap.exists()){
+      digits.forEach(d=>d.textContent="0");
+      return;
     }
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyB7WHatcQ3QsHcoQqxAY2rJ4XVjVLY4CYQ",
-      authDomain: "dearmc-7bcee.firebaseapp.com",
-      databaseURL: "https://dearmc-7bcee-default-rtdb.firebaseio.com",
-      projectId: "dearmc-7bcee",
-      storageBucket: "dearmc-7bcee.appspot.com",
-      messagingSenderId: "690002837359",
-      appId: "1:690002837359:web:4046447df9b969c881f29a",
-      measurementId: "G-7G5928KRZ1"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    const value = String(snap.val()).replace(/\D/g,"").padStart(5,"0").slice(0,5);
 
-    const digits = ["d0", "d1", "d2", "d3", "d4"].map(id => document.getElementById(id));
-    const drawDateEl = document.getElementById("draw-date");
-    const drawTimeEl = document.getElementById("draw-time");
-    const drawTimeLeftEl = document.getElementById("draw-time-left");
-    const countdownEl = document.getElementById("countdown");
-    const liveEl = document.getElementById("banner-live");
-    const weeklyEl = document.getElementById("banner-weekly");
-
-    const TIMEZONE = "Asia/Kolkata";
-    const SLOTS = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
-    const pad2 = n => String(n).padStart(2, '0');
-    const nowIST = () => new Date(new Date().toLocaleString("en-US", { timeZone: TIMEZONE }));
-    const ymd = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-    const fmtDateHuman = d => new Intl.DateTimeFormat('en-IN', { timeZone: TIMEZONE, day: '2-digit', month: 'short', year: 'numeric' }).format(d);
-
-    function parseSlotOn(dateYMD, label) {
-      const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label); if (!m) return new Date();
-      let [_, hh, mm, ap] = m; let H = (parseInt(hh, 10) % 12) + (ap.toUpperCase() === 'PM' ? 12 : 0);
-      return new Date(`${dateYMD}T${pad2(H)}:${mm}:00`);
+    for(let i=0;i<5;i++){
+      digits[i].textContent=value[i];
     }
+  });
+}
 
-    function nextAndPrevSlots(now) {
-      const today = ymd(now);
-      const todaySlots = SLOTS.map(lbl => ({ label: lbl, time: parseSlotOn(today, lbl), date: today }));
-      const futureToday = todaySlots.filter(s => s.time > now);
-      if (futureToday.length) {
-        const next = futureToday[0];
-        const prevCandidates = todaySlots.filter(s => s.time <= now);
-        const prev = prevCandidates.length ? prevCandidates.at(-1) : (() => {
-          const yst = new Date(now); yst.setDate(now.getDate() - 1);
-          const ymdY = ymd(yst); return { label: SLOTS.at(-1), time: parseSlotOn(ymdY, SLOTS.at(-1)), date: ymdY };
-        })();
-        return { next, prev };
-      }
-      const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);
-      const next = { label: SLOTS[0], time: parseSlotOn(ymd(tomorrow), SLOTS[0]), date: ymd(tomorrow) };
-      const prev = { label: SLOTS.at(-1), time: parseSlotOn(today, SLOTS.at(-1)), date: today };
-      return { next, prev };
-    }
+/* =======================
+   MAIN UPDATE LOOP
+   ======================= */
 
-    const msToHMS = (ms) => { if (ms < 0) ms = 0; const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000), s = Math.floor((ms % 60000) / 1000); return `${pad2(h)}:${pad2(m)}:${pad2(s)}`; };
+let schedule = getSchedule(nowIST());
+attachResultListener(schedule.prev.date, schedule.prev.label);
 
-    function refreshBanners(label, schedule) {
-      const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label); if (!m) return;
-      let [_, hh, mm, ap] = m; let H = (parseInt(hh, 10) % 12) + (ap.toUpperCase() === 'PM' ? 12 : 0);
-      let period = H < 12 ? "MORNING" : H < 17 ? "AFTERNOON" : "EVENING";
-      let weekday = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, weekday: 'long' }).format(nowIST()).toUpperCase();
-      let short = mm === "00" ? `${parseInt(hh)}${ap}` : `${parseInt(hh)}:${mm}${ap}`;
-      liveEl.textContent = `DEAR ${period} ${weekday} LIVE ${short}`;
-      weeklyEl.textContent = `DEAR ${period} ${weekday} WEEKLY LOTTERY`;
-    }
+function update(){
 
-    let schedule = nextAndPrevSlots(nowIST());
-    function update() {
-      const now = nowIST();
-      if (now > schedule.next.time) schedule = nextAndPrevSlots(now);
-      drawDateEl.textContent = fmtDateHuman(schedule.next.time);
-      drawTimeEl.textContent = schedule.prev.label;
-      drawTimeLeftEl.textContent = schedule.prev.label;
-      countdownEl.textContent = msToHMS(schedule.next.time - now);
-      refreshBanners(schedule.prev.label, schedule);
-    }
+  const now = nowIST();
+  const oldLabel = schedule.prev.label;
+  const oldDate = schedule.prev.date;
 
-    onValue(ref(db, `lottery/${schedule.prev.date}/${schedule.prev.label}/result`), snap => {
-      if (snap.exists()) {
-        const s = String(snap.val()).padStart(5, '0');
-        for (let i = 0; i < 5; i++) digits[i].textContent = s[i];
-      }
-    });
+  schedule = getSchedule(now);
 
-    setInterval(update, 1000);
-    update();
+  drawDateEl.textContent = schedule.next.time.toLocaleDateString("en-IN",{timeZone:TIMEZONE});
+  drawTimeEl.textContent = schedule.prev.label;
+  drawTimeLeftEl.textContent = schedule.prev.label;
+  countdownEl.textContent = msToHMS(schedule.next.time-now);
 
-    document.getElementById("downloadBtn").addEventListener("click", () => {
-      const area = document.getElementById('capture-area');
-      html2canvas(area, {
-        scale: 3,
-        useCORS: true,
-        backgroundColor: "#ffffff"
-      }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `DearMC_Result_${drawTimeEl.textContent.replace(/\s/g, '')}.png`;
-        link.href = canvas.toDataURL("image/png", 1.0);
-        link.click();
-      });
-    });
-  </script>
+  const weekday = now.toLocaleDateString("en-US",{timeZone:TIMEZONE,weekday:'long'}).toUpperCase();
+  liveEl.textContent = `DEAR ${weekday} LIVE ${schedule.prev.label.replace(":00","").replace(" ","")}`;
+  weeklyEl.textContent = `DEAR ${weekday} WEEKLY LOTTERY`;
+
+  if(oldLabel!==schedule.prev.label || oldDate!==schedule.prev.date){
+    attachResultListener(schedule.prev.date, schedule.prev.label);
+  }
+}
+
+setInterval(update,1000);
+update();
+
+/* =======================
+    DOWNLOAD IMAGE
+   ======================= */
+
+document.getElementById("downloadBtn").addEventListener("click",()=>{
+  const area=document.getElementById("capture-area");
+
+  html2canvas(area,{
+    scale:3,
+    useCORS:true,
+    backgroundColor:"#ffffff"
+  }).then(canvas=>{
+    const link=document.createElement("a");
+    link.download=`DearMC_Result_${drawTimeEl.textContent.replace(/\s/g,'')}.png`;
+    link.href=canvas.toDataURL("image/png",1.0);
+    link.click();
+  });
+});
+</script>
 </body>
 
 </html>

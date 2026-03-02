@@ -1,11 +1,30 @@
 import { auth } from './firebase-init.js';
-import { signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-document.getElementById('login-btn').addEventListener('click', () => {
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value.trim();
+document.addEventListener('DOMContentLoaded', () => {
+  const loginBtn = document.getElementById('login-btn');
 
-  signInWithEmailAndPassword(auth, email, password)
-    .then(() => window.location.href = 'admin.html')
-    .catch(err => document.getElementById('login-error').innerText = err.message);
+  if (!loginBtn) {
+    console.error("Login button not found.");
+    return;
+  }
+
+  loginBtn.addEventListener('click', async () => {
+    const email = document.getElementById('email')?.value.trim();
+    const password = document.getElementById('password')?.value.trim();
+    const errorBox = document.getElementById('login-error');
+
+    if (!email || !password) {
+      errorBox.innerText = "Email and password required.";
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = 'admin.html';
+    } catch (err) {
+      console.error(err);
+      errorBox.innerText = err.message;
+    }
+  });
 });

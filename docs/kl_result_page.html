@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Young+Serif&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --sidebar-maroon: #800000;
@@ -53,16 +54,13 @@
             background: #fff;
             border: 2px solid #000;
             width: 1600px;
-            /* Slightly wider to accommodate labels */
         }
 
-        th,
-        td {
+        th, td {
             border: 1px solid #999;
             padding: 6px 2px;
             font-weight: bold;
             font-size: 11px;
-            /* Smaller font to fit labels */
             text-align: center;
         }
 
@@ -154,67 +152,95 @@
                         <th colspan="2" class="month-header">JAN</th>
                     </tr>
                     <tr class="hdr-labels">
-                        <th>MACHINE</th>
-                        <th class="col-right">RESULT</th>
-                        <th>MACHINE</th>
-                        <th class="col-right">RESULT</th>
-                        <th>MACHINE</th>
-                        <th class="col-right">RESULT</th>
-                        <th>MACHINE</th>
-                        <th class="col-right">RESULT</th>
-                        <th>MACHINE</th>
-                        <th class="col-right">RESULT</th>
-                        <th>MACHINE</th>
-                        <th class="col-right">RESULT</th>
-                        <th>MACHINE</th>
-                        <th class="col-right">RESULT</th>
-                        <th>MACHINE</th>
-                        <th class="col-right">RESULT</th>
-                        <th>MACHINE</th>
-                        <th class="col-right">RESULT</th>
-                        <th>MACHINE</th>
-                        <th class="col-right">RESULT</th>
-                        <th>MACHINE</th>
-                        <th class="col-right">RESULT</th>
-                        <th>MACHINE</th>
-                        <th class="col-right">RESULT</th>
+                        <th>MACHINE</th><th class="col-right">RESULT</th>
+                        <th>MACHINE</th><th class="col-right">RESULT</th>
+                        <th>MACHINE</th><th class="col-right">RESULT</th>
+                        <th>MACHINE</th><th class="col-right">RESULT</th>
+                        <th>MACHINE</th><th class="col-right">RESULT</th>
+                        <th>MACHINE</th><th class="col-right">RESULT</th>
+                        <th>MACHINE</th><th class="col-right">RESULT</th>
+                        <th>MACHINE</th><th class="col-right">RESULT</th>
+                        <th>MACHINE</th><th class="col-right">RESULT</th>
+                        <th>MACHINE</th><th class="col-right">RESULT</th>
+                        <th>MACHINE</th><th class="col-right">RESULT</th>
+                        <th>MACHINE</th><th class="col-right">RESULT</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                </tbody>
+                    </tbody>
             </table>
         </div>
     </div>
 
     <button class="btn-download" id="dlBtn" onclick="downloadTable()">Download Chart</button>
 
-    <script>
-        // 1. Generate Data (6-Digit Numbers)
-        function generateTableData() {
-            const body = document.getElementById('tableBody');
-            let html = '';
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-            for (let d = 1; d <= 31; d++) {
-                html += `<tr><td class="date-col">${d}</td>`;
-                for (let m = 0; m < 12; m++) {
-                    const isFebEnd = (d > 28 && m === 0);
-                    const isShortMonthEnd = (d > 30 && [2, 4, 7, 9].includes(m));
+        const firebaseConfig = {
+            databaseURL: "https://dearlive-97ef5-default-rtdb.firebaseio.com",
+        };
 
-                    if (isFebEnd || isShortMonthEnd) {
-                        html += `<td class="stars">***</td><td class="col-right stars">***</td>`;
-                    } else {
-                        let val1 = Math.floor(100000 + Math.random() * 900000);
-                        let val2 = Math.floor(100000 + Math.random() * 900000);
-                        let cls = (d % 5 === 0) ? 'highlight-red' : '';
-                        html += `<td class="${cls}">${val1}</td><td class="col-right ${cls}">${val2}</td>`;
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        function fetchAndBuildTable() {
+            const lotteryRef = ref(db, 'lottery');
+
+            onValue(lotteryRef, (snapshot) => {
+                const allData = snapshot.val() || {};
+                const body = document.getElementById('tableBody');
+                const currentYear = 2026; // Set based on your database context
+                let html = '';
+
+                // Month mapping to match table headers: FEB (02) to JAN (01)
+                const monthKeys = ["02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "01"];
+                
+                for (let d = 1; d <= 31; d++) {
+                    const dayStr = String(d).padStart(2, '0');
+                    html += `<tr><td class="date-col">${d}</td>`;
+
+                    for (let m = 0; m < 12; m++) {
+                        const monthStr = monthKeys[m];
+                        // If month is JAN, it belongs to the following year
+                        const year = (monthStr === "01") ? currentYear : 2025; 
+                        const dateKey = `${year}-${monthStr}-${dayStr}`;
+
+                        // Short month validation
+                        const isFebEnd = (d > 28 && monthStr === "02");
+                        const isShortMonthEnd = (d > 30 && ["04", "06", "09", "11"].includes(monthStr));
+
+                        if (isFebEnd || isShortMonthEnd) {
+                            html += `<td class="stars">***</td><td class="col-right stars">***</td>`;
+                        } else {
+                            let machineVal = "---";
+                            let resultVal = "---";
+
+                            if (allData[dateKey]) {
+                                const slots = allData[dateKey];
+                                // Search through all time slots for kl_machine and kl_result
+                                for (let time in slots) {
+                                    if (slots[time].kl_machine) machineVal = slots[time].kl_machine;
+                                    if (slots[time].kl_result) resultVal = slots[time].kl_result;
+                                }
+                            }
+
+                            let cls = (d % 5 === 0) ? 'highlight-red' : '';
+                            html += `<td class="${cls}">${machineVal}</td><td class="col-right ${cls}">${resultVal}</td>`;
+                        }
                     }
+                    html += `</tr>`;
                 }
-                html += `</tr>`;
-            }
-            body.innerHTML = html;
+                body.innerHTML = html;
+                applyAutoScale();
+            });
         }
 
-        // 2. Mobile Responsive Scaling
+        window.addEventListener('load', fetchAndBuildTable);
+    </script>
+
+    <script>
         function applyAutoScale() {
             const inner = document.getElementById('tableInner');
             const outer = document.getElementById('tableOuter');
@@ -233,7 +259,6 @@
             }
         }
 
-        // 3. PNG Export
         async function downloadTable() {
             const btn = document.getElementById('dlBtn');
             const node = document.getElementById('targetTable');
@@ -249,19 +274,13 @@
                 link.href = dataUrl;
                 link.click();
             } catch (error) {
-                alert("Download failed. Please try again.");
+                alert("Download failed.");
             } finally {
                 btn.innerText = "Download Chart";
             }
         }
 
-        // Initialize
         window.addEventListener('resize', applyAutoScale);
-        window.addEventListener('load', () => {
-            generateTableData();
-            applyAutoScale();
-        });
     </script>
 </body>
-
 </html>

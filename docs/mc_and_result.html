@@ -264,8 +264,8 @@
         <div class="toolbar">
             <select id="monthSelect"></select>
             <select id="yearSelect">
-                <option value="2026">2026</option>
                 <option value="2025">2025</option>
+                <option value="2026">2026</option>
             </select>
             <button class="btn-apply" onclick="renderChart()">Apply Filter</button>
         </div>
@@ -291,11 +291,17 @@
         <button class="btn-download" id="dlBtn" onclick="exportToPNG()">Download PNG Chart</button>
     </div>
 
-    <script>
+   
+ 
+  
+    <script type="module">
+       import { auth, db } from './firebase-init.js';
+        import { signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js';
+        import { ref, get } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js';
         const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
         const times = ["10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "05:00 PM", "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM"];
 
-        function toggleSidebar() {
+       window.toggleSidebar = function() {
             document.getElementById('sidebar').classList.toggle('active');
         }
 
@@ -306,7 +312,7 @@
             mSel.add(opt);
         });
 
-        function autoScale() {
+        window.autoScale = function () {
             const wrapper = document.getElementById('scaler');
             const captureArea = document.getElementById('captureArea');
             const outerContainer = document.getElementById('outerContainer');
@@ -321,47 +327,83 @@
             outerContainer.style.height = (scaledHeight + 40) + "px";
         }
 
-        function renderChart() {
-            const month = parseInt(mSel.value);
-            const year = document.getElementById('yearSelect').value;
-            const body = document.getElementById('chartBody');
-            const head = document.getElementById('headerRow');
-            const banner = document.getElementById('tableTitle');
-            const days = new Date(year, month, 0).getDate();
+            window.renderChart = function () {
 
-            banner.innerText = `DEAR RESULT AND MC CHART - ${monthNames[month - 1]} ${year}`;
+    const month = parseInt(mSel.value);
+    const year = document.getElementById('yearSelect').value;
+    const body = document.getElementById('chartBody');
+    const head = document.getElementById('headerRow');
+    const banner = document.getElementById('tableTitle');
 
-            let headHtml = `<td class="day-col">DATE</td>`;
-            times.forEach(t => {
-                headHtml += `<td><span class="time-label">${t}</span>MC / RES</td>`;
-            });
-            headHtml += `<td class="day-col">DATE</td>`;
-            head.innerHTML = headHtml;
+    const monthStr = String(month).padStart(2, '0');
+    const monthPrefix = `${year}-${monthStr}`;
 
-            body.innerHTML = "";
-            for (let d = 1; d <= days; d++) {
-                let row = `<tr><td class="day-col">${d}</td>`;
-                for (let i = 0; i < times.length; i++) {
-                    const randomMC = Math.floor(10000 + Math.random() * 90000);
-                    const randomRes = Math.floor(100 + Math.random() * 900);
+    banner.innerText = `DEAR RESULT AND MC CHART - ${monthNames[month - 1]} ${year}`;
 
-                    let extraClass = "";
-                    if (i === 3) extraClass = "col-01pm";
-                    if (i === 5) extraClass = "col-06pm";
-                    if (i === 7) extraClass = "col-08pm";
+    // Build header
+    let headHtml = `<td class="day-col">DATE</td>`;
+    times.forEach(t => {
+        headHtml += `<td><span class="time-label">${t}</span>MC / RES</td>`;
+    });
+    headHtml += `<td class="day-col">DATE</td>`;
+    head.innerHTML = headHtml;
 
-                    row += `<td class="${extraClass}">${randomMC}<span class="res-sub">${randomRes}</span></td>`;
+    body.innerHTML = "";
+
+    const lotteryRef = ref(db, "lottery");
+
+    // IMPORTANT: remove old listeners by using get instead of onValue
+    get(lotteryRef).then(snapshot => {
+
+        const allData = snapshot.val() || {};
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        for (let d = 1; d <= daysInMonth; d++) {
+
+            const dayStr = String(d).padStart(2, '0');
+            const dateKey = `${monthPrefix}-${dayStr}`;
+
+            let row = `<tr><td class="day-col">${d}</td>`;
+
+            for (let i = 0; i < times.length; i++) {
+
+                const timeKey = times[i];
+
+                let machine = "---";
+                let threeDigit = "---";
+
+                if (
+                    allData[dateKey] &&
+                    allData[dateKey][timeKey]
+                ) {
+                    machine = allData[dateKey][timeKey].machine ?? "---";
+                    threeDigit = allData[dateKey][timeKey].three_digit ?? "---";
                 }
-                row += `<td class="day-col">${d}</td></tr>`;
-                body.innerHTML += row;
+
+                row += `
+                    <td>
+                        ${machine}
+                        <span class="res-sub">${threeDigit}</span>
+                    </td>
+                `;
             }
 
-            setTimeout(autoScale, 100);
+            row += `<td class="day-col">${d}</td></tr>`;
+            body.innerHTML += row;
         }
 
-        async function exportToPNG() {
+        autoScale();
+
+    }).catch(error => {
+        console.error("DB Error:", error);
+    });
+};
+
+        window.exportToPNG = async function () {
             const node = document.getElementById('captureArea');
             const btn = document.getElementById('dlBtn');
+            const yearSelect = document.getElementById('yearSelect');
+
             btn.innerText = "Capturing Image...";
 
             try {
@@ -373,16 +415,19 @@
                         transformOrigin: 'top left'
                     }
                 });
+
                 const link = document.createElement('a');
                 link.download = `Result-MC-Chart-${monthNames[mSel.value - 1]}-${yearSelect.value}.png`;
                 link.href = dataUrl;
                 link.click();
+
             } catch (e) {
+                console.error(e);
                 alert("Error generating image.");
             } finally {
                 btn.innerText = "Download PNG Chart";
             }
-        }
+        };
 
         window.addEventListener('resize', autoScale);
         renderChart();

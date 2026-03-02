@@ -249,7 +249,7 @@
                 <option value="2026">2026</option>
                 <option value="2025">2025</option>
             </select>
-            <button class="btn-apply" onclick="renderChart()">Apply Filter</button>
+         <button class="btn-apply" id="applyBtn">Apply Filter</button>
         </div>
 
         <div class="table-outer" id="tableOuter">
@@ -271,7 +271,10 @@
         <button class="btn-download" onclick="exportToPNG()">Download PNG Chart</button>
     </div>
 
-    <script>
+    <script type="module">
+         import { auth, db } from './firebase-init.js';
+        import { signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js';
+       import { ref, get } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js';
         const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
         const times = ["10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "05:00 PM", "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM"];
 
@@ -283,11 +286,11 @@
             mSel.add(opt);
         });
 
-        function toggleSidebar() {
+        window.toggleSidebar = function() {
             document.getElementById('sidebar').classList.toggle('active');
         }
 
-        function applyAutoScale() {
+        window.applyAutoScale = function() {
             const inner = document.getElementById('tableInner');
             const outer = document.getElementById('tableOuter');
             const captureArea = document.getElementById('captureArea');
@@ -301,72 +304,104 @@
             outer.style.height = (captureArea.offsetHeight * scale) + 40 + "px";
         }
 
-        function renderChart() {
-            const month = parseInt(mSel.value);
-            const year = document.getElementById('yearSelect').value;
-            const body = document.getElementById('chartBody');
-            const head = document.getElementById('headerRow');
-            const banner = document.getElementById('tableBannerTitle');
+       async function renderChart() {
 
-            const daysInMonth = new Date(year, month, 0).getDate();
-            banner.innerText = `DEAR MACHINE NUMBER CHART - ${monthNames[month - 1]} ${year}`;
+    const month = parseInt(mSel.value);
+    const year = document.getElementById('yearSelect').value;
 
-            // Header
-            let headHtml = `<td class="time-header">Date</td>`;
-            times.forEach(t => {
-                headHtml += `<td class="time-header"><span class="time-label">${t}</span>MC</td>`;
-            });
-            headHtml += `<td class="time-header">Date</td>`;
-            head.innerHTML = headHtml;
+    const body = document.getElementById('chartBody');
+    const head = document.getElementById('headerRow');
+    const banner = document.getElementById('tableBannerTitle');
 
-            // Data Rows
-            let bodyHtml = "";
-            for (let d = 1; d <= daysInMonth; d++) {
-                let row = `<tr><td class="date-col">${d}</td>`;
-                for (let i = 0; i < times.length; i++) {
-                    const val = Math.floor(10000 + Math.random() * 90000);
-                    let cls = "";
-                    if (i === 3) cls = "col-01pm";
-                    if (i === 5) cls = "col-06pm";
-                    if (i === 7) cls = "col-08pm";
-                    row += `<td class="${cls}">${val}</td>`;
+    const daysInMonth = new Date(year, month, 0).getDate();
+    banner.innerText = `DEAR MACHINE NUMBER CHART - ${monthNames[month - 1]} ${year}`;
+
+    /* ========= HEADER ========= */
+
+    let headHtml = `<td class="time-header">Date</td>`;
+    times.forEach(t => {
+        headHtml += `<td class="time-header"><span class="time-label">${t}</span> MC</td>`;
+    });
+    headHtml += `<td class="time-header">Date</td>`;
+    head.innerHTML = headHtml;
+
+    body.innerHTML = "<tr><td colspan='11'>Loading...</td></tr>";
+
+    /* ========= FETCH FULL LOTTERY NODE ========= */
+
+    const snapshot = await get(ref(db, 'lottery'));
+    const lotteryData = snapshot.exists() ? snapshot.val() : {};
+
+    let bodyHtml = "";
+
+    for (let d = 1; d <= daysInMonth; d++) {
+
+        const dayStr = String(d).padStart(2, '0');
+        const monthStr = String(month).padStart(2, '0');
+        const dateKey = `${year}-${monthStr}-${dayStr}`;
+
+        let row = `<tr><td class="date-col">${d}</td>`;
+
+        times.forEach((time, i) => {
+
+            let value = "";
+
+            if (
+                lotteryData[dateKey] &&
+                lotteryData[dateKey][time] &&
+                lotteryData[dateKey][time].machine
+            ) {
+                value = String(lotteryData[dateKey][time].machine)
+                    .replace(/\D/g, "")
+                    .padStart(5, "0")
+                    .slice(0, 5);
+            }
+
+            let cls = "";
+            if (i === 3) cls = "col-01pm";
+            if (i === 5) cls = "col-06pm";
+            if (i === 7) cls = "col-08pm";
+
+            row += `<td class="${cls}">${value}</td>`;
+        });
+
+        row += `<td class="date-col">${d}</td></tr>`;
+        bodyHtml += row;
+    }
+
+    body.innerHTML = bodyHtml;
+
+    setTimeout(applyAutoScale, 100);
+}
+        document.getElementById('applyBtn').addEventListener('click', renderChart);
+
+        window.exportToPNG = async function () {
+                const node = document.getElementById('captureArea');
+                const btn = document.querySelector('.btn-download');
+                btn.innerText = "Capturing Image...";
+
+                try {
+                    const dataUrl = await htmlToImage.toPng(node, {
+                        backgroundColor: '#ffffff',
+                        pixelRatio: 2,
+                        style: {
+                            transform: 'scale(1)',
+                            transformOrigin: 'top left'
+                        }
+                    });
+
+                    const link = document.createElement('a');
+                    link.download = `Dear-Machine-Chart-${monthNames[mSel.value - 1]}-${yearSelect.value}.png`;
+                    link.href = dataUrl;
+                    link.click();
+
+                } catch (e) {
+                    alert("Image capture failed. Check browser permissions.");
+                    console.error(e);
+                } finally {
+                    btn.innerText = "Download PNG Chart";
                 }
-                row += `<td class="date-col">${d}</td></tr>`;
-                bodyHtml += row;
-            }
-            body.innerHTML = bodyHtml;
-
-            // Recalculate scale after rendering
-            setTimeout(applyAutoScale, 100);
-        }
-
-        async function exportToPNG() {
-            const node = document.getElementById('captureArea');
-            const btn = document.querySelector('.btn-download');
-            btn.innerText = "Capturing Image...";
-
-            try {
-                // The style: transform scale(1) ensures the image downloads at full size
-                // even if the screen is zoomed out.
-                const dataUrl = await htmlToImage.toPng(node, {
-                    backgroundColor: '#ffffff',
-                    pixelRatio: 2,
-                    style: {
-                        transform: 'scale(1)',
-                        transformOrigin: 'top left'
-                    }
-                });
-                const link = document.createElement('a');
-                link.download = `Dear-Machine-Chart-${monthNames[mSel.value - 1]}-${yearSelect.value}.png`;
-                link.href = dataUrl;
-                link.click();
-            } catch (e) {
-                alert("Image capture failed. Check browser permissions.");
-                console.error(e);
-            } finally {
-                btn.innerText = "Download PNG Chart";
-            }
-        }
+            };
 
         // Handle window resize for mobile orientation changes
         window.addEventListener('resize', applyAutoScale);

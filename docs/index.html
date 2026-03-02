@@ -161,10 +161,6 @@
             transition: transform 0.1s;
         }
 
-        .btn:active {
-            transform: scale(0.95);
-        }
-
         .guessing-section {
             padding: 20px;
             text-align: center;
@@ -309,19 +305,19 @@
                     <div class="cell">
                         <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="result-01PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">6PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="result-06PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="result-08PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                 </div>
@@ -330,37 +326,37 @@
                     <div class="cell">
                         <div class="c-head"><span class="time">10AM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="result-10AM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">11AM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="result-11AM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">12PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="result-12PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">5PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="result-05PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">7PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="result-07PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
                         <div class="c-head"><span class="time">9PM</span><span class="prize">1st Prize</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="result-09PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                 </div>
@@ -369,58 +365,57 @@
 
                 <div class="grid">
                     <div class="cell">
-                        <div class="c-head"><span class="time">1PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-head"><span class="time">1PM</span><span class="prize">MC</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="machine-01PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">6PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-head"><span class="time">6PM</span><span class="prize">MC</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="machine-06PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">8PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-head"><span class="time">8PM</span><span class="prize">MC</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
-                        </div>
-                    </div>
-
-                    <div class="cell">
-                        <div class="c-head"><span class="time">10AM</span><span class="prize">1st Prize</span></div>
-                        <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="machine-08PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">11AM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-head"><span class="time">10AM</span><span class="prize">MC</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="machine-10AM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">12PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-head"><span class="time">11AM</span><span class="prize">MC</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="machine-11AM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">5PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-head"><span class="time">12PM</span><span class="prize">MC</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="machine-12PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">7PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-head"><span class="time">5PM</span><span class="prize">MC</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="machine-05PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                     <div class="cell">
-                        <div class="c-head"><span class="time">9PM</span><span class="prize">1st Prize</span></div>
+                        <div class="c-head"><span class="time">7PM</span><span class="prize">MC</span></div>
                         <div class="c-body">
-                            <div class="num">===</div><button class="btn">REFRESH</button>
+                            <div class="num" id="machine-07PM">===</div><button class="btn">REFRESH</button>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="c-head"><span class="time">9PM</span><span class="prize">MC</span></div>
+                        <div class="c-body">
+                            <div class="num" id="machine-09PM">===</div><button class="btn">REFRESH</button>
                         </div>
                     </div>
                 </div>
@@ -431,27 +426,28 @@
             </button>
 
             <div class="guessing-section">
-                <div class="header-text">Dear Lottery Guessing 1PM – 6PM – 8PM<br>(27.02.2026)</div>
-                <div class="number-grid">
-                    <div class="num-box">18</div>
-                    <div class="num-box">58</div>
-                    <div class="num-box">74</div>
-                    <div class="num-box">93</div>
-                    <div class="num-box">76</div>
-                    <div class="num-box">91</div>
-                    <div class="num-box">38</div>
-                    <div class="num-box">14</div>
-                    <div class="num-box">72</div>
-                    <div class="num-box">25</div>
+                <div class="header-text">Dear Lottery Guessing 1PM – 6PM – 8PM<br>(<span id="current-date"></span>)
+                </div>
+                <div class="number-grid" id="guessing-number-list">
+                    <div class="num-box">--</div>
+                    <div class="num-box">--</div>
+                    <div class="num-box">--</div>
+                    <div class="num-box">--</div>
+                    <div class="num-box">--</div>
+                    <div class="num-box">--</div>
+                    <div class="num-box">--</div>
+                    <div class="num-box">--</div>
+                    <div class="num-box">--</div>
+                    <div class="num-box">--</div>
                 </div>
                 <div class="arrow-down"></div>
                 <div class="guess-card-container">
-                    <div class="guess-card"><span class="title-red">1pm Dear Guessing </span><span
-                            class="guessing-num">3 r 6</span></div>
-                    <div class="guess-card"><span class="title-red">6pm Dear Guessing </span><span
-                            class="guessing-num">3 r 6</span></div>
-                    <div class="guess-card"><span class="title-red">8pm Dear Guessing </span><span
-                            class="guessing-num">3 r 6</span></div>
+                    <div class="guess-card"><span class="title-red">1pm Dear Guessing </span><span class="guessing-num"
+                            id="guess-01PM">-- r --</span></div>
+                    <div class="guess-card"><span class="title-red">6pm Dear Guessing </span><span class="guessing-num"
+                            id="guess-06PM">-- r --</span></div>
+                    <div class="guess-card"><span class="title-red">8pm Dear Guessing </span><span class="guessing-num"
+                            id="guess-08PM">-- r --</span></div>
                 </div>
             </div>
 
@@ -467,41 +463,83 @@
         </div>
     </div>
 
-    <script>
-        document.querySelectorAll('.btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const numDisplay = e.target.parentElement.querySelector('.num');
-                numDisplay.textContent = "....";
-                setTimeout(() => {
-                    numDisplay.textContent = Math.floor(10000 + Math.random() * 90000);
-                }, 400);
-            });
-        });
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        async function downloadResults() {
+        const firebaseConfig = { databaseURL: "https://dearlive-97ef5-default-rtdb.firebaseio.com" };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        function formatTimeForId(timeString) {
+            return timeString.replace(":00 ", "");
+        }
+
+        function loadTodayData() {
+            const today = new Date().toISOString().slice(0, 10);
+            const todayRef = ref(db, `lottery/${today}`);
+
+            onValue(todayRef, (snapshot) => {
+                if (!snapshot.exists()) return;
+                const data = snapshot.val();
+
+                // 1. Load Results and Machine Numbers
+                Object.keys(data).forEach(timeKey => {
+                    const slotData = data[timeKey];
+                    const cleanTime = formatTimeForId(timeKey);
+
+                    const resEl = document.getElementById(`result-${cleanTime}`);
+                    const macEl = document.getElementById(`machine-${cleanTime}`);
+                    const guesEl = document.getElementById(`guess-${cleanTime}`);
+
+                    if (resEl && slotData.result) resEl.textContent = slotData.result;
+                    if (macEl && slotData.machine) macEl.textContent = slotData.machine;
+
+                    // 2. Load Time-Specific Guessing (e.g. "56" -> "5 r 6")
+                    if (guesEl && slotData.guessing) {
+                        const val = slotData.guessing;
+                        if (val.length >= 2) {
+                            guesEl.textContent = `${val[0]} r ${val[1]}`;
+                        } else {
+                            guesEl.textContent = val;
+                        }
+                    }
+                });
+
+                // 3. Load Global Guessing List (The 10 boxes)
+                const guessListBox = document.getElementById('guessing-number-list');
+                if (data.guessing_list) {
+                    const list = data.guessing_list.split(','); // Assumes comma separated "18,58,74..."
+                    let boxesHtml = "";
+                    list.forEach(num => {
+                        boxesHtml += `<div class="num-box">${num.trim()}</div>`;
+                    });
+                    guessListBox.innerHTML = boxesHtml;
+                }
+            });
+        }
+
+        window.downloadResults = async function () {
             const captureArea = document.getElementById('capture-area');
             const btns = document.querySelectorAll('.btn');
             btns.forEach(b => b.style.display = 'none');
-
             try {
-                const canvas = await html2canvas(captureArea, {
-                    scale: 3,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: "#ffffff"
-                });
+                const canvas = await html2canvas(captureArea, { scale: 3, useCORS: true, backgroundColor: "#ffffff" });
                 const link = document.createElement('a');
-                const date = new Date().toISOString().slice(0, 10);
-                link.download = `Dear-Result-MC-${date}.png`;
-                link.href = canvas.toDataURL('image/png', 1.0);
+                link.download = `Dear-Result-${new Date().toLocaleDateString()}.png`;
+                link.href = canvas.toDataURL();
                 link.click();
-            } catch (err) {
-                console.error("Download failed", err);
-                alert("Could not generate image.");
-            } finally {
-                btns.forEach(b => b.style.display = 'block');
-            }
+            } catch (err) { alert("Download failed."); }
+            finally { btns.forEach(b => b.style.display = 'block'); }
+        };
+
+        function setCurrentDate() {
+            const today = new Date();
+            document.getElementById("current-date").textContent = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
         }
+
+        setCurrentDate();
+        loadTodayData();
     </script>
 </body>
 

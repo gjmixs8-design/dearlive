@@ -3,7 +3,7 @@
 // 5 mins before: show presenter + spin random digits; at time: show admin result + confetti.
 
 import { db } from './firebase-init.js';
-import { ref, onValue } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+import { ref, onValue } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
 
 // keep slots aligned to your admin (IST-based hours)
 const SLOTS = [
