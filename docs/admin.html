@@ -6,17 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEAR Admin Panel</title>
     <style>
+        :root {
+            --gold: #f8c128;
+            --dark: #111;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
         body {
             margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f8c128, #ce882d, #f3c07c);
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #856234, #111);
             color: #fff;
+            min-height: 100vh;
         }
 
         .container {
-            padding: 10px;
-            /* Reduced padding for more horizontal space */
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
         .header-top {
@@ -24,116 +31,128 @@
             margin-bottom: 30px;
         }
 
-        .label-bar {
+        .nav-tabs {
             display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            font-size: 13px;
-            /* Slightly smaller font for 7 columns */
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-tabs button {
+            background: var(--glass);
+            color: #fff;
+            border: 1px solid var(--gold);
+            padding: 12px 25px;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: 0.3s;
+        }
+
+        .nav-tabs button.active {
+            background: var(--gold);
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 0 15px var(--gold);
+        }
+
+        .page-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .grid-header {
+            display: grid;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            margin-bottom: 10px;
             font-weight: bold;
             text-align: center;
-            color: #ffffff;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            margin-bottom: 10px;
+            color: var(--gold);
         }
 
-        .label-bar div {
-            flex: 1;
+        .dear-grid {
+            grid-template-columns: 100px 1fr 1fr 1fr 1fr;
         }
 
-        .cards-wrapper {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            /* Tighter gap for better fit */
+        .kl-grid {
+            grid-template-columns: 1fr 1fr 1fr;
         }
 
-        .card-column {
-            flex: 1;
-            min-width: 100px;
-            /* Adjusted for 7 columns */
+        .jackpot-grid {
+            grid-template-columns: 120px 1fr;
         }
 
-        .card {
-            position: relative;
-            background: #111;
+        .row-card {
+            display: grid;
+            background: var(--dark);
+            margin-bottom: 8px;
             padding: 10px;
-            margin: 8px 0;
             border-radius: 8px;
-            overflow: hidden;
+            border: 1px solid rgba(248, 193, 40, 0.2);
+            align-items: center;
+            gap: 10px;
         }
 
-        /* Animated Border Effect */
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1;
-            padding: 2px;
-            background-image: linear-gradient(45deg, #f0c757, #e29b16, #e4d69b);
-            background-size: 600% 600%;
-            animation: borderRoll 10s linear infinite;
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            -webkit-mask-composite: xor;
+        .time-label {
+            text-align: center;
+            font-weight: bold;
+            color: var(--gold);
         }
 
-        @keyframes borderRoll {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        .card input {
-            position: relative;
-            z-index: 2;
+        input {
             width: 100%;
-            padding: 8px;
-            font-size: 14px;
-            border: none;
-            outline: none;
-            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            background: var(--glass);
             color: #fff;
-            border-radius: 4px;
-            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .btn-group {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 40px;
+            padding-bottom: 50px;
         }
 
-        button {
-            background: #dddb50;
-            color: #242222;
+        .main-btn {
+            background: var(--gold);
+            color: #000;
             font-weight: bold;
-            padding: 12px 25px;
+            padding: 15px 40px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 16px;
             margin: 5px;
-            transition: 0.3s;
         }
 
-        button:hover {
-            background: #f59c36;
-            color: #fff;
-        }
-
-        a {
-            text-decoration: none;
+        .main-btn:hover {
+            filter: brightness(1.2);
         }
     </style>
     <script type="module" src="firebase-init.js" defer></script>
@@ -143,34 +162,46 @@
 <body>
     <div class="container">
         <div class="header-top">
-            <h1>DEAR Admin</h1>
-            <input type="date" id="select-date">
+            <h1>DEAR Live Admin</h1>
+            <input type="date" id="select-date" style="width: auto; padding: 10px 20px;">
         </div>
 
-        <div class="label-bar">
-            <div>MC Number</div>
-            <div>Result</div>
-            <div>3 Digit</div>
-            <div>KL Machine</div>
-            <div>KL Result</div>
-            <div>Guessing</div>
-            <div>Jackpot</div>
+        <div class="nav-tabs">
+            <button id="tab-dear" class="active">Dear Entry</button>
+            <button id="tab-kl">KL & Jackpot Entry</button>
         </div>
 
-        <div class="cards-wrapper">
-            <div class="card-column" id="machine-column"></div>
-            <div class="card-column" id="result-column"></div>
-            <div class="card-column" id="three_digit-column"></div>
-            <div class="card-column" id="kl-machine-column"></div>
-            <div class="card-column" id="kl-result-column"></div>
-            <div class="card-column" id="guessing-column"></div>
-            <div class="card-column" id="jackpot-column"></div>
+        <div id="page-dear" class="page-content active">
+            <div class="grid-header dear-grid">
+                <div>Time</div>
+                <div>Machine (5)</div>
+                <div>Result (5)</div>
+                <div>3-Digit Res</div>
+                <div>Guess (2D)</div>
+            </div>
+            <div id="dear-rows"></div>
+        </div>
+
+        <div id="page-kl" class="page-content">
+            <h2 style="color:var(--gold); text-align:center;">KL Daily Results</h2>
+            <div class="grid-header kl-grid">
+                <div>KL Machine (5)</div>
+                <div>KL Result (5)</div>
+                <div>KL Guess (3D)</div>
+            </div>
+            <div id="kl-row"></div>
+
+            <h2 style="color:var(--gold); text-align:center; margin-top:40px;">Jackpot Section</h2>
+            <div class="grid-header jackpot-grid">
+                <div>Time</div>
+                <div>Jackpot Number (3)</div>
+            </div>
+            <div id="jackpot-rows"></div>
         </div>
 
         <div class="btn-group">
-            <button id="submit-data-btn">Submit All Data</button>
-            <button id="logout-btn">Logout</button>
-            <a href="view.html"><button id="view-btn">View Results</button></a>
+            <button id="submit-btn" class="main-btn">Save All Entries</button>
+            <a href="view.html"><button class="main-btn" style="background:#555; color:#fff;">View Database</button></a>
         </div>
     </div>
 </body>

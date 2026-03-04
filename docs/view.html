@@ -2,217 +2,112 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DEAR — View & Update</title>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEAR Database Viewer</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #856234, #9e7427, #fcbc5c);
-      color: #fff;
-    }
-
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
+      background: #1a1a1a;
+      color: #eee;
+      font-family: sans-serif;
       padding: 20px;
     }
 
+    .grid {
+      display: grid;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #333;
+    }
+
+    .dear-grid {
+      grid-template-columns: 100px 1fr 1fr 1fr 1fr;
+    }
+
+    .kl-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .jack-grid {
+      grid-template-columns: 100px 1fr;
+    }
+
     .header {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
+      font-weight: bold;
+      color: #f8c128;
+      background: #000;
+      border-radius: 5px;
     }
 
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 700;
-      color: #f5b743;
-    }
-
-    .controls {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    input[type="date"] {
-      background: rgba(255, 255, 255, .08);
-      border: 1px solid rgba(255, 187, 0, 0.3);
+    input {
+      background: #222;
+      border: 1px solid #444;
       color: #fff;
-      padding: 10px 12px;
-      border-radius: 8px;
-      outline: none;
+      padding: 8px;
+      text-align: center;
+      border-radius: 4px;
+    }
+
+    input.changed {
+      border-color: #f8c128;
+      box-shadow: 0 0 5px #f8c128;
+    }
+
+    .save-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #000;
+      padding: 20px;
+      text-align: center;
     }
 
     button {
-      background: #f5bc20;
-      color: #111;
-      font-weight: 700;
+      background: #f8c128;
       border: none;
-      border-radius: 8px;
-      padding: 10px 16px;
+      padding: 10px 30px;
+      font-weight: bold;
       cursor: pointer;
-      transition: .2s;
-    }
-
-    button:hover {
-      background: #ccba7e;
-      color: #fff;
-    }
-
-    /* Scrollable Table Area */
-    .table-wrapper {
-      overflow-x: auto;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      padding-bottom: 10px;
-    }
-
-    /* 8 Columns: Time + 7 Data Fields */
-    .grid-layout {
-      display: grid;
-      grid-template-columns: 120px repeat(7, minmax(110px, 1fr));
-      gap: 12px;
-      min-width: 1000px;
-      /* Ensures columns don't squash */
-      align-items: center;
-    }
-
-    .label-bar {
-      padding: 15px 10px;
-      font-size: 14px;
-      font-weight: 700;
-      color: #fdfdfd;
-      border-bottom: 2px solid rgba(255, 187, 0, 0.2);
-      text-align: center;
-    }
-
-    .rows {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
-      padding: 0 10px;
-    }
-
-    .row {
-      position: relative;
-      background: #111;
-      border-radius: 8px;
-      padding: 10px;
-      overflow: hidden;
-    }
-
-    /* Neon Border Effect */
-    .row::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 8px;
-      pointer-events: none;
-      padding: 1.5px;
-      background-image: linear-gradient(45deg, #ffa600, #7e5b1b, #f3c369);
-      background-size: 600% 600%;
-      animation: borderRoll 10s linear infinite;
-      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      mask-composite: exclude;
-    }
-
-    @keyframes borderRoll {
-      0% {
-        background-position: 0% 50%;
-      }
-
-      50% {
-        background-position: 100% 50%;
-      }
-
-      100% {
-        background-position: 0% 50%;
-      }
-    }
-
-    .slot {
-      font-weight: 700;
-      color: #e9d08b;
-      text-align: center;
-    }
-
-    .row input {
-      width: 100%;
-      padding: 8px;
-      font-size: 14px;
-      border: none;
-      outline: none;
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
-      border-radius: 4px;
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .row input:focus {
-      border-color: #ffa600;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .footer-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-top: 30px;
-    }
-
-    /* Dirty (Changed) State */
-    .dirty {
-      outline: 2px solid #8b590c !important;
+      border-radius: 5px;
     }
   </style>
-
   <script type="module" src="firebase-init.js" defer></script>
   <script type="module" src="view.js" defer></script>
 </head>
 
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>DEAR — View & Update</h1>
-      <div class="controls">
-        <input type="date" id="datePicker" />
-        <button id="logoutBtn">Logout</button>
-      </div>
-    </div>
+  <input type="date" id="viewDate" style="margin-bottom: 20px;">
 
-    <div class="table-wrapper">
-      <div class="grid-layout label-bar">
-        <div>Time Slot</div>
-        <div>MC Num</div>
-        <div>Result</div>
-        <div>3 Digit</div>
-        <div>KL Machine</div>
-        <div>KL Result</div>
-        <div>Guessing</div>
-        <div>Jackpot</div>
-      </div>
+  <h3>Dear Records</h3>
+  <div class="grid dear-grid header">
+    <div>Time</div>
+    <div>Machine</div>
+    <div>Result</div>
+    <div>3-Digit</div>
+    <div>Guess(2D)</div>
+  </div>
+  <div id="dear-view"></div>
 
-      <div class="rows" id="rows">
-      </div>
-    </div>
+  <h3>KL Records</h3>
+  <div class="grid kl-grid header">
+    <div>Machine</div>
+    <div>Result</div>
+    <div>Guess(3D)</div>
+  </div>
+  <div id="kl-view"></div>
 
-    <div class="footer-actions">
-      <button id="saveChangesBtn">Save Changes</button>
-      <button id="resetBtn" style="background:#444; color:#fff;">Reset</button>
-      <a href="admin.html"><button style="background:#555; color:#fff;">Back to Admin</button></a>
-    </div>
+  <h3>Jackpot Records</h3>
+  <div class="grid jack-grid header">
+    <div>Time</div>
+    <div>Number</div>
+  </div>
+  <div id="jack-view"></div>
+
+  <div class="save-bar">
+    <button id="saveChanges">Update Modified Records</button>
+    <a href="admin.html" style="color:#aaa; margin-left: 20px;">Back to Admin</a>
   </div>
 </body>
 

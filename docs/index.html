@@ -52,6 +52,7 @@
             margin-bottom: 20px;
             overflow: hidden;
             box-shadow: var(--shadow);
+            position: relative;
         }
 
         #capture-area {
@@ -287,10 +288,96 @@
         .nav-link:last-child {
             grid-column: span 2;
         }
+
+        /* NEW FLOATING CONTACT STYLES */
+        .contact-panel {
+            position: fixed;
+            right: 10px;
+            top: 40%;
+            z-index: 1000;
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .contact-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            gap: 2px;
+        }
+
+        .contact-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .contact-btn img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .bg-telegram {
+            background-color: #0088cc;
+        }
+
+        .bg-whatsapp {
+            background-color: #25D366;
+        }
+
+        .btn-text {
+            font-size: 9px;
+            font-weight: bold;
+            color: #d32f2f;
+            text-transform: capitalize;
+        }
+
+        .contact-btn:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 600px) {
+            .contact-panel {
+                top: 30%;
+                right: 5px;
+                padding: 5px;
+            }
+
+            .contact-btn {
+                width: 38px;
+                height: 38px;
+            }
+        }
     </style>
 </head>
 
 <body>
+
+    <div class="contact-panel">
+        <a href="YOUR_TELEGRAM_LINK" target="_blank" class="contact-item">
+            <div class="contact-btn bg-telegram">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+            </div>
+            <span class="btn-text">Telegram</span>
+        </a>
+        <a href="YOUR_WHATSAPP_LINK" target="_blank" class="contact-item">
+            <div class="contact-btn bg-whatsapp">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+            </div>
+            <span class="btn-text">Whatsapp</span>
+        </a>
+    </div>
 
     <div class="main-wrapper">
         <div class="container">
@@ -483,7 +570,6 @@
                 if (!snapshot.exists()) return;
                 const data = snapshot.val();
 
-                // 1. Load Results and Machine Numbers
                 Object.keys(data).forEach(timeKey => {
                     const slotData = data[timeKey];
                     const cleanTime = formatTimeForId(timeKey);
@@ -495,7 +581,6 @@
                     if (resEl && slotData.result) resEl.textContent = slotData.result;
                     if (macEl && slotData.machine) macEl.textContent = slotData.machine;
 
-                    // 2. Load Time-Specific Guessing (e.g. "56" -> "5 r 6")
                     if (guesEl && slotData.guessing) {
                         const val = slotData.guessing;
                         if (val.length >= 2) {
@@ -506,10 +591,9 @@
                     }
                 });
 
-                // 3. Load Global Guessing List (The 10 boxes)
                 const guessListBox = document.getElementById('guessing-number-list');
                 if (data.guessing_list) {
-                    const list = data.guessing_list.split(','); // Assumes comma separated "18,58,74..."
+                    const list = data.guessing_list.split(',');
                     let boxesHtml = "";
                     list.forEach(num => {
                         boxesHtml += `<div class="num-box">${num.trim()}</div>`;

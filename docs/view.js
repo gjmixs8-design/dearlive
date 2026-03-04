@@ -1,234 +1,67 @@
-import { auth, db } from './firebase-init.js';
+import { db } from './firebase-init.js';
+import { ref, get, update } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js';
 
-import {
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+const DEAR_SLOTS = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM'];
+const JACK_SLOTS = ['11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '04:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
+let cache = {};
 
-import {
-  ref,
-  get,
-  update
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+function createBox(slot, type, len, val) {
+    const i = document.createElement('input');
+    i.value = val || '';
+    i.maxLength = len;
+    i.dataset.slot = slot;
+    i.dataset.type = type;
+    i.oninput = () => {
+        i.value = i.value.replace(/\D/g, '');
+        i.classList.toggle('changed', i.value !== (cache[slot]?.[type] || ''));
+    };
+    return i;
+}
 
-/* === CONFIGURATION === */
+async function sync() {
+    const date = document.getElementById('viewDate').value;
+    if(!date) return;
+    const snap = await get(ref(db, `lottery/${date}`));
+    cache = snap.val() || {};
 
-const timeSlots = [
-  '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM',
-  '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM'
-];
+    const dv = document.getElementById('dear-view'); dv.innerHTML = '';
+    DEAR_SLOTS.forEach(s => {
+        const d = document.createElement('div'); d.className = 'grid dear-grid';
+        d.innerHTML = `<div>${s}</div>`;
+        d.appendChild(createBox(s, 'machine', 5, cache[s]?.machine));
+        d.appendChild(createBox(s, 'result', 5, cache[s]?.result));
+        d.appendChild(createBox(s, 'three_digit', 3, cache[s]?.three_digit));
+        d.appendChild(createBox(s, 'guessing', 2, cache[s]?.guessing));
+        dv.appendChild(d);
+    });
 
-const fieldConfigs = {
-  machine: 5,
-  result: 5,
-  three_digit: 3,
-  kl_machine: 5,
-  kl_result: 5,
-  guessing: 2,
-  jackpot: 3
+    const kv = document.getElementById('kl-view'); kv.innerHTML = '';
+    const kd = document.createElement('div'); kd.className = 'grid kl-grid';
+    kd.appendChild(createBox('Daily', 'kl_machine', 5, cache['Daily']?.kl_machine));
+    kd.appendChild(createBox('Daily', 'kl_result', 5, cache['Daily']?.kl_result));
+    kd.appendChild(createBox('Daily', 'kl_guessing', 3, cache['Daily']?.kl_guessing));
+    kv.appendChild(kd);
+
+    const jv = document.getElementById('jack-view'); jv.innerHTML = '';
+    JACK_SLOTS.forEach(s => {
+        const d = document.createElement('div'); d.className = 'grid jack-grid';
+        d.innerHTML = `<div>${s}</div>`;
+        d.appendChild(createBox(s, 'jackpot', 3, cache[s]?.jackpot));
+        jv.appendChild(d);
+    });
+}
+
+document.getElementById('viewDate').onchange = sync;
+document.getElementById('saveChanges').onclick = async () => {
+    const date = document.getElementById('viewDate').value;
+    const updates = {};
+    document.querySelectorAll('input.changed').forEach(i => {
+        updates[`lottery/${date}/${i.dataset.slot}/${i.dataset.type}`] = i.value || null;
+    });
+    await update(ref(db), updates);
+    alert("Database Updated!");
+    sync();
 };
 
-/* === DOM ELEMENTS === */
-
-const datePicker = document.getElementById('datePicker');
-const logoutBtn = document.getElementById('logoutBtn');
-const rowsWrap = document.getElementById('rows');
-const saveBtn = document.getElementById('saveChangesBtn');
-const resetBtn = document.getElementById('resetBtn');
-
-/* === STATE === */
-
-let loadedSnapshot = {};
-let currentDateKey = '';
-let inputsMap = new Map();
-
-/* === AUTH CHECK === */
-
-onAuthStateChanged(auth, (user) => {
-  if (!user) window.location.href = 'index.html';
-});
-
-logoutBtn.addEventListener('click', async () => {
-  await signOut(auth);
-  window.location.href = 'index.html';
-});
-
-/* === BUILD INPUT ROWS === */
-
-function buildRows() {
-  rowsWrap.innerHTML = '';
-  inputsMap.clear();
-
-  timeSlots.forEach(slot => {
-    const row = document.createElement('div');
-    row.className = 'row grid-layout';
-
-    let innerHTML = `<div class="slot">${slot}</div>`;
-
-    Object.keys(fieldConfigs).forEach(type => {
-      const maxLen = fieldConfigs[type];
-      innerHTML += `
-        <input type="text"
-          inputmode="numeric"
-          placeholder="${maxLen} digits"
-          data-slot="${slot}"
-          data-type="${type}"
-          maxlength="${maxLen}" />
-      `;
-    });
-
-    row.innerHTML = innerHTML;
-
-    const inputs = row.querySelectorAll('input');
-
-    inputs.forEach(inp => {
-      const type = inp.dataset.type;
-      const requiredLen = fieldConfigs[type];
-
-      // numeric only
-      inp.addEventListener('input', () => {
-        inp.value = inp.value.replace(/\D/g, '').slice(0, requiredLen);
-        markDirtyIfChanged(inp);
-      });
-
-      inp.addEventListener('blur', () => {
-        if (inp.value && inp.value.length !== requiredLen) {
-          alert(`${inp.dataset.slot} (${type}): Must be exactly ${requiredLen} digits`);
-        }
-      });
-
-      inputsMap.set(`${slot}::${type}`, inp);
-    });
-
-    rowsWrap.appendChild(row);
-  });
-}
-
-/* === LOAD DATA === */
-
-async function loadForDate(dateKey) {
-  if (!dateKey) return;
-
-  currentDateKey = dateKey;
-  buildRows();
-
-  try {
-    const snap = await get(ref(db, `lottery/${dateKey}`));
-    const data = snap.val() || {};
-
-    loadedSnapshot = data;
-
-    timeSlots.forEach(slot => {
-      Object.keys(fieldConfigs).forEach(type => {
-        const val = data?.[slot]?.[type] ?? '';
-        const inp = inputsMap.get(`${slot}::${type}`);
-        if (inp) {
-          inp.value = val;
-          inp.classList.remove('dirty');
-        }
-      });
-    });
-
-  } catch (error) {
-    console.error("Load failed:", error);
-  }
-}
-
-/* === DIRTY TRACKING === */
-
-function isDifferent(slot, type, val) {
-  const prev = loadedSnapshot?.[slot]?.[type] ?? '';
-  return String(prev) !== String(val);
-}
-
-function markDirtyIfChanged(inp) {
-  const { slot, type } = inp.dataset;
-  inp.classList.toggle('dirty', isDifferent(slot, type, inp.value));
-}
-
-/* === SAVE CHANGES === */
-
-async function saveChanges() {
-  if (!currentDateKey) return alert('Select a date first.');
-
-  const updates = {};
-  let hasValidationError = false;
-
-  for (const [key, el] of inputsMap) {
-    const type = el.dataset.type;
-    const requiredLen = fieldConfigs[type];
-
-    if (el.value && el.value.length !== requiredLen) {
-      alert(`${el.dataset.slot} (${type}): Must be exactly ${requiredLen} digits`);
-      el.focus();
-      hasValidationError = true;
-      break;
-    }
-
-    const [slot, fieldType] = key.split('::');
-
-    if (isDifferent(slot, fieldType, el.value)) {
-      updates[`lottery/${currentDateKey}/${slot}/${fieldType}`] = el.value || null;
-    }
-  }
-
-  if (hasValidationError) return;
-
-  if (Object.keys(updates).length === 0) {
-    alert('No changes to save.');
-    return;
-  }
-
-  try {
-    await update(ref(db), updates);
-    alert('Changes saved successfully!');
-
-    // update local snapshot
-    Object.entries(updates).forEach(([path, val]) => {
-      const parts = path.split('/');
-      const slot = parts[2];
-      const type = parts[3];
-
-      if (!loadedSnapshot[slot]) loadedSnapshot[slot] = {};
-      loadedSnapshot[slot][type] = val ?? '';
-    });
-
-    inputsMap.forEach(el => markDirtyIfChanged(el));
-
-  } catch (e) {
-    console.error(e);
-    alert('Failed to save.');
-  }
-}
-
-/* === RESET === */
-
-function resetToLoaded() {
-  if (!currentDateKey) return;
-
-  inputsMap.forEach((el, key) => {
-    const [slot, type] = key.split('::');
-    const val = loadedSnapshot?.[slot]?.[type] ?? '';
-    el.value = val;
-    el.classList.remove('dirty');
-  });
-}
-
-/* === EVENTS === */
-
-saveBtn.addEventListener('click', saveChanges);
-resetBtn.addEventListener('click', resetToLoaded);
-
-datePicker.addEventListener('change', () => {
-  loadForDate(datePicker.value);
-});
-
-/* === SET DEFAULT TO TODAY === */
-
-(function setToday() {
-  const d = new Date();
-  const pad = n => String(n).padStart(2, '0');
-  const today = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-  datePicker.value = today;
-  loadForDate(today);
-})();
+document.getElementById('viewDate').value = new Date().toISOString().split('T')[0];
+sync();
