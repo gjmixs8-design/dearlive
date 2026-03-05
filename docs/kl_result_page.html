@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kerala Yearly MC Chart</title>
-    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/dist/html-to-image.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Young+Serif&display=swap" rel="stylesheet">
@@ -53,7 +53,7 @@
             border-collapse: collapse;
             background: #fff;
             border: 2px solid #000;
-            width: 1600px;
+            width: 1600px; /* Fixed width for the yearly layout */
         }
 
         th, td {
@@ -191,10 +191,10 @@
             onValue(lotteryRef, (snapshot) => {
                 const allData = snapshot.val() || {};
                 const body = document.getElementById('tableBody');
-                const currentYear = 2026; // Set based on your database context
+                const currentYear = 2026; 
                 let html = '';
 
-                // Month mapping to match table headers: FEB (02) to JAN (01)
+                // Mapping Feb 2025 to Jan 2026
                 const monthKeys = ["02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "01"];
                 
                 for (let d = 1; d <= 31; d++) {
@@ -203,11 +203,10 @@
 
                     for (let m = 0; m < 12; m++) {
                         const monthStr = monthKeys[m];
-                        // If month is JAN, it belongs to the following year
                         const year = (monthStr === "01") ? currentYear : 2025; 
                         const dateKey = `${year}-${monthStr}-${dayStr}`;
 
-                        // Short month validation
+                        // Validate if the date exists in the calendar
                         const isFebEnd = (d > 28 && monthStr === "02");
                         const isShortMonthEnd = (d > 30 && ["04", "06", "09", "11"].includes(monthStr));
 
@@ -217,13 +216,10 @@
                             let machineVal = "---";
                             let resultVal = "---";
 
-                            if (allData[dateKey]) {
-                                const slots = allData[dateKey];
-                                // Search through all time slots for kl_machine and kl_result
-                                for (let time in slots) {
-                                    if (slots[time].kl_machine) machineVal = slots[time].kl_machine;
-                                    if (slots[time].kl_result) resultVal = slots[time].kl_result;
-                                }
+                            // Access the "Daily" node directly
+                            if (allData[dateKey] && allData[dateKey].Daily) {
+                                machineVal = allData[dateKey].Daily.kl_machine || "---";
+                                resultVal = allData[dateKey].Daily.kl_result || "---";
                             }
 
                             let cls = (d % 5 === 0) ? 'highlight-red' : '';
@@ -241,6 +237,7 @@
     </script>
 
     <script>
+        // Adjusts the table scale to fit the screen width
         function applyAutoScale() {
             const inner = document.getElementById('tableInner');
             const outer = document.getElementById('tableOuter');
@@ -259,6 +256,7 @@
             }
         }
 
+        // Converts the HTML table to a PNG image for download
         async function downloadTable() {
             const btn = document.getElementById('dlBtn');
             const node = document.getElementById('targetTable');
@@ -267,13 +265,14 @@
             try {
                 const dataUrl = await htmlToImage.toPng(node, {
                     backgroundColor: '#fff',
-                    style: { transform: 'scale(1)' }
+                    style: { transform: 'scale(1)' } // High quality export
                 });
                 const link = document.createElement('a');
                 link.download = 'Kerala-Yearly-Chart.png';
                 link.href = dataUrl;
                 link.click();
             } catch (error) {
+                console.error(error);
                 alert("Download failed.");
             } finally {
                 btn.innerText = "Download Chart";
