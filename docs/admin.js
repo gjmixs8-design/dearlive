@@ -33,8 +33,8 @@ function init() {
         div.innerHTML = `<div class="time-tag"><b>${s}</b></div>` + 
             createInp('Machine', 'machine', s, 5) +
             createInp('Result', 'result', s, 5) +
-            createInp('3D Res', 'three_digit', s, 3) +
-            createInp('2D Guess', 'guessing', s, 2);
+            createInp('3Digit Result', 'three_digit', s, 3) +
+            createInp('dear guessing', 'guessing', s, 2);
         dearBox.appendChild(div);
     });
 
