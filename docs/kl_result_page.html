@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kerala Yearly MC Chart</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/dist/html-to-image.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Young+Serif&display=swap" rel="stylesheet">
@@ -27,12 +27,39 @@
             overflow-x: hidden;
         }
 
+        .header-section {
+            background: #fff;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+
         h1 {
             color: var(--sidebar-maroon);
-            margin-top: 30px;
-            font-size: 22px;
+            margin: 0 0 15px 0;
+            font-size: 24px;
             text-transform: uppercase;
             font-family: "Young Serif", serif;
+        }
+
+        .year-select-container {
+            margin-bottom: 10px;
+        }
+
+        .year-label {
+            font-weight: bold;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        #yearSelect {
+            padding: 8px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: 2px solid var(--sidebar-maroon);
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: white;
         }
 
         .table-outer {
@@ -53,7 +80,7 @@
             border-collapse: collapse;
             background: #fff;
             border: 2px solid #000;
-            width: 1600px; /* Fixed width for the yearly layout */
+            width: 1650px; /* Increased slightly for double date columns */
         }
 
         th, td {
@@ -64,48 +91,18 @@
             text-align: center;
         }
 
-        .hdr-main {
-            background: #e99d11;
-            color: white;
-            font-size: 20px;
-        }
-
-        .hdr-sub {
-            background: #f8d256;
-            color: #d32f2f;
-        }
-
-        .hdr-labels {
-            background: #fff3e0;
-            color: #555;
-            font-size: 10px;
-        }
-
-        .date-col {
-            background: #fcbb67;
-            width: 50px;
-            border-right: 2px solid var(--border-heavy);
-        }
-
-        .month-header {
-            background: var(--header-salmon);
-            color: #000;
-            border-right: 2px solid var(--border-heavy);
-        }
-
-        .col-right {
-            border-right: 2px solid var(--border-heavy);
-        }
-
-        .stars {
-            color: #d32f2f;
-            background: #eee;
-        }
-
-        .highlight-red {
-            color: #d32f2f;
-            background-color: #ffebee;
-        }
+        .hdr-main { background: #e99d11; color: rgb(29, 27, 27); font-size: 22px; }
+        .hdr-sub { background: #f8d256; color: #d32f2f; }
+        .hdr-labels { background: #fff3e0; color: #555; font-size: 10px; }
+        
+        /* Updated date column styles */
+        .date-col-left { background: #fcbb67; width: 50px; border-right: 2px solid var(--border-heavy); }
+        .date-col-right { background: #fcbb67; width: 50px; border-left: 2px solid var(--border-heavy); }
+        
+        .month-header { background: var(--header-salmon); color: #000; border-right: 2px solid var(--border-heavy); }
+        .col-right { border-right: 2px solid var(--border-heavy); }
+        .stars { color: #d32f2f; background: #eee; }
+        .highlight-red { color: #d32f2f; background-color: #ffebee; }
 
         .btn-download {
             background: var(--sidebar-maroon);
@@ -119,25 +116,35 @@
             transition: 0.3s;
         }
 
-        .btn-download:hover {
-            background: #a00000;
-        }
+        .btn-download:hover { background: #a00000; }
     </style>
 </head>
 
 <body>
 
-    <h1>Kerala Yearly Result Chart (2025 - 26)</h1>
+    <div class="header-section">
+        <h1 id="chartTitle">Kerala Yearly Result Chart (2025-26)</h1>
+        
+        <div class="year-select-container">
+            <span class="year-label">Select Year:</span>
+            <select id="yearSelect">
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+            </select>
+        </div>
+    </div>
 
     <div class="table-outer" id="tableOuter">
         <div class="table-inner" id="tableInner">
             <table id="targetTable">
                 <thead>
                     <tr class="hdr-main">
-                        <th colspan="25">Kerala Yearly Result Chart (2025 - 26)</th>
+                        <th colspan="26" id="tableYearHeader">Kerala Yearly Result Chart (2026)</th>
                     </tr>
                     <tr class="hdr-sub">
-                        <th class="date-col" rowspan="2">DATE</th>
+                        <th class="date-col-left" rowspan="2">DATE</th>
+                        <th colspan="2" class="month-header">JAN</th>
                         <th colspan="2" class="month-header">FEB</th>
                         <th colspan="2" class="month-header">MAR</th>
                         <th colspan="2" class="month-header">APR</th>
@@ -149,30 +156,24 @@
                         <th colspan="2" class="month-header">OCT</th>
                         <th colspan="2" class="month-header">NOV</th>
                         <th colspan="2" class="month-header">DEC</th>
-                        <th colspan="2" class="month-header">JAN</th>
+                        <th class="date-col-right" rowspan="2">DATE</th>
                     </tr>
                     <tr class="hdr-labels">
-                        <th>MACHINE</th><th class="col-right">RESULT</th>
-                        <th>MACHINE</th><th class="col-right">RESULT</th>
-                        <th>MACHINE</th><th class="col-right">RESULT</th>
-                        <th>MACHINE</th><th class="col-right">RESULT</th>
-                        <th>MACHINE</th><th class="col-right">RESULT</th>
-                        <th>MACHINE</th><th class="col-right">RESULT</th>
-                        <th>MACHINE</th><th class="col-right">RESULT</th>
-                        <th>MACHINE</th><th class="col-right">RESULT</th>
-                        <th>MACHINE</th><th class="col-right">RESULT</th>
-                        <th>MACHINE</th><th class="col-right">RESULT</th>
-                        <th>MACHINE</th><th class="col-right">RESULT</th>
-                        <th>MACHINE</th><th class="col-right">RESULT</th>
+                        <th>MC</th><th class="col-right">RES</th><th>MC</th><th class="col-right">RES</th>
+                        <th>MC</th><th class="col-right">RES</th><th>MC</th><th class="col-right">RES</th>
+                        <th>MC</th><th class="col-right">RES</th><th>MC</th><th class="col-right">RES</th>
+                        <th>MC</th><th class="col-right">RES</th><th>MC</th><th class="col-right">RES</th>
+                        <th>MC</th><th class="col-right">RES</th><th>MC</th><th class="col-right">RES</th>
+                        <th>MC</th><th class="col-right">RES</th><th>MC</th><th class="col-right">RES</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    </tbody>
+                </tbody>
             </table>
         </div>
     </div>
 
-    <button class="btn-download" id="dlBtn" onclick="downloadTable()">Download Chart</button>
+    <button class="btn-download" id="dlBtn" onclick="downloadTable()">Download PNG Chart</button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -185,66 +186,68 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        function fetchAndBuildTable() {
+        const yearSelect = document.getElementById('yearSelect');
+        const tableBody = document.getElementById('tableBody');
+        const tableYearHeader = document.getElementById('tableYearHeader');
+
+        function updateChart() {
+            const selectedYear = yearSelect.value;
+            tableYearHeader.innerText = `Kerala Yearly Result Chart (${selectedYear})`;
+            
             const lotteryRef = ref(db, 'lottery');
 
             onValue(lotteryRef, (snapshot) => {
                 const allData = snapshot.val() || {};
-                const body = document.getElementById('tableBody');
-                const currentYear = 2026; 
                 let html = '';
-
-                // Mapping Feb 2025 to Jan 2026
-                const monthKeys = ["02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "01"];
+                const monthKeys = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
                 
                 for (let d = 1; d <= 31; d++) {
                     const dayStr = String(d).padStart(2, '0');
-                    html += `<tr><td class="date-col">${d}</td>`;
+                    // Start row with LEFT date
+                    html += `<tr><td class="date-col-left">${d}</td>`;
 
                     for (let m = 0; m < 12; m++) {
                         const monthStr = monthKeys[m];
-                        const year = (monthStr === "01") ? currentYear : 2025; 
-                        const dateKey = `${year}-${monthStr}-${dayStr}`;
+                        const dateKey = `${selectedYear}-${monthStr}-${dayStr}`;
+                        const dateObj = new Date(selectedYear, m, d);
+                        const isValidDate = dateObj.getFullYear() == selectedYear && dateObj.getMonth() == m && dateObj.getDate() == d;
 
-                        // Validate if the date exists in the calendar
-                        const isFebEnd = (d > 28 && monthStr === "02");
-                        const isShortMonthEnd = (d > 30 && ["04", "06", "09", "11"].includes(monthStr));
-
-                        if (isFebEnd || isShortMonthEnd) {
+                        if (!isValidDate) {
                             html += `<td class="stars">***</td><td class="col-right stars">***</td>`;
                         } else {
                             let machineVal = "---";
                             let resultVal = "---";
 
-                            // Access the "Daily" node directly
-                            if (allData[dateKey] && allData[dateKey].Daily) {
-                                machineVal = allData[dateKey].Daily.kl_machine || "---";
-                                resultVal = allData[dateKey].Daily.kl_result || "---";
+                            if (allData[dateKey] && allData[dateKey]['Daily']) {
+                                const daily = allData[dateKey]['Daily'];
+                                machineVal = daily.kl_machine || "---";
+                                resultVal = daily.kl_result || "---";
                             }
 
                             let cls = (d % 5 === 0) ? 'highlight-red' : '';
                             html += `<td class="${cls}">${machineVal}</td><td class="col-right ${cls}">${resultVal}</td>`;
                         }
                     }
-                    html += `</tr>`;
+                    // End row with RIGHT date
+                    html += `<td class="date-col-right">${d}</td></tr>`;
                 }
-                body.innerHTML = html;
+                tableBody.innerHTML = html;
                 applyAutoScale();
             });
         }
 
-        window.addEventListener('load', fetchAndBuildTable);
+        yearSelect.addEventListener('change', updateChart);
+        window.addEventListener('load', updateChart);
     </script>
 
     <script>
-        // Adjusts the table scale to fit the screen width
         function applyAutoScale() {
             const inner = document.getElementById('tableInner');
             const outer = document.getElementById('tableOuter');
             const table = document.getElementById('targetTable');
 
             const availableWidth = window.innerWidth * 0.98;
-            const actualWidth = 1600;
+            const actualWidth = 1650; 
             const scale = availableWidth / actualWidth;
 
             if (scale < 1) {
@@ -256,26 +259,25 @@
             }
         }
 
-        // Converts the HTML table to a PNG image for download
         async function downloadTable() {
             const btn = document.getElementById('dlBtn');
             const node = document.getElementById('targetTable');
-            btn.innerText = "Processing...";
+            btn.innerText = "Generating Image...";
 
             try {
                 const dataUrl = await htmlToImage.toPng(node, {
                     backgroundColor: '#fff',
-                    style: { transform: 'scale(1)' } // High quality export
+                    style: { transform: 'scale(1)' } 
                 });
                 const link = document.createElement('a');
-                link.download = 'Kerala-Yearly-Chart.png';
+                link.download = `Kerala-Chart-${document.getElementById('yearSelect').value}.png`;
                 link.href = dataUrl;
                 link.click();
             } catch (error) {
                 console.error(error);
                 alert("Download failed.");
             } finally {
-                btn.innerText = "Download Chart";
+                btn.innerText = "Download PNG Chart";
             }
         }
 
