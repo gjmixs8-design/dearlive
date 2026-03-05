@@ -193,6 +193,12 @@
       position: relative;
     }
 
+    .search-highlight {
+      background-color: #ffeb3b !important;
+      color: #000 !important;
+      outline: 2px solid red;
+    }
+
     .col-01pm {
       background-color: var(--color-01pm);
     }
@@ -240,11 +246,8 @@
     <div class="toolbar">
       <input type="text" id="tableSearch" placeholder="Search Number...">
       <select id="monthSelect"></select>
-      <select id="yearSelect">
-        <option value="2025">2025</option>
-        <option value="2026">2026</option>
-      </select>
-      <button class="btn-apply">Apply Filter</button>
+      <select id="yearSelect"></select>
+      <button class="btn-apply" onclick="renderTable()">Apply Filter</button>
     </div>
 
     <div class="table-outer" id="tableOuter">
@@ -288,106 +291,127 @@
       </div>
     </div>
 
-    <button class="btn-download" onclick="exportToPNG()">Download PNG Chart</button>
+    <button class="btn-download" id="dlBtn" onclick="exportToPNG()">Download PNG Chart</button>
   </div>
 
- <script type="module">
-  import { db } from './firebase-init.js';
-  import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js';
+  <script type="module">
+    import { db } from './firebase-init.js';
+    import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js';
 
-  const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-  
-  // These MUST match your Firebase keys exactly (including the space and colon)
-  const timeSlots = ["10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "05:00 PM", "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM"];
+    const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+    const timeSlots = ["10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "05:00 PM", "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM"];
 
-  const mSel = document.getElementById('monthSelect');
-  const yearSelect = document.getElementById('yearSelect');
-  const tableBody = document.getElementById('tableBody');
-  const tableBanner = document.getElementById('tableBanner');
-  const searchInput = document.getElementById('tableSearch');
+    const mSel = document.getElementById('monthSelect');
+    const ySel = document.getElementById('yearSelect');
+    const tableBody = document.getElementById('tableBody');
+    const tableBanner = document.getElementById('tableBanner');
+    const searchInput = document.getElementById('tableSearch');
 
-  let allLotteryData = {}; 
+    let allLotteryData = {};
+    const now = new Date();
 
-  // Initialize Month Dropdown
-  monthNames.forEach((m, i) => {
-    const opt = new Option(m, i + 1);
-    if (i === new Date().getMonth()) opt.selected = true;
-    mSel.add(opt);
-  });
-
-  window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('active');
-
-  window.applyAutoScale = () => {
-    const inner = document.getElementById('tableInner');
-    const outer = document.getElementById('tableOuter');
-    const captureArea = document.getElementById('captureArea');
-    const availableWidth = window.innerWidth * 0.95;
-    const actualWidth = captureArea.offsetWidth + 20;
-    const scale = Math.min(1, availableWidth / actualWidth);
-    document.documentElement.style.setProperty('--scale', scale);
-    if(outer) outer.style.height = (captureArea.offsetHeight * scale) + 50 + "px";
-  };
-
-  function renderTable() {
-    const searchTerm = searchInput.value.trim().toLowerCase();
-    const month = String(mSel.value).padStart(2, '0');
-    const year = yearSelect.value;
-    const daysInMonth = new Date(year, parseInt(month), 0).getDate();
-    
-    tableBanner.innerText = `Dear Result Number Chart - ${monthNames[mSel.value - 1]} ${year}`;
-    tableBody.innerHTML = "";
-
-    for (let d = 1; d <= daysInMonth; d++) {
-      const day = String(d).padStart(2, '0');
-      const dateKey = `${year}-${month}-${day}`; // Matches "2026-03-02"
-      const dayData = allLotteryData[dateKey] || {};
-      
-      let rowHtml = `<tr><td class="date-col">${d}</td>`;
-      let rowMatch = false;
-      let tempCells = "";
-
-      timeSlots.forEach((slot, index) => {
-        // Accessing the "result" field specifically from your screenshot
-        let value = (dayData[slot] && dayData[slot].result) ? dayData[slot].result : "-";
-
-        if (searchTerm && String(value).toLowerCase().includes(searchTerm)) rowMatch = true;
-
-        let cls = "";
-        if (slot.includes("01:00 PM")) cls = "col-01pm";
-        if (slot.includes("06:00 PM")) cls = "col-06pm";
-        if (slot.includes("08:00 PM")) cls = "col-08pm";
-
-        tempCells += `<td class="data-cell ${cls}">${value}</td>`;
-      });
-
-      if (searchTerm && String(d).includes(searchTerm)) rowMatch = true;
-
-      if (!searchTerm || rowMatch) {
-        rowHtml += tempCells + `<td class="date-col">${d}</td></tr>`;
-        tableBody.innerHTML += rowHtml;
-      }
-    }
-    setTimeout(applyAutoScale, 50);
-  }
-
-  // Listener for the "lottery" node
-  function connectToFirebase() {
-    const lotteryRef = ref(db, 'lottery');
-    tableBody.innerHTML = "<tr><td colspan='11'>Loading Results...</td></tr>";
-
-    onValue(lotteryRef, (snapshot) => {
-      allLotteryData = snapshot.exists() ? snapshot.val() : {};
-      renderTable();
+    // 1. Initialize Dropdowns with Current Date
+    monthNames.forEach((m, i) => {
+      const opt = new Option(m, i + 1);
+      if (i === now.getMonth()) opt.selected = true;
+      mSel.add(opt);
     });
-  }
 
-  mSel.addEventListener('change', renderTable);
-  yearSelect.addEventListener('change', renderTable);
-  searchInput.addEventListener('input', renderTable);
-  window.addEventListener('resize', applyAutoScale);
+    const startYear = 2025;
+    const endYear = now.getFullYear() + 1;
+    for (let y = startYear; y <= endYear; y++) {
+      const opt = new Option(y, y);
+      if (y === now.getFullYear()) opt.selected = true;
+      ySel.add(opt);
+    }
 
-  connectToFirebase();
-</script>
+    window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('active');
+
+    window.applyAutoScale = () => {
+      const inner = document.getElementById('tableInner');
+      const outer = document.getElementById('tableOuter');
+      const captureArea = document.getElementById('captureArea');
+      const availableWidth = window.innerWidth * 0.95;
+      const actualWidth = captureArea.offsetWidth + 20;
+      const scale = Math.min(1, availableWidth / actualWidth);
+      document.documentElement.style.setProperty('--scale', scale);
+      if (outer) outer.style.height = (captureArea.offsetHeight * scale) + 50 + "px";
+    };
+
+    // 2. Fixed Search & Filter Logic
+    window.renderTable = function () {
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      const month = String(mSel.value).padStart(2, '0');
+      const year = ySel.value;
+      const daysInMonth = new Date(year, parseInt(month), 0).getDate();
+
+      tableBanner.innerText = `Dear Result Number Chart - ${monthNames[mSel.value - 1]} ${year}`;
+      tableBody.innerHTML = "";
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const day = String(d).padStart(2, '0');
+        const dateKey = `${year}-${month}-${day}`;
+        const dayData = allLotteryData[dateKey] || {};
+
+        let rowHtml = `<tr><td class="date-col">${d}</td>`;
+        let rowHasMatch = false;
+        let tempRowContent = "";
+
+        timeSlots.forEach((slot) => {
+          let value = (dayData[slot] && dayData[slot].result) ? dayData[slot].result : "-";
+          let isMatch = searchTerm && String(value).toLowerCase().includes(searchTerm);
+          if (isMatch) rowHasMatch = true;
+
+          let cls = "";
+          if (slot.includes("01:00 PM")) cls = "col-01pm";
+          else if (slot.includes("06:00 PM")) cls = "col-06pm";
+          else if (slot.includes("08:00 PM")) cls = "col-08pm";
+
+          let highlightClass = isMatch ? "search-highlight" : "";
+          tempRowContent += `<td class="data-cell ${cls} ${highlightClass}">${value}</td>`;
+        });
+
+        // Date match
+        if (searchTerm && String(d) === searchTerm) rowHasMatch = true;
+
+        // If no search, show all. If search, only show rows with matches.
+        if (!searchTerm || rowHasMatch) {
+          rowHtml += tempRowContent + `<td class="date-col">${d}</td></tr>`;
+          tableBody.innerHTML += rowHtml;
+        }
+      }
+      setTimeout(applyAutoScale, 50);
+    }
+
+    function connectToFirebase() {
+      const lotteryRef = ref(db, 'lottery');
+      tableBody.innerHTML = "<tr><td colspan='11'>Loading Results...</td></tr>";
+
+      onValue(lotteryRef, (snapshot) => {
+        allLotteryData = snapshot.exists() ? snapshot.val() : {};
+        renderTable();
+      });
+    }
+
+    window.exportToPNG = async function () {
+      const node = document.getElementById('captureArea');
+      const btn = document.getElementById('dlBtn');
+      btn.innerText = "Capturing...";
+      try {
+        const dataUrl = await htmlToImage.toPng(node, { backgroundColor: '#fff', pixelRatio: 2 });
+        const link = document.createElement('a');
+        link.download = `Result-Chart-${monthNames[mSel.value - 1]}-${ySel.value}.png`;
+        link.href = dataUrl;
+        link.click();
+      } catch (e) { console.error(e); }
+      finally { btn.innerText = "Download PNG Chart"; }
+    };
+
+    searchInput.addEventListener('input', renderTable);
+    window.addEventListener('resize', applyAutoScale);
+
+    connectToFirebase();
+  </script>
 </body>
 
 </html>

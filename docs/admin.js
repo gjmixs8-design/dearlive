@@ -1,11 +1,14 @@
 import { auth, db } from './firebase-init.js';
+import { signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js';
 import { ref, update } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js';
 
-const DEAR_SLOTS = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM'];
-const JACKPOT_SLOTS = ['11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '04:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
-const DAILY_SLOTS = ['02:30 PM'];
+const dearSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM'];
+const jackpotSlots = ['11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '04:00 PM', '06:00 PM', '07:00 PM', '08:00 PM'];
 
-// Tab Logic
+// Auth Guard
+onAuthStateChanged(auth, user => { if (!user) window.location.href = 'index.html'; });
+
+// Tab Switching logic
 document.querySelectorAll('.nav-tabs button').forEach(btn => {
     btn.onclick = () => {
         document.querySelectorAll('.nav-tabs button, .page-content').forEach(el => el.classList.remove('active'));
@@ -14,58 +17,70 @@ document.querySelectorAll('.nav-tabs button').forEach(btn => {
     };
 });
 
-function createInp(slot, type, len) {
-    const input = document.createElement('input');
-    input.placeholder = `${len} Digits`;
-    input.maxLength = len;
-    input.dataset.slot = slot;
-    input.dataset.type = type;
-    input.oninput = () => input.value = input.value.replace(/\D/g, '');
-    return input;
+function createInp(label, type, slot, max) {
+    return `
+        <div class="input-group">
+            <label>${label}</label>
+            <input type="text" data-slot="${slot}" data-type="${type}" maxlength="${max}" inputmode="numeric" placeholder="-">
+        </div>`;
 }
 
 function init() {
-    const dearRows = document.getElementById('dear-rows');
-    DEAR_SLOTS.forEach(slot => {
+    const dearBox = document.getElementById('dear-rows');
+    dearSlots.forEach(s => {
         const div = document.createElement('div');
-        div.className = 'row-card dear-grid';
-        div.innerHTML = `<div class="time-label">${slot}</div>`;
-        div.appendChild(createInp(slot, 'machine', 5));
-        div.appendChild(createInp(slot, 'result', 5));
-        div.appendChild(createInp(slot, 'three_digit', 3));
-        div.appendChild(createInp(slot, 'guessing', 2));
-        dearRows.appendChild(div);
+        div.className = 'grid-row grid-dear';
+        div.innerHTML = `<div class="time-tag"><b>${s}</b></div>` + 
+            createInp('Machine', 'machine', s, 5) +
+            createInp('Result', 'result', s, 5) +
+            createInp('3D Res', 'three_digit', s, 3) +
+            createInp('2D Guess', 'guessing', s, 2);
+        dearBox.appendChild(div);
     });
 
-    const klRow = document.getElementById('kl-row');
-    DAILY_SLOTS.forEach(slot => {
-      const klDiv = document.createElement('div');
-      klDiv.className = 'row-card kl-grid';
-      klDiv.appendChild(createInp(slot, 'kl_machine', 5));
-      klDiv.appendChild(createInp(slot, 'kl_result', 5));
-      klDiv.appendChild(createInp(slot, 'kl_guessing', 3));
-      klRow.appendChild(klDiv);
-      });
+    const klBox = document.getElementById('kl-row');
+    const klDiv = document.createElement('div');
+    klDiv.className = 'grid-row grid-kl';
+    klDiv.innerHTML = 
+        createInp('KL Machine', 'kl_machine', 'Daily', 5) +
+        createInp('KL Result', 'kl_result', 'Daily', 5) +
+        createInp('KL Guess', 'kl_guessing', 'Daily', 2);
+    klBox.appendChild(klDiv);
 
-    const jackRows = document.getElementById('jackpot-rows');
-    JACKPOT_SLOTS.forEach(slot => {
+    const jackBox = document.getElementById('jackpot-rows');
+    jackpotSlots.forEach(s => {
         const div = document.createElement('div');
-        div.className = 'row-card jackpot-grid';
-        div.innerHTML = `<div class="time-label">${slot}</div>`;
-        div.appendChild(createInp(slot, 'jackpot', 3));
-        jackRows.appendChild(div);
+        div.className = 'grid-row grid-jackpot';
+        div.innerHTML = `<div class="time-tag"><b>${s}</b></div>` + createInp('Jackpot', 'jackpot', s, 3);
+        jackBox.appendChild(div);
+    });
+
+    // Restriction: Numbers only
+    document.querySelectorAll('input').forEach(i => {
+        i.oninput = () => i.value = i.value.replace(/\D/g, '');
     });
 }
 
 init();
 
-document.getElementById('submit-btn').onclick = async () => {
+document.getElementById('submit-data-btn').onclick = async () => {
     const date = document.getElementById('select-date').value;
-    if(!date) return alert("Select Date");
+    if(!date) return alert("Please select a date first");
+    
+    document.getElementById('loader').style.display = 'flex';
     const updates = {};
-    document.querySelectorAll('input[data-type]').forEach(i => {
+    document.querySelectorAll('input').forEach(i => {
         if(i.value) updates[`lottery/${date}/${i.dataset.slot}/${i.dataset.type}`] = i.value;
     });
-    await update(ref(db), updates);
-    alert("Data Saved Successfully!");
+
+    try {
+        await update(ref(db), updates);
+        alert("Success! All data is live.");
+    } catch (e) { 
+        alert("Database Error: Check connection."); 
+    } finally {
+        document.getElementById('loader').style.display = 'none';
+    }
 };
+
+document.getElementById('logout-btn').onclick = () => signOut(auth);

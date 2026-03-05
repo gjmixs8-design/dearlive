@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,6 @@
             --green-border: #2e7d32;
             --header-bg: #fdc279;
             --text-red: #d32f2f;
-            --link-blue: #0000ee;
             --cyan-divider: #4dd0e1;
         }
 
@@ -60,8 +60,6 @@
             font-size: 1.4rem;
             font-weight: bold;
             text-decoration: underline;
-            cursor: pointer;
-            display: block;
             margin-bottom: 8px;
         }
 
@@ -89,7 +87,9 @@
         .guessing-num {
             font-size: 1.8rem;
             letter-spacing: 8px;
+            font-weight: bold;
             margin-bottom: 10px;
+            color: #333;
         }
 
         .box-header {
@@ -155,16 +155,27 @@
             justify-content: center;
         }
 
-        .btn-pink { background-color: #e91e63; }
-        .btn-green { background-color: #4caf50; }
-        .btn-blue { background-color: #2196f3; }
-        .btn-orange { background-color: #ff9800; }
+        .btn-pink {
+            background-color: #e91e63;
+        }
+
+        .btn-green {
+            background-color: #4caf50;
+        }
+
+        .btn-blue {
+            background-color: #2196f3;
+        }
+
+        .btn-orange {
+            background-color: #ff9800;
+        }
     </style>
 </head>
 
 <body>
     <div class="wrapper">
-        <div class="header-title">-Jackpot + KR-Chart-Guessing</div>
+        <div class="header-title">-Jackpot + KR-Chart-Guessing-</div>
         <div class="cyan-divider"></div>
 
         <div class="result-item"><span class="result-link-top">11 AM Result</span>
@@ -197,10 +208,12 @@
         <div class="cyan-divider"></div>
 
         <div class="title-red">KL Guessing</div>
-        <div id="guessing-box" class="guessing-num">---</div>
+        <div class="guessing-num">
+            <span id="guess-kl-2d">--</span>
+        </div>
 
         <div class="box-header">KL Machine Number</div>
-        <div id="machine-box" class="number-display">---</div>
+      <div id="machine-box" class="number-display">-- r --</div>
 
         <div class="box-header" style="font-size: 1.4rem;">Kerala Jackpot Result</div>
 
@@ -212,72 +225,56 @@
         <div class="button-grid">
             <a href="home.html" class="btn btn-pink">🎉 Kerala Jackpot</a>
             <a href="index.html" class="btn btn-green">💰 Dear Jackpot</a>
-            <a href="kl_result_page.html" class="btn btn-blue">📊 Kerala Lottery Chart</a>
-            <a href="jackpot_result.html" class="btn btn-orange">📊 Jackpot and kl</a>
+            <a href="#" class="btn btn-blue">📊 Kerala Lottery Chart</a>
+            <a href="#" class="btn btn-orange">📊 Jackpot and KL</a>
         </div>
     </div>
 
-   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // CONFIG: Your Firebase credentials
-    const firebaseConfig = {
-        databaseURL: "https://dearlive-97ef5-default-rtdb.firebaseio.com",
-    };
+        const firebaseConfig = {
+            databaseURL: "https://dearlive-97ef5-default-rtdb.firebaseio.com",
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-    // Auto-detect today's date (Matches your Firebase key: 2026-03-02)
-    const getTodayDate = () => {
-        const d = new Date();
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
+        const getTodayDate = () => {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
 
-    const today = getTodayDate();
-    const lotteryRef = ref(db, `lottery/${today}`);
+        const today = getTodayDate();
+        const lotteryRef = ref(db, `lottery/${today}`);
 
-    // Listen for Real-time Data
-    onValue(lotteryRef, (snapshot) => {
-        const data = snapshot.val();
-        if (!data) {
-            console.log("No data found for today's date.");
-            return;
-        }
+        onValue(lotteryRef, (snapshot) => {
+            const data = snapshot.val();
+            if (!data) return;
 
-        // 1. FIX: Update Three Digit boxes using the 'jackpot' key from your data
-        const digitBoxes = document.querySelectorAll('.digit-box');
-        digitBoxes.forEach(box => {
-            const timeKey = box.getAttribute('data-time'); // e.g., "11:00 AM"
-            
-            // Look into the specific time slot and find the 'jackpot' field (e.g., "989")
-            if (data[timeKey] && data[timeKey].jackpot) {
-                box.innerText = data[timeKey].jackpot;
-            } else {
-                box.innerText = "---"; // Reset if no data exists for that specific slot
+            // Update Time Slot Jackpot boxes
+            document.querySelectorAll('.digit-box').forEach(box => {
+                const timeKey = box.getAttribute('data-time');
+                if (data[timeKey] && data[timeKey].jackpot) {
+                    box.innerText = data[timeKey].jackpot;
+                }
+            });
+
+            // Update KL Specific Data (2D Guessing, Machine, Result)
+            // Note: We look for the 'Daily' key which stores KL data
+            if (data['Daily']) {
+                const kl = data['Daily'];
+                // Only take the first 2 digits for Guessing as requested
+                document.getElementById('guess-kl-2d').innerText = kl.kl_guessing ? `${kl.kl_guessing.charAt(0)} r ${kl.kl_guessing.charAt(1)}` : "-- r --";
+                document.getElementById('machine-box').innerText = kl.kl_machine || "---";
+                document.getElementById('kl-result-box').innerText = kl.kl_result || "---";
             }
         });
-
-        // 2. KL Guessing, Machine, and Result Logic (Remains same)
-        let foundGuessing = "---";
-        let foundKLMachine = "---";
-        let foundKLResult = "---";
-
-        // Search through slots to find KL-specific updates
-        Object.values(data).forEach(slot => {
-            if (slot.guessing) foundGuessing = slot.guessing;
-            if (slot.kl_machine) foundKLMachine = slot.kl_machine;
-            if (slot.kl_result) foundKLResult = slot.kl_result;
-        });
-
-        document.getElementById('guessing-box').innerText = foundGuessing;
-        document.getElementById('machine-box').innerText = foundKLMachine;
-        document.getElementById('kl-result-box').innerText = foundKLResult;
-    });
-</script>
+    </script>
 </body>
+
 </html>
