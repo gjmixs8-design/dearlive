@@ -4,31 +4,132 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login</title>
+  <title>Admin Login</title>
   <script type="module" src="./firebase-init.js"></script>
   <script type="module" src="./login.js"></script>
   <style>
+    :root {
+      --primary-color: #fdd835;
+      --primary-hover: #fbc02d;
+      --text-dark: #333;
+      --error-red: #ff5252;
+    }
+
     body {
       background: linear-gradient(135deg, #ffe864, #ffffff);
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
-      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      color: var(--text-dark);
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      /* Desktop width */
+      margin: 20px;
+      /* Mobile spacing */
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .input-group {
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      margin-top: 8px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      /* Prevents iOS auto-zoom on focus */
+      transition: border-color 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary-hover);
+      box-shadow: 0 0 0 3px rgba(253, 216, 53, 0.2);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--primary-color);
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, background-color 0.2s;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    #login-error {
+      color: var(--error-red);
+      font-size: 14px;
+      margin-top: 1rem;
+      min-height: 1.2em;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 1.5rem;
+        border-radius: 12px;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 
 <body>
+
   <div class="login-container">
     <h2>Admin Login</h2>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <button id="login-btn">Login</button>
+
+    <div class="input-group">
+      <input type="email" id="email" placeholder="Email Address" required />
+    </div>
+
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Password" required />
+    </div>
+
+    <button id="login-btn">Sign In</button>
+
     <p id="login-error"></p>
   </div>
+
 </body>
 
 </html>
