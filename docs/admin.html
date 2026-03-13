@@ -3,88 +3,104 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEAR Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DEAR Live - Modern Admin</title>
     <style>
         :root {
-            --gold: #f8c128;
-            --white: #f1f1f1;
-            --dark: #111;
-            --glass: rgba(255, 255, 255, 0.08);
+            --primary: #f8c128;
+            --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --input-bg: rgba(0, 0, 0, 0.3);
+            --text: #ffffff;
+            --dice-neon: #39FF14;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at top, #444, #111);
-            color: #fff;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text);
             min-height: 100vh;
-            padding-bottom: 50px;
+            padding: 10px;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 15px;
+            width: 100%;
         }
 
         .header-top {
             text-align: center;
-            margin-bottom: 20px;
+            padding: 20px 0;
         }
 
-        /* Fixed Date Input Styling */
+        h1 {
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
         #select-date {
-            padding: 12px;
-            border-radius: 8px;
-            border: 2px solid var(--gold);
-            background: #fff;
-            color: #000;
             width: 100%;
-            max-width: 300px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
+            max-width: 400px;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(248, 193, 40, 0.4);
+            background: #383838;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
         }
 
         .nav-tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin: 20px 0;
+            background: var(--input-bg);
+            padding: 5px;
+            border-radius: 15px;
         }
 
         .nav-tabs button {
             flex: 1;
-            padding: 15px;
-            background: var(--dark);
-            color: #fff;
-            border: 1px solid var(--gold);
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: #ccc;
+            font-weight: 600;
+            border-radius: 10px;
             cursor: pointer;
             transition: 0.3s;
-            font-weight: bold;
-            border-radius: 8px;
         }
 
         .nav-tabs button.active {
-            background: var(--gold);
+            background: var(--primary);
             color: #000;
+            box-shadow: 0 4px 10px rgba(248, 193, 40, 0.2);
         }
 
         .page-content {
             display: none;
-            animation: fadeIn 0.3s ease;
         }
 
         .page-content.active {
             display: block;
+            animation: slideUp 0.4s ease;
         }
 
-        @keyframes fadeIn {
+        @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -92,116 +108,145 @@
         }
 
         .grid-row {
-            display: grid;
+            display: flex;
+            flex-wrap: wrap;
             gap: 10px;
+            background: var(--card-bg);
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             align-items: center;
-            margin-bottom: 12px;
-            padding: 12px;
-            background: var(--glass);
-            border-radius: 10px;
-            border-left: 4px solid var(--gold);
+            backdrop-filter: blur(10px);
         }
 
-        .grid-dear {
-            grid-template-columns: 90px 1fr 1fr 1fr 1fr;
-        }
-
-        .grid-kl {
-            grid-template-columns: 1fr 1fr 1fr;
-        }
-
-        .grid-jackpot {
-            grid-template-columns: 90px 1fr;
-        }
-
-        @media (max-width: 650px) {
-
-            .grid-dear,
-            .grid-kl {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .time-tag {
-                grid-column: span 2;
-                background: var(--gold);
-                color: #000;
-                text-align: center;
-                border-radius: 5px;
-                font-weight: 900;
-            }
+        .time-tag {
+            width: 100%;
+            font-weight: 800;
+            color: var(--primary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .input-group {
+            flex: 1 1 120px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 5px;
         }
 
         label {
-            font-size: 11px;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            color: var(--gold);
+            opacity: 0.8;
+            letter-spacing: 0.5px;
         }
 
         input {
-            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 12px;
-            background: #000;
+            border-radius: 8px;
             color: #fff;
-            border: 1px solid #444;
-            border-radius: 6px;
             text-align: center;
-            box-sizing: border-box;
-            font-size: 16px;
+            font-size: 1.1rem;
+            width: 100%;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .dice-btn {
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            margin-top: 15px;
+        }
+
+        .dice-btn:active {
+            transform: scale(0.9) rotate(20deg);
         }
 
         .btn-group {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-top: 30px;
+            gap: 10px;
+            margin-top: 20px;
         }
 
-        .primary-btn {
+        .main-btn {
             padding: 18px;
+            border-radius: 15px;
             border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
+            font-weight: 800;
             text-transform: uppercase;
+            cursor: pointer;
+            font-size: 1rem;
         }
 
         #submit-data-btn {
-            background: var(--gold);
+            background: var(--primary);
             color: #000;
+            box-shadow: 0 10px 20px rgba(248, 193, 40, 0.3);
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
         }
 
         #loader {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        @media (min-width: 768px) {
+            .time-tag {
+                width: 80px;
+                border-bottom: none;
+                margin-bottom: 0;
+            }
+
+            .dice-btn {
+                margin-top: 0;
+            }
+
+            .input-group {
+                flex: 1;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div id="loader"><b style="color:var(--gold)">Processing...</b></div>
+    <div id="loader"><b style="color:var(--primary); font-size: 1.5rem;">🎲 Rolling Records...</b></div>
     <div class="container">
         <div class="header-top">
-            <h1 style="letter-spacing: 2px;">DEAR ADMIN</h1>
+            <h1>DEAR LIVE PANEL</h1>
             <input type="date" id="select-date">
         </div>
 
         <div class="nav-tabs">
             <button id="tab-dear" class="active">DEAR</button>
-            <button id="tab-kl">KL & JACKPOT</button>
+            <button id="tab-kl" class="active">KL & JACKPOT</button>
         </div>
 
         <div id="page-dear" class="page-content active">
@@ -209,18 +254,17 @@
         </div>
 
         <div id="page-kl" class="page-content">
-            <h3 style="color:var(--gold)">KL DAILY</h3>
             <div id="kl-row"></div>
-            <h3 style="color:var(--gold); margin-top:30px;">JACKPOT SLOTS</h3>
-            <div id="jackpot-rows"></div>
+            <div id="jackpot-rows" style="margin-top:20px;"></div>
         </div>
 
         <div class="btn-group">
-            <button id="submit-data-btn" class="primary-btn">Update All Records</button>
-            <button id="clear-btn" class="primary-btn" style="background:#888; color:#000">Clear Form</button>
-            <a href="view.html" style="text-decoration:none"><button class="primary-btn"
-                    style="width:100%; background:#fff; color:#000">View & Edit</button></a>
-            <button id="logout-btn" class="primary-btn" style="background:#444; color:#fff">Logout</button>
+            <button id="submit-data-btn" class="main-btn">SUBMIT ALL</button>
+            <button id="clear-btn" class="main-btn secondary-btn">CLEAR Form</button>
+            <a href="view.html" style="text-decoration:none"><button class="main-btn secondary-btn"
+                    style="width:100%">View </button></a>
+            <button id="logout-btn" class="main-btn" style="background:transparent; color:red; border:1px solid red">
+                Logout</button>
         </div>
     </div>
     <script type="module" src="admin.js"></script>
