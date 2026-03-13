@@ -550,78 +550,110 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const firebaseConfig = { databaseURL: "https://dearlive-97ef5-default-rtdb.firebaseio.com" };
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+    const firebaseConfig = { databaseURL: "https://dearlive-97ef5-default-rtdb.firebaseio.com" };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-        const allSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM'];
+    const allSlots = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM'];
 
-        function formatTimeForId(timeString) {
-            return timeString.replace(":00 ", "");
-        }
+    function formatTimeForId(timeString) {
+        return timeString.replace(":00 ", "");
+    }
 
-        function loadTodayData() {
-            const today = new Date().toISOString().slice(0, 10);
-            const todayRef = ref(db, `lottery/${today}`);
+    // HELPER: Checks if the current time has reached the slot time
+    function isTimeReached(slotTimeStr) {
+        const now = new Date();
+        const [time, modifier] = slotTimeStr.split(' ');
+        let [hours, minutes] = time.split(':');
+        hours = parseInt(hours);
 
-            onValue(todayRef, (snapshot) => {
-                if (!snapshot.exists()) return;
-                const data = snapshot.val();
+        if (modifier === 'PM' && hours < 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
 
-                allSlots.forEach(timeKey => {
-                    const slotData = data[timeKey];
-                    const cleanTime = formatTimeForId(timeKey);
+        const slotDate = new Date();
+        slotDate.setHours(hours, parseInt(minutes), 0, 0);
 
-                    if (slotData) {
-                        // Update Result & Machine sections
-                        const resEl = document.getElementById(`result-${cleanTime}`);
-                        const macEl = document.getElementById(`machine-${cleanTime}`);
-                        if (resEl && slotData.result) resEl.textContent = slotData.result;
-                        if (macEl && slotData.machine) macEl.textContent = slotData.machine;
+        return now >= slotDate;
+    }
 
-                        // Update the 9-box grid based on "guessing" data from Admin Panel
-                        const gridBox = document.getElementById(`grid-box-${cleanTime}`);
-                        if (gridBox && slotData.guessing) {
-                            gridBox.textContent = slotData.guessing;
-                        }
+    function loadTodayData() {
+        const today = new Date().toISOString().slice(0, 10);
+        const todayRef = ref(db, `lottery/${today}`);
 
-                        // Update specific 1pm, 6pm, 8pm Guessing Cards
-                        const guesEl = document.getElementById(`guess-${cleanTime}`);
-                        if (guesEl && slotData.guessing) {
-                            const val = slotData.guessing;
-                            guesEl.textContent = (val.length >= 2) ? `${val[0]} r ${val[1]}` : val;
-                        }
+        onValue(todayRef, (snapshot) => {
+            if (!snapshot.exists()) return;
+            const data = snapshot.val();
+
+            allSlots.forEach(timeKey => {
+                const slotData = data[timeKey];
+                const cleanTime = formatTimeForId(timeKey);
+                
+                // Get elements
+                const resEl = document.getElementById(`result-${cleanTime}`);
+                const macEl = document.getElementById(`machine-${cleanTime}`);
+                const gridBox = document.getElementById(`grid-box-${cleanTime}`);
+                const guesEl = document.getElementById(`guess-${cleanTime}`);
+
+                // VALIDATION: 
+                // 1. Must have reached the time (isTimeReached)
+                // 2. Data must exist in Firebase (slotData)
+                // 3. Admin must have filled ALL fields (Result, Machine, Guessing)
+                const isDataReady = slotData && 
+                                   slotData.result && slotData.result.trim() !== "" &&
+                                   slotData.machine && slotData.machine.trim() !== "" &&
+                                   slotData.guessing && slotData.guessing.trim() !== "";
+
+                if (isTimeReached(timeKey) && isDataReady) {
+                    if (resEl) resEl.textContent = slotData.result;
+                    if (macEl) macEl.textContent = slotData.machine;
+                    if (gridBox) gridBox.textContent = slotData.guessing;
+                    if (guesEl) {
+                        const val = slotData.guessing;
+                        guesEl.textContent = (val.length >= 2) ? `${val[0]} r ${val[1]}` : val;
                     }
-                });
+                } else {
+                    // Show placeholders if time not reached OR admin hasn't finished typing
+                    if (resEl) resEl.textContent = "---";
+                    if (macEl) macEl.textContent = "---";
+                    if (gridBox) gridBox.textContent = "-";
+                    if (guesEl) guesEl.textContent = "-";
+                }
             });
+        });
+    }
+
+    window.downloadResults = async function () {
+        const captureArea = document.getElementById('capture-area');
+        const btns = document.querySelectorAll('.btn');
+        btns.forEach(b => b.style.display = 'none');
+        try {
+            const canvas = await html2canvas(captureArea, { scale: 3, useCORS: true, backgroundColor: "#ffffff" });
+            const link = document.createElement('a');
+            link.download = `Dear-Result-${new Date().toLocaleDateString()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        } catch (err) { alert("Download failed."); }
+        finally { btns.forEach(b => b.style.display = 'block'); }
+    };
+
+    function setCurrentDate() {
+        const today = new Date();
+        const dateEl = document.getElementById("current-date");
+        if(dateEl) {
+            dateEl.textContent = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
         }
+    }
 
-        window.downloadResults = async function () {
-            const captureArea = document.getElementById('capture-area');
-            const btns = document.querySelectorAll('.btn');
-            btns.forEach(b => b.style.display = 'none');
-            try {
-                const canvas = await html2canvas(captureArea, { scale: 3, useCORS: true, backgroundColor: "#ffffff" });
-                const link = document.createElement('a');
-                link.download = `Dear-Result-${new Date().toLocaleDateString()}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-            } catch (err) { alert("Download failed."); }
-            finally { btns.forEach(b => b.style.display = 'block'); }
-        };
-
-        function setCurrentDate() {
-            const today = new Date();
-            document.getElementById("current-date").textContent = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
-        }
-
-        setCurrentDate();
-        loadTodayData();
-    </script>
+    setCurrentDate();
+    loadTodayData();
+    
+    // Auto-refresh every minute to check if the next time slot has opened
+    setInterval(loadTodayData, 60000); 
+</script>
 </body>
 
 </html>

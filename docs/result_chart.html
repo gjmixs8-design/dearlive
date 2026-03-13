@@ -294,7 +294,7 @@
     <button class="btn-download" id="dlBtn" onclick="exportToPNG()">Download PNG Chart</button>
   </div>
 
-  <script type="module">
+ <script type="module">
     import { db } from './firebase-init.js';
     import { ref, onValue } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js';
 
@@ -310,7 +310,23 @@
     let allLotteryData = {};
     const now = new Date();
 
-    // 1. Initialize Dropdowns with Current Date
+    // Helper: Validate if slot time has been reached for a specific date
+    function isTimeReached(dateKey, slotTimeStr) {
+      const currentTime = new Date();
+      const [time, modifier] = slotTimeStr.split(' ');
+      let [hours, minutes] = time.split(':');
+      hours = parseInt(hours);
+
+      if (modifier === 'PM' && hours < 12) hours += 12;
+      if (modifier === 'AM' && hours === 12) hours = 0;
+
+      const slotDate = new Date(dateKey); 
+      slotDate.setHours(hours, parseInt(minutes), 0, 0);
+
+      return currentTime >= slotDate;
+    }
+
+    // 1. Initialize Dropdowns
     monthNames.forEach((m, i) => {
       const opt = new Option(m, i + 1);
       if (i === now.getMonth()) opt.selected = true;
@@ -328,7 +344,6 @@
     window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('active');
 
     window.applyAutoScale = () => {
-      const inner = document.getElementById('tableInner');
       const outer = document.getElementById('tableOuter');
       const captureArea = document.getElementById('captureArea');
       const availableWidth = window.innerWidth * 0.95;
@@ -338,7 +353,7 @@
       if (outer) outer.style.height = (captureArea.offsetHeight * scale) + 50 + "px";
     };
 
-    // 2. Fixed Search & Filter Logic
+    // 2. Fixed Search & Filter Logic with Strict Validation
     window.renderTable = function () {
       const searchTerm = searchInput.value.trim().toLowerCase();
       const month = String(mSel.value).padStart(2, '0');
@@ -358,8 +373,22 @@
         let tempRowContent = "";
 
         timeSlots.forEach((slot) => {
-          let value = (dayData[slot] && dayData[slot].result) ? dayData[slot].result : "-";
-          let isMatch = searchTerm && String(value).toLowerCase().includes(searchTerm);
+          const slotData = dayData[slot] || null;
+          let displayValue = "-";
+
+          // --- THE FIX: DUAL VALIDATION ---
+          // 1. Admin must have filled ALL fields (Result, Machine, Guessing)
+          // 2. Scheduled time must have passed
+          const isReady = slotData && 
+                          slotData.result && slotData.result.trim() !== "" &&
+                          slotData.machine && slotData.machine.trim() !== "" &&
+                          slotData.guessing && slotData.guessing.trim() !== "";
+
+          if (isReady && isTimeReached(dateKey, slot)) {
+            displayValue = slotData.result;
+          }
+
+          let isMatch = searchTerm && String(displayValue).toLowerCase().includes(searchTerm);
           if (isMatch) rowHasMatch = true;
 
           let cls = "";
@@ -368,13 +397,11 @@
           else if (slot.includes("08:00 PM")) cls = "col-08pm";
 
           let highlightClass = isMatch ? "search-highlight" : "";
-          tempRowContent += `<td class="data-cell ${cls} ${highlightClass}">${value}</td>`;
+          tempRowContent += `<td class="data-cell ${cls} ${highlightClass}">${displayValue}</td>`;
         });
 
-        // Date match
         if (searchTerm && String(d) === searchTerm) rowHasMatch = true;
 
-        // If no search, show all. If search, only show rows with matches.
         if (!searchTerm || rowHasMatch) {
           rowHtml += tempRowContent + `<td class="date-col">${d}</td></tr>`;
           tableBody.innerHTML += rowHtml;
@@ -407,6 +434,8 @@
       finally { btn.innerText = "Download PNG Chart"; }
     };
 
+    mSel.addEventListener('change', renderTable);
+    ySel.addEventListener('change', renderTable);
     searchInput.addEventListener('input', renderTable);
     window.addEventListener('resize', applyAutoScale);
 

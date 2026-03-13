@@ -271,144 +271,152 @@
         <button class="btn-download" onclick="exportToPNG()">Download PNG Chart</button>
     </div>
 
-    <script type="module">
-         import { auth, db } from './firebase-init.js';
-        import { signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js';
-       import { ref, get } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js';
-        const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-        const times = ["10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "05:00 PM", "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM"];
+   <script type="module">
+    import { auth, db } from './firebase-init.js';
+    import { signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js';
+    import { ref, get } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js';
 
-        // Initialize Month Select
-        const mSel = document.getElementById('monthSelect');
-        monthNames.forEach((m, i) => {
-            let opt = new Option(m, i + 1);
-            if (i === new Date().getMonth()) opt.selected = true;
-            mSel.add(opt);
-        });
+    const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+    const times = ["10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "05:00 PM", "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM"];
 
-        window.toggleSidebar = function() {
-            document.getElementById('sidebar').classList.toggle('active');
-        }
-
-        window.applyAutoScale = function() {
-            const inner = document.getElementById('tableInner');
-            const outer = document.getElementById('tableOuter');
-            const captureArea = document.getElementById('captureArea');
-
-            const availableWidth = window.innerWidth * 0.98;
-            const actualWidth = captureArea.offsetWidth + 20; // Include padding
-            let scale = Math.min(1, availableWidth / actualWidth);
-
-            document.documentElement.style.setProperty('--scale', scale);
-            // Adjust outer container height to prevent white space
-            outer.style.height = (captureArea.offsetHeight * scale) + 40 + "px";
-        }
-
-       async function renderChart() {
-
-    const month = parseInt(mSel.value);
-    const year = document.getElementById('yearSelect').value;
-
-    const body = document.getElementById('chartBody');
-    const head = document.getElementById('headerRow');
-    const banner = document.getElementById('tableBannerTitle');
-
-    const daysInMonth = new Date(year, month, 0).getDate();
-    banner.innerText = `DEAR MACHINE NUMBER CHART - ${monthNames[month - 1]} ${year}`;
-
-    /* ========= HEADER ========= */
-
-    let headHtml = `<td class="time-header">Date</td>`;
-    times.forEach(t => {
-        headHtml += `<td class="time-header"><span class="time-label">${t}</span> MC</td>`;
+    // Initialize Month Select
+    const mSel = document.getElementById('monthSelect');
+    monthNames.forEach((m, i) => {
+        let opt = new Option(m, i + 1);
+        if (i === new Date().getMonth()) opt.selected = true;
+        mSel.add(opt);
     });
-    headHtml += `<td class="time-header">Date</td>`;
-    head.innerHTML = headHtml;
 
-    body.innerHTML = "<tr><td colspan='11'>Loading...</td></tr>";
+    // Helper: Validate if slot time has been reached for a specific date
+    function isTimeReached(dateKey, slotTimeStr) {
+        const now = new Date();
+        const [time, modifier] = slotTimeStr.split(' ');
+        let [hours, minutes] = time.split(':');
+        hours = parseInt(hours);
 
-    /* ========= FETCH FULL LOTTERY NODE ========= */
+        if (modifier === 'PM' && hours < 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
 
-    const snapshot = await get(ref(db, 'lottery'));
-    const lotteryData = snapshot.exists() ? snapshot.val() : {};
+        const slotDate = new Date(dateKey); 
+        slotDate.setHours(hours, parseInt(minutes), 0, 0);
 
-    let bodyHtml = "";
-
-    for (let d = 1; d <= daysInMonth; d++) {
-
-        const dayStr = String(d).padStart(2, '0');
-        const monthStr = String(month).padStart(2, '0');
-        const dateKey = `${year}-${monthStr}-${dayStr}`;
-
-        let row = `<tr><td class="date-col">${d}</td>`;
-
-        times.forEach((time, i) => {
-
-            let value = "";
-
-            if (
-                lotteryData[dateKey] &&
-                lotteryData[dateKey][time] &&
-                lotteryData[dateKey][time].machine
-            ) {
-                value = String(lotteryData[dateKey][time].machine)
-                    .replace(/\D/g, "")
-                    .padStart(5, "0")
-                    .slice(0, 5);
-            }
-
-            let cls = "";
-            if (i === 3) cls = "col-01pm";
-            if (i === 5) cls = "col-06pm";
-            if (i === 7) cls = "col-08pm";
-
-            row += `<td class="${cls}">${value}</td>`;
-        });
-
-        row += `<td class="date-col">${d}</td></tr>`;
-        bodyHtml += row;
+        return now >= slotDate;
     }
 
-    body.innerHTML = bodyHtml;
+    window.toggleSidebar = function() {
+        document.getElementById('sidebar').classList.toggle('active');
+    }
 
-    setTimeout(applyAutoScale, 100);
-}
-        document.getElementById('applyBtn').addEventListener('click', renderChart);
+    window.applyAutoScale = function() {
+        const inner = document.getElementById('tableInner');
+        const outer = document.getElementById('tableOuter');
+        const captureArea = document.getElementById('captureArea');
 
-        window.exportToPNG = async function () {
-                const node = document.getElementById('captureArea');
-                const btn = document.querySelector('.btn-download');
-                btn.innerText = "Capturing Image...";
+        const availableWidth = window.innerWidth * 0.98;
+        const actualWidth = captureArea.offsetWidth + 20;
+        let scale = Math.min(1, availableWidth / actualWidth);
 
-                try {
-                    const dataUrl = await htmlToImage.toPng(node, {
-                        backgroundColor: '#ffffff',
-                        pixelRatio: 2,
-                        style: {
-                            transform: 'scale(1)',
-                            transformOrigin: 'top left'
-                        }
-                    });
+        document.documentElement.style.setProperty('--scale', scale);
+        outer.style.height = (captureArea.offsetHeight * scale) + 40 + "px";
+    }
 
-                    const link = document.createElement('a');
-                    link.download = `Dear-Machine-Chart-${monthNames[mSel.value - 1]}-${yearSelect.value}.png`;
-                    link.href = dataUrl;
-                    link.click();
+    async function renderChart() {
+        const month = parseInt(mSel.value);
+        const year = document.getElementById('yearSelect').value;
 
-                } catch (e) {
-                    alert("Image capture failed. Check browser permissions.");
-                    console.error(e);
-                } finally {
-                    btn.innerText = "Download PNG Chart";
+        const body = document.getElementById('chartBody');
+        const head = document.getElementById('headerRow');
+        const banner = document.getElementById('tableBannerTitle');
+
+        const daysInMonth = new Date(year, month, 0).getDate();
+        banner.innerText = `DEAR MACHINE NUMBER CHART - ${monthNames[month - 1]} ${year}`;
+
+        /* ========= HEADER ========= */
+        let headHtml = `<td class="time-header">Date</td>`;
+        times.forEach(t => {
+            headHtml += `<td class="time-header"><span class="time-label">${t}</span> MC</td>`;
+        });
+        headHtml += `<td class="time-header">Date</td>`;
+        head.innerHTML = headHtml;
+
+        body.innerHTML = "<tr><td colspan='11'>Loading Data...</td></tr>";
+
+        /* ========= FETCH DATA ========= */
+        const snapshot = await get(ref(db, 'lottery'));
+        const lotteryData = snapshot.exists() ? snapshot.val() : {};
+
+        let bodyHtml = "";
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dayStr = String(d).padStart(2, '0');
+            const monthStr = String(month).padStart(2, '0');
+            const dateKey = `${year}-${monthStr}-${dayStr}`;
+
+            let row = `<tr><td class="date-col">${d}</td>`;
+
+            times.forEach((time, i) => {
+                let displayValue = ""; // Default empty
+                const slotData = (lotteryData[dateKey] && lotteryData[dateKey][time]) ? lotteryData[dateKey][time] : null;
+
+                // --- THE FIX: DUAL VALIDATION ---
+                // 1. Check if Admin has finished the update (Machine + Result + Guessing)
+                // 2. Check if the scheduled time has passed
+                const isReady = slotData && 
+                                slotData.machine && slotData.machine.trim() !== "" &&
+                                slotData.result && slotData.result.trim() !== "" &&
+                                slotData.guessing && slotData.guessing.trim() !== "";
+
+                if (isReady && isTimeReached(dateKey, time)) {
+                    displayValue = String(slotData.machine)
+                        .replace(/\D/g, "")
+                        .padStart(5, "0")
+                        .slice(0, 5);
                 }
-            };
 
-        // Handle window resize for mobile orientation changes
-        window.addEventListener('resize', applyAutoScale);
+                let cls = "";
+                if (i === 3) cls = "col-01pm";
+                if (i === 5) cls = "col-06pm";
+                if (i === 7) cls = "col-08pm";
 
-        // Initial render
-        renderChart();
-    </script>
+                row += `<td class="${cls}">${displayValue}</td>`;
+            });
+
+            row += `<td class="date-col">${d}</td></tr>`;
+            bodyHtml += row;
+        }
+
+        body.innerHTML = bodyHtml;
+        setTimeout(applyAutoScale, 100);
+    }
+
+    document.getElementById('applyBtn').addEventListener('click', renderChart);
+
+    window.exportToPNG = async function () {
+        const node = document.getElementById('captureArea');
+        const btn = document.querySelector('.btn-download');
+        btn.innerText = "Capturing...";
+
+        try {
+            const dataUrl = await htmlToImage.toPng(node, {
+                backgroundColor: '#ffffff',
+                pixelRatio: 2,
+                style: { transform: 'scale(1)', transformOrigin: 'top left' }
+            });
+
+            const link = document.createElement('a');
+            link.download = `Dear-Machine-Chart-${monthNames[mSel.value - 1]}-${yearSelect.value}.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (e) {
+            alert("Image capture failed.");
+        } finally {
+            btn.innerText = "Download PNG Chart";
+        }
+    };
+
+    window.addEventListener('resize', applyAutoScale);
+    renderChart();
+</script>
 </body>
 
 </html>

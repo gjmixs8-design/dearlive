@@ -274,141 +274,153 @@
     </div>
 
     <script type="module">
-        import { auth, db } from './firebase-init.js';
-        import { ref, get } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js';
+    import { auth, db } from './firebase-init.js';
+    import { ref, get } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js';
 
-        const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-        const times = ["10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "05:00 PM", "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM"];
+    const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+    const times = ["10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "05:00 PM", "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM"];
 
-        const mSel = document.getElementById('monthSelect');
-        const ySel = document.getElementById('yearSelect');
+    const mSel = document.getElementById('monthSelect');
+    const ySel = document.getElementById('yearSelect');
 
-        // --- Initialization Logic ---
+    const now = new Date();
+    const currentMonth = now.getMonth(); 
+    const currentYear = now.getFullYear();
+
+    // Populate Dropdowns
+    monthNames.forEach((m, i) => {
+        let opt = new Option(m, i + 1);
+        if (i === currentMonth) opt.selected = true;
+        mSel.add(opt);
+    });
+
+    for (let y = currentYear; y >= 2024; y--) {
+        let opt = new Option(y, y);
+        if (y === currentYear) opt.selected = true;
+        ySel.add(opt);
+    }
+
+    // --- NEW HELPER: Time Validation ---
+    function isTimeReached(dateKey, slotTimeStr) {
         const now = new Date();
-        const currentMonth = now.getMonth(); // 0-11
-        const currentYear = now.getFullYear();
+        const [time, modifier] = slotTimeStr.split(' ');
+        let [hours, minutes] = time.split(':');
+        hours = parseInt(hours);
 
-        // Populate Month Dropdown
-        monthNames.forEach((m, i) => {
-            let opt = new Option(m, i + 1);
-            if (i === currentMonth) opt.selected = true;
-            mSel.add(opt);
+        if (modifier === 'PM' && hours < 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
+
+        // Create a date object for the specific day in the chart
+        const slotDate = new Date(dateKey); 
+        slotDate.setHours(hours, parseInt(minutes), 0, 0);
+
+        return now >= slotDate;
+    }
+
+    window.toggleSidebar = function () {
+        document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    window.autoScale = function () {
+        const captureArea = document.getElementById('captureArea');
+        const outerContainer = document.getElementById('outerContainer');
+        const availableWidth = window.innerWidth * 0.98;
+        const actualTableWidth = captureArea.offsetWidth + 20;
+        let scale = Math.min(1, availableWidth / actualTableWidth);
+        document.documentElement.style.setProperty('--scale', scale);
+        const scaledHeight = captureArea.offsetHeight * scale;
+        outerContainer.style.height = (scaledHeight + 40) + "px";
+    }
+
+    window.renderChart = function () {
+        const month = parseInt(mSel.value);
+        const year = ySel.value;
+        const body = document.getElementById('chartBody');
+        const head = document.getElementById('headerRow');
+        const banner = document.getElementById('tableTitle');
+
+        const monthStr = String(month).padStart(2, '0');
+        const monthPrefix = `${year}-${monthStr}`;
+
+        banner.innerText = `DEAR RESULT AND MC CHART - ${monthNames[month - 1]} ${year}`;
+
+        let headHtml = `<td class="day-col">DATE</td>`;
+        times.forEach(t => {
+            headHtml += `<td><span class="time-label">${t}</span>MC / RES</td>`;
         });
+        headHtml += `<td class="day-col">DATE</td>`;
+        head.innerHTML = headHtml;
 
-        // Populate Year Dropdown (Current and Previous years)
-        for (let y = currentYear; y >= 2024; y--) {
-            let opt = new Option(y, y);
-            if (y === currentYear) opt.selected = true;
-            ySel.add(opt);
-        }
+        body.innerHTML = "";
+        const lotteryRef = ref(db, "lottery");
 
-        window.toggleSidebar = function () {
-            document.getElementById('sidebar').classList.toggle('active');
-        }
+        get(lotteryRef).then(snapshot => {
+            const allData = snapshot.val() || {};
+            const daysInMonth = new Date(year, month, 0).getDate();
 
-        window.autoScale = function () {
-            const captureArea = document.getElementById('captureArea');
-            const outerContainer = document.getElementById('outerContainer');
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dayStr = String(d).padStart(2, '0');
+                const dateKey = `${monthPrefix}-${dayStr}`;
 
-            const availableWidth = window.innerWidth * 0.98;
-            const actualTableWidth = captureArea.offsetWidth + 20;
+                let row = `<tr><td class="day-col">${d}</td>`;
 
-            let scale = Math.min(1, availableWidth / actualTableWidth);
-            document.documentElement.style.setProperty('--scale', scale);
+                for (let i = 0; i < times.length; i++) {
+                    const timeKey = times[i];
+                    let machine = "---";
+                    let threeDigit = "---";
 
-            const scaledHeight = captureArea.offsetHeight * scale;
-            outerContainer.style.height = (scaledHeight + 40) + "px";
-        }
+                    const slotData = allData[dateKey] ? allData[dateKey][timeKey] : null;
 
-        window.renderChart = function () {
-            const month = parseInt(mSel.value);
-            const year = ySel.value;
-            const body = document.getElementById('chartBody');
-            const head = document.getElementById('headerRow');
-            const banner = document.getElementById('tableTitle');
+                    // --- THE FIX: DATA VALIDATION ---
+                    // 1. Data must exist
+                    // 2. All 3 fields must be filled by Admin
+                    // 3. Time must have passed
+                    const isDataReady = slotData && 
+                                       slotData.machine && slotData.machine.trim() !== "" &&
+                                       slotData.result && slotData.result.trim() !== "" &&
+                                       slotData.guessing && slotData.guessing.trim() !== "";
 
-            const monthStr = String(month).padStart(2, '0');
-            const monthPrefix = `${year}-${monthStr}`;
-
-            banner.innerText = `DEAR RESULT AND MC CHART - ${monthNames[month - 1]} ${year}`;
-
-            // Build header
-            let headHtml = `<td class="day-col">DATE</td>`;
-            times.forEach(t => {
-                headHtml += `<td><span class="time-label">${t}</span>MC / RES</td>`;
-            });
-            headHtml += `<td class="day-col">DATE</td>`;
-            head.innerHTML = headHtml;
-
-            body.innerHTML = "";
-
-            const lotteryRef = ref(db, "lottery");
-
-            get(lotteryRef).then(snapshot => {
-                const allData = snapshot.val() || {};
-                const daysInMonth = new Date(year, month, 0).getDate();
-
-                for (let d = 1; d <= daysInMonth; d++) {
-                    const dayStr = String(d).padStart(2, '0');
-                    const dateKey = `${monthPrefix}-${dayStr}`;
-
-                    let row = `<tr><td class="day-col">${d}</td>`;
-
-                    for (let i = 0; i < times.length; i++) {
-                        const timeKey = times[i];
-                        let machine = "---";
-                        let threeDigit = "---";
-
-                        if (allData[dateKey] && allData[dateKey][timeKey]) {
-                            machine = allData[dateKey][timeKey].machine ?? "---";
-                            threeDigit = allData[dateKey][timeKey].three_digit ?? "---";
-                        }
-
-                        row += `<td>${machine}<span class="res-sub">${threeDigit}</span></td>`;
+                    if (isDataReady && isTimeReached(dateKey, timeKey)) {
+                        machine = slotData.machine;
+                        threeDigit = slotData.three_digit || "---";
                     }
 
-                    row += `<td class="day-col">${d}</td></tr>`;
-                    body.innerHTML += row;
+                    row += `<td>${machine}<span class="res-sub">${threeDigit}</span></td>`;
                 }
-                autoScale();
-            }).catch(error => {
-                console.error("DB Error:", error);
-            });
-        };
 
-        window.exportToPNG = async function () {
-            const node = document.getElementById('captureArea');
-            const btn = document.getElementById('dlBtn');
-
-            btn.innerText = "Capturing Image...";
-
-            try {
-                const dataUrl = await htmlToImage.toPng(node, {
-                    backgroundColor: '#fff',
-                    pixelRatio: 2,
-                    style: {
-                        transform: 'scale(1)',
-                        transformOrigin: 'top left'
-                    }
-                });
-
-                const link = document.createElement('a');
-                link.download = `Result-MC-Chart-${monthNames[mSel.value - 1]}-${ySel.value}.png`;
-                link.href = dataUrl;
-                link.click();
-            } catch (e) {
-                console.error(e);
-                alert("Error generating image.");
-            } finally {
-                btn.innerText = "Download PNG Chart";
+                row += `<td class="day-col">${d}</td></tr>`;
+                body.innerHTML += row;
             }
-        };
+            autoScale();
+        }).catch(error => {
+            console.error("DB Error:", error);
+        });
+    };
 
-        window.addEventListener('resize', autoScale);
+    window.exportToPNG = async function () {
+        const node = document.getElementById('captureArea');
+        const btn = document.getElementById('dlBtn');
+        btn.innerText = "Capturing Image...";
+        try {
+            const dataUrl = await htmlToImage.toPng(node, {
+                backgroundColor: '#fff',
+                pixelRatio: 2,
+                style: { transform: 'scale(1)', transformOrigin: 'top left' }
+            });
+            const link = document.createElement('a');
+            link.download = `Result-MC-Chart-${monthNames[mSel.value - 1]}-${ySel.value}.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (e) {
+            alert("Error generating image.");
+        } finally {
+            btn.innerText = "Download PNG Chart";
+        }
+    };
 
-        // Initial Call on Page Load
-        renderChart();
-    </script>
+    window.addEventListener('resize', autoScale);
+    renderChart();
+</script>
 </body>
 
 </html>

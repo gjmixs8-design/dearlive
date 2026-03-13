@@ -192,104 +192,134 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const firebaseConfig = {
-            databaseURL: "https://dearlive-97ef5-default-rtdb.firebaseio.com",
-        };
+    const firebaseConfig = {
+        databaseURL: "https://dearlive-97ef5-default-rtdb.firebaseio.com",
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-        const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-        const mSel = document.getElementById('monthSelect');
-        const ySel = document.getElementById('yearSelect');
+    const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+    const mSel = document.getElementById('monthSelect');
+    const ySel = document.getElementById('yearSelect');
 
-        // Setup Month Dropdown
-        monthNames.forEach((m, i) => {
-            let opt = new Option(m, i + 1);
-            if (i === new Date().getMonth()) opt.selected = true;
-            mSel.add(opt);
-        });
+    // Helper: Validate if a specific slot time on a specific date has passed
+    function isTimeReached(dateKey, slotTimeStr, customHour = null) {
+        const now = new Date();
+        const [time, modifier] = slotTimeStr.split(' ');
+        let [hours, minutes] = time.split(':');
+        hours = parseInt(hours);
 
-        window.renderChart = function() {
-            const month = String(mSel.value).padStart(2, '0');
-            const year = ySel.value;
-            const banner = document.getElementById('tableBannerTitle');
-            banner.innerText = `JACKPOT + KERALA RESULT CHART - ${monthNames[parseInt(month) - 1]} ${year}`;
+        if (modifier === 'PM' && hours < 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
+        
+        // If a custom hour is provided (like for Kerala), override
+        if (customHour !== null) hours = customHour;
 
-            const lotteryRef = ref(db, 'lottery');
-            onValue(lotteryRef, (snapshot) => {
-                const allData = snapshot.val() || {};
-                const body = document.getElementById('chartBody');
-                const daysInMonth = new Date(year, month, 0).getDate();
-                
-                let bodyHtml = "";
-                const timeSlots = ["11:00 AM", "12:00 PM", "01:00 PM", "02:00 PM", "04:00 PM", "06:00 PM", "07:00 PM", "08:00 PM"];
+        const slotDate = new Date(dateKey); 
+        slotDate.setHours(hours, parseInt(minutes || 0), 0, 0);
 
-                for (let d = 1; d <= daysInMonth; d++) {
-                    const dayStr = String(d).padStart(2, '0');
-                    const dateKey = `${year}-${month}-${dayStr}`;
-                    const dayData = allData[dateKey] || {};
+        return now >= slotDate;
+    }
 
-                    // Extract values for the 8 Jackpot slots and 1 Kerala Result
-                    let results = timeSlots.map(slot => (dayData[slot] && dayData[slot].jackpot) ? dayData[slot].jackpot : "---");
-                    
-                    // Kerala Result usually sits in any slot, but we look for kl_result
-                    let keralaVal = "---";
-                    Object.values(dayData).forEach(val => {
-                        if (val.kl_result) keralaVal = val.kl_result;
-                    });
+    // Setup Month Dropdown
+    monthNames.forEach((m, i) => {
+        let opt = new Option(m, i + 1);
+        if (i === new Date().getMonth()) opt.selected = true;
+        mSel.add(opt);
+    });
 
-                    bodyHtml += `
-                        <tr>
-                            <td class="col-date">${d}</td>
-                            <td>${results[0]}</td><td>${results[1]}</td><td>${results[2]}</td><td>${results[3]}</td>
-                            <td class="col-jackpot-cell">${keralaVal}</td>
-                            <td>${results[4]}</td><td>${results[5]}</td><td>${results[6]}</td><td>${results[7]}</td>
-                            <td class="col-date">${d}</td>
-                        </tr>`;
-                }
-                body.innerHTML = bodyHtml;
-                setTimeout(applyAutoScale, 100);
-            });
-        };
+    window.renderChart = function() {
+        const month = String(mSel.value).padStart(2, '0');
+        const year = ySel.value;
+        const banner = document.getElementById('tableBannerTitle');
+        if(banner) banner.innerText = `JACKPOT + KERALA RESULT CHART - ${monthNames[parseInt(month) - 1]} ${year}`;
 
-        function applyAutoScale() {
-            const inner = document.getElementById('tableInner');
-            const outer = document.getElementById('tableOuter');
-            const captureArea = document.getElementById('captureArea');
-            const availableWidth = window.innerWidth * 0.98;
-            const actualWidth = captureArea.offsetWidth;
-            let scale = Math.min(1, availableWidth / actualWidth);
-            document.documentElement.style.setProperty('--scale', scale);
-            outer.style.height = (captureArea.offsetHeight * scale) + 40 + "px";
-        }
+        const lotteryRef = ref(db, 'lottery');
+        onValue(lotteryRef, (snapshot) => {
+            const allData = snapshot.val() || {};
+            const body = document.getElementById('chartBody');
+            const daysInMonth = new Date(year, month, 0).getDate();
+            
+            let bodyHtml = "";
+            const timeSlots = ["11:00 AM", "12:00 PM", "01:00 PM", "02:00 PM", "04:00 PM", "06:00 PM", "07:00 PM", "08:00 PM"];
 
-        window.exportToPNG = async function() {
-            const node = document.getElementById('captureArea');
-            const btn = document.querySelector('.btn-download');
-            btn.innerText = "Capturing Image...";
-            try {
-                const dataUrl = await htmlToImage.toPng(node, {
-                    backgroundColor: '#ffffff',
-                    pixelRatio: 2,
-                    style: { transform: 'scale(1)', transformOrigin: 'top left' }
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dayStr = String(d).padStart(2, '0');
+                const dateKey = `${year}-${month}-${dayStr}`;
+                const dayData = allData[dateKey] || {};
+
+                // 1. Process Jackpot Results
+                let results = timeSlots.map(slot => {
+                    const slotData = dayData[slot];
+                    // Check if: 1. Data exists, 2. Jackpot field is filled, 3. Time has passed
+                    const isReady = slotData && slotData.jackpot && slotData.jackpot.trim() !== "" && isTimeReached(dateKey, slot);
+                    return isReady ? slotData.jackpot : "---";
                 });
-                const link = document.createElement('a');
-                link.download = `Jackpot-Kerala-Chart-${monthNames[mSel.value - 1]}.png`;
-                link.href = dataUrl;
-                link.click();
-            } catch (e) {
-                alert("Capture failed.");
-            } finally {
-                btn.innerText = "Download PNG Chart";
-            }
-        };
+                
+                // 2. Process Kerala Result (Threshold: 3:00 PM)
+                let keralaVal = "---";
+                const isKeralaTime = isTimeReached(dateKey, "03:00 PM", 15);
+                
+                Object.values(dayData).forEach(val => {
+                    // Check if kl_result exists and kl_machine is also filled (standardizing "Ready" state)
+                    if (val.kl_result && val.kl_result.trim() !== "" && val.kl_machine && isKeralaTime) {
+                        keralaVal = val.kl_result;
+                    }
+                });
 
-        window.addEventListener('resize', applyAutoScale);
-        renderChart();
-    </script>
+                bodyHtml += `
+                    <tr>
+                        <td class="col-date">${d}</td>
+                        <td>${results[0]}</td><td>${results[1]}</td><td>${results[2]}</td><td>${results[3]}</td>
+                        <td class="col-jackpot-cell">${keralaVal}</td>
+                        <td>${results[4]}</td><td>${results[5]}</td><td>${results[6]}</td><td>${results[7]}</td>
+                        <td class="col-date">${d}</td>
+                    </tr>`;
+            }
+            if(body) body.innerHTML = bodyHtml;
+            setTimeout(applyAutoScale, 100);
+        });
+    };
+
+    function applyAutoScale() {
+        const outer = document.getElementById('tableOuter');
+        const captureArea = document.getElementById('captureArea');
+        if(!outer || !captureArea) return;
+
+        const availableWidth = window.innerWidth * 0.98;
+        const actualWidth = captureArea.offsetWidth;
+        let scale = Math.min(1, availableWidth / actualWidth);
+        document.documentElement.style.setProperty('--scale', scale);
+        outer.style.height = (captureArea.offsetHeight * scale) + 40 + "px";
+    }
+
+    window.exportToPNG = async function() {
+        const node = document.getElementById('captureArea');
+        const btn = document.querySelector('.btn-download');
+        if(btn) btn.innerText = "Capturing Image...";
+        try {
+            const dataUrl = await htmlToImage.toPng(node, {
+                backgroundColor: '#ffffff',
+                pixelRatio: 2,
+                style: { transform: 'scale(1)', transformOrigin: 'top left' }
+            });
+            const link = document.createElement('a');
+            link.download = `Jackpot-Kerala-Chart-${monthNames[mSel.value - 1]}.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (e) {
+            alert("Capture failed.");
+        } finally {
+            if(btn) btn.innerText = "Download PNG Chart";
+        }
+    };
+
+    window.addEventListener('resize', applyAutoScale);
+    renderChart();
+</script>
 </body>
 </html>

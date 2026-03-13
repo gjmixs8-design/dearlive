@@ -175,113 +175,129 @@
 
     <button class="btn-download" id="dlBtn" onclick="downloadTable()">Download PNG Chart</button>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const firebaseConfig = {
-            databaseURL: "https://dearlive-97ef5-default-rtdb.firebaseio.com",
-        };
+    const firebaseConfig = {
+        databaseURL: "https://dearlive-97ef5-default-rtdb.firebaseio.com",
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-        const yearSelect = document.getElementById('yearSelect');
-        const tableBody = document.getElementById('tableBody');
-        const tableYearHeader = document.getElementById('tableYearHeader');
+    const yearSelect = document.getElementById('yearSelect');
+    const tableBody = document.getElementById('tableBody');
+    const tableYearHeader = document.getElementById('tableYearHeader');
 
-        function updateChart() {
-            const selectedYear = yearSelect.value;
-            tableYearHeader.innerText = `Kerala Yearly Result Chart (${selectedYear})`;
+    // HELPER: Ensure results only show after 3:00 PM for the current day
+    function isTimeReached(selectedYear, monthIdx, day) {
+        const now = new Date();
+        const slotTime = new Date(selectedYear, monthIdx, day, 15, 0, 0); // 15:00 = 3:00 PM
+        return now >= slotTime;
+    }
+
+    function updateChart() {
+        const selectedYear = yearSelect.value;
+        if(tableYearHeader) tableYearHeader.innerText = `Kerala Yearly Result Chart (${selectedYear})`;
+        
+        const lotteryRef = ref(db, 'lottery');
+
+        onValue(lotteryRef, (snapshot) => {
+            const allData = snapshot.val() || {};
+            let html = '';
+            const monthKeys = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
             
-            const lotteryRef = ref(db, 'lottery');
+            for (let d = 1; d <= 31; d++) {
+                const dayStr = String(d).padStart(2, '0');
+                html += `<tr><td class="date-col-left">${d}</td>`;
 
-            onValue(lotteryRef, (snapshot) => {
-                const allData = snapshot.val() || {};
-                let html = '';
-                const monthKeys = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
-                
-                for (let d = 1; d <= 31; d++) {
-                    const dayStr = String(d).padStart(2, '0');
-                    // Start row with LEFT date
-                    html += `<tr><td class="date-col-left">${d}</td>`;
+                for (let m = 0; m < 12; m++) {
+                    const monthStr = monthKeys[m];
+                    const dateKey = `${selectedYear}-${monthStr}-${dayStr}`;
+                    const dateObj = new Date(selectedYear, m, d);
+                    const isValidDate = dateObj.getFullYear() == selectedYear && dateObj.getMonth() == m && dateObj.getDate() == d;
 
-                    for (let m = 0; m < 12; m++) {
-                        const monthStr = monthKeys[m];
-                        const dateKey = `${selectedYear}-${monthStr}-${dayStr}`;
-                        const dateObj = new Date(selectedYear, m, d);
-                        const isValidDate = dateObj.getFullYear() == selectedYear && dateObj.getMonth() == m && dateObj.getDate() == d;
+                    if (!isValidDate) {
+                        html += `<td class="stars">***</td><td class="col-right stars">***</td>`;
+                    } else {
+                        let machineVal = "---";
+                        let resultVal = "---";
 
-                        if (!isValidDate) {
-                            html += `<td class="stars">***</td><td class="col-right stars">***</td>`;
-                        } else {
-                            let machineVal = "---";
-                            let resultVal = "---";
+                        // --- THE FIX: DATA VALIDATION ---
+                        const daily = (allData[dateKey] && allData[dateKey]['Daily']) ? allData[dateKey]['Daily'] : null;
+                        
+                        // Check: 
+                        // 1. Data exists 
+                        // 2. Both Machine and Result are filled by Admin
+                        // 3. The current time has passed 3:00 PM (for today's row)
+                        const isReady = daily && 
+                                        daily.kl_machine && daily.kl_machine.trim() !== "" &&
+                                        daily.kl_result && daily.kl_result.trim() !== "" &&
+                                        isTimeReached(selectedYear, m, d);
 
-                            if (allData[dateKey] && allData[dateKey]['Daily']) {
-                                const daily = allData[dateKey]['Daily'];
-                                machineVal = daily.kl_machine || "---";
-                                resultVal = daily.kl_result || "---";
-                            }
-
-                            let cls = (d % 5 === 0) ? 'highlight-red' : '';
-                            html += `<td class="${cls}">${machineVal}</td><td class="col-right ${cls}">${resultVal}</td>`;
+                        if (isReady) {
+                            machineVal = daily.kl_machine;
+                            resultVal = daily.kl_result;
                         }
+
+                        let cls = (d % 5 === 0) ? 'highlight-red' : '';
+                        html += `<td class="${cls}">${machineVal}</td><td class="col-right ${cls}">${resultVal}</td>`;
                     }
-                    // End row with RIGHT date
-                    html += `<td class="date-col-right">${d}</td></tr>`;
                 }
-                tableBody.innerHTML = html;
-                applyAutoScale();
+                html += `<td class="date-col-right">${d}</td></tr>`;
+            }
+            tableBody.innerHTML = html;
+            applyAutoScale();
+        });
+    }
+
+    yearSelect.addEventListener('change', updateChart);
+    window.addEventListener('load', updateChart);
+</script>
+
+<script>
+    function applyAutoScale() {
+        const outer = document.getElementById('tableOuter');
+        const table = document.getElementById('targetTable');
+        if (!outer || !table) return;
+
+        const availableWidth = window.innerWidth * 0.98;
+        const actualWidth = 1650; 
+        const scale = availableWidth / actualWidth;
+
+        if (scale < 1) {
+            document.documentElement.style.setProperty('--scale', scale);
+            outer.style.height = (table.offsetHeight * scale) + "px";
+        } else {
+            document.documentElement.style.setProperty('--scale', '1');
+            outer.style.height = "auto";
+        }
+    }
+
+    async function downloadTable() {
+        const btn = document.getElementById('dlBtn');
+        const node = document.getElementById('targetTable');
+        if(!node) return;
+        btn.innerText = "Generating Image...";
+
+        try {
+            const dataUrl = await htmlToImage.toPng(node, {
+                backgroundColor: '#fff',
+                style: { transform: 'scale(1)' } 
             });
+            const link = document.createElement('a');
+            link.download = `Kerala-Chart-${document.getElementById('yearSelect').value}.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (error) {
+            alert("Download failed.");
+        } finally {
+            btn.innerText = "Download PNG Chart";
         }
+    }
 
-        yearSelect.addEventListener('change', updateChart);
-        window.addEventListener('load', updateChart);
-    </script>
-
-    <script>
-        function applyAutoScale() {
-            const inner = document.getElementById('tableInner');
-            const outer = document.getElementById('tableOuter');
-            const table = document.getElementById('targetTable');
-
-            const availableWidth = window.innerWidth * 0.98;
-            const actualWidth = 1650; 
-            const scale = availableWidth / actualWidth;
-
-            if (scale < 1) {
-                document.documentElement.style.setProperty('--scale', scale);
-                outer.style.height = (table.offsetHeight * scale) + "px";
-            } else {
-                document.documentElement.style.setProperty('--scale', '1');
-                outer.style.height = "auto";
-            }
-        }
-
-        async function downloadTable() {
-            const btn = document.getElementById('dlBtn');
-            const node = document.getElementById('targetTable');
-            btn.innerText = "Generating Image...";
-
-            try {
-                const dataUrl = await htmlToImage.toPng(node, {
-                    backgroundColor: '#fff',
-                    style: { transform: 'scale(1)' } 
-                });
-                const link = document.createElement('a');
-                link.download = `Kerala-Chart-${document.getElementById('yearSelect').value}.png`;
-                link.href = dataUrl;
-                link.click();
-            } catch (error) {
-                console.error(error);
-                alert("Download failed.");
-            } finally {
-                btn.innerText = "Download PNG Chart";
-            }
-        }
-
-        window.addEventListener('resize', applyAutoScale);
-    </script>
+    window.addEventListener('resize', applyAutoScale);
+</script>
 </body>
 </html>

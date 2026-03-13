@@ -230,51 +230,93 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const firebaseConfig = {
-            databaseURL: "https://dearlive-97ef5-default-rtdb.firebaseio.com",
-        };
+    const firebaseConfig = {
+        databaseURL: "https://dearlive-97ef5-default-rtdb.firebaseio.com",
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-        const getTodayDate = () => {
-            const d = new Date();
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        };
+    const getTodayDate = () => {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
-        const today = getTodayDate();
-        const lotteryRef = ref(db, `lottery/${today}`);
+    // Helper: Check if slot time has passed
+    function isTimeReached(slotLabel, customHour = null) {
+        const now = new Date();
+        let hours, minutes = 0;
 
-        onValue(lotteryRef, (snapshot) => {
-            const data = snapshot.val();
-            if (!data) return;
+        if (customHour !== null) {
+            hours = customHour;
+        } else {
+            const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(slotLabel);
+            if (!m) return true; // Default to true if format is weird
+            hours = (parseInt(m[1]) % 12) + (m[3].toUpperCase() === 'PM' ? 12 : 0);
+            minutes = parseInt(m[2]);
+        }
 
-            // Update Time Slot Jackpot boxes
-            document.querySelectorAll('.digit-box').forEach(box => {
-                const timeKey = box.getAttribute('data-time');
-                if (data[timeKey] && data[timeKey].jackpot) {
-                    box.innerText = data[timeKey].jackpot;
-                }
-            });
+        const slotDate = new Date();
+        slotDate.setHours(hours, minutes, 0, 0);
+        return now >= slotDate;
+    }
 
-            // Update KL Specific Data (2D Guessing, Machine, Result)
-            // Note: We look for the 'Daily' key which stores KL data
-            if (data['Daily']) {
-                const kl = data['Daily'];
-                // Only take the first 2 digits for Guessing as requested
-                document.getElementById('guess-kl-2d').innerText = kl.kl_guessing ? `${kl.kl_guessing.charAt(0)} r ${kl.kl_guessing.charAt(1)}` : "-- r --";
-                document.getElementById('machine-box').innerText = kl.kl_machine || "---";
-                document.getElementById('kl-result-box').innerText = kl.kl_result || "---";
+    const today = getTodayDate();
+    const lotteryRef = ref(db, `lottery/${today}`);
+
+    onValue(lotteryRef, (snapshot) => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        /* =========================================
+           UPDATE JACKPOT BOXES (By Time Slot)
+           ========================================= */
+        document.querySelectorAll('.digit-box').forEach(box => {
+            const timeKey = box.getAttribute('data-time'); // e.g., "11:00 AM"
+            
+            // Logic: Must have data AND time must have passed
+            if (data[timeKey] && data[timeKey].jackpot && isTimeReached(timeKey)) {
+                box.innerText = data[timeKey].jackpot;
+            } else {
+                box.innerText = "---";
             }
         });
-    </script>
+
+        /* =========================================
+           UPDATE KERALA (KL) SPECIFIC DATA
+           ========================================= */
+        if (data['Daily']) {
+            const kl = data['Daily'];
+            const isKLTime = isTimeReached(null, 15); // Lock to 3:00 PM (15:00)
+
+            // Strict Ready Check: Ensure both result and machine are filled
+            const isReady = kl.kl_result && kl.kl_result.trim() !== "" && 
+                            kl.kl_machine && kl.kl_machine.trim() !== "" &&
+                            isKLTime;
+
+            if (isReady) {
+                // Guessing logic: X r Y
+                if (kl.kl_guessing && kl.kl_guessing.length >= 2) {
+                    document.getElementById('guess-kl-2d').innerText = `${kl.kl_guessing.charAt(0)} r ${kl.kl_guessing.charAt(1)}`;
+                }
+                document.getElementById('machine-box').innerText = kl.kl_machine;
+                document.getElementById('kl-result-box').innerText = kl.kl_result;
+            } else {
+                // Keep default state until ready and time reached
+                document.getElementById('guess-kl-2d').innerText = "-- r --";
+                document.getElementById('machine-box').innerText = "---";
+                document.getElementById('kl-result-box').innerText = "---";
+            }
+        }
+    });
+</script>
 </body>
 
 </html>

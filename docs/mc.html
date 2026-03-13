@@ -266,8 +266,8 @@
     <button class="btn-download" onclick="downloadImage()">Download Image</button>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
- <script type="module">
+ <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script type="module">
 import { db } from './firebase-init.js';
 import { ref, onValue, off } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js';
 
@@ -291,11 +291,11 @@ const now = new Date();
 const todayKey = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
 const displayDate = `D-${pad(now.getDate())}-${pad(now.getMonth()+1)}-${String(now.getFullYear()).slice(-2)}`;
 
-dateEl.textContent = displayDate;
-dayEl.textContent = now.toLocaleDateString('en-US',{weekday:'long'});
+if(dateEl) dateEl.textContent = displayDate;
+if(dayEl) dayEl.textContent = now.toLocaleDateString('en-US',{weekday:'long'});
 
 /* =========================
-   SLOT LOGIC
+   SLOT LOGIC (TIME CHECK)
 ========================= */
 
 function getSlotDateTime(slot){
@@ -308,12 +308,11 @@ function getSlotDateTime(slot){
   return new Date(now.getFullYear(),now.getMonth(),now.getDate(),hour,minute,0);
 }
 
+// Logic: Find the most recent slot that has actually occurred
 let selectedSlot = null;
-
-for(let i=timeSlots.length-1;i>=0;i--){
+for(let i=timeSlots.length-1; i>=0; i--){
   const slotTime = getSlotDateTime(timeSlots[i]);
-  const releaseTime = new Date(slotTime.getTime() - 60*60*1000);
-  if(now >= releaseTime){
+  if(now >= slotTime){ // Strict: current time must be >= slot time
     selectedSlot = timeSlots[i];
     break;
   }
@@ -325,36 +324,41 @@ for(let i=timeSlots.length-1;i>=0;i--){
 
 function setDigits(value='00000'){
   const clean = String(value).replace(/\D/g,'').padStart(5,'0').slice(0,5);
-
-  for(let i=0;i<5;i++){
-    document.getElementById(`digit-${i+1}`).textContent = clean[i];
+  for(let i=0; i<5; i++){
+    const el = document.getElementById(`digit-${i+1}`);
+    if(el) el.textContent = clean[i];
   }
 }
 
 /* =========================
-   FIREBASE LISTENER
+   FIREBASE LISTENER (STRICT VALIDATION)
 ========================= */
 
 let currentRef = null;
 
 function attachMachineListener(slot){
-
   if(!slot) return;
+  if(currentRef) off(currentRef);
 
-  if(currentRef){
-    off(currentRef);
-  }
+  // We listen to the whole slot object to check if Result and Guessing are also ready
+  const path = `lottery/${todayKey}/${slot}`;
+  currentRef = ref(db, path);
 
-  const path = `lottery/${todayKey}/${slot}/machine`;
-  currentRef = ref(db,path);
+  onValue(currentRef, (snapshot) => {
+    const slotData = snapshot.val();
 
-  onValue(currentRef,(snapshot)=>{
-    if(!snapshot.exists()){
+    // THE FIX: Check if time is reached (extra safety) AND admin filled all 3 fields
+    const isReady = slotData && 
+                    slotData.machine && slotData.machine.trim() !== "" &&
+                    slotData.result && slotData.result.trim() !== "" &&
+                    slotData.guessing && slotData.guessing.trim() !== "";
+
+    if (isReady) {
+      setDigits(slotData.machine);
+    } else {
+      // If admin hasn't finished updating everything, show zeros
       setDigits('00000');
-      return;
     }
-
-    setDigits(snapshot.val());
   });
 }
 
@@ -363,10 +367,10 @@ function attachMachineListener(slot){
 ========================= */
 
 if(selectedSlot){
-  timeEl.textContent = `D-${selectedSlot.toLowerCase().replace(' ','')}`;
+  if(timeEl) timeEl.textContent = `D-${selectedSlot.toLowerCase().replace(' ','')}`;
   attachMachineListener(selectedSlot);
-}else{
-  timeEl.textContent = 'No MC Yet';
+} else {
+  if(timeEl) timeEl.textContent = 'No MC Yet';
   setDigits('00000');
 }
 
@@ -376,6 +380,7 @@ if(selectedSlot){
 
 window.downloadImage = async function(){
   const container = document.getElementById('image-container');
+  if(!container) return;
   const canvas = await html2canvas(container,{scale:2,useCORS:true});
 
   const link = document.createElement('a');

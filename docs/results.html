@@ -333,14 +333,13 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <<script type="module">
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import { getDatabase, ref, onValue, off } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
 
 /* =======================
-    FIREBASE CONFIG
+    FIREBASE CONFIG (Ensure your values are here)
    ======================= */
-
 const firebaseConfig = {
     apiKey: "AIzaSyCVIGlYqFf1AktnPXflEFjewAl7oNJQXrE",
     authDomain: "dearlive-97ef5.firebaseapp.com",
@@ -356,7 +355,6 @@ const db = getDatabase(app);
 /* =======================
     DOM ELEMENTS
    ======================= */
-
 const digits = ["d0", "d1", "d2", "d3", "d4"].map(id => document.getElementById(id));
 const drawDateEl = document.getElementById("draw-date");
 const drawTimeEl = document.getElementById("draw-time");
@@ -368,124 +366,138 @@ const weeklyEl = document.getElementById("banner-weekly");
 /* =======================
     TIME SETTINGS
    ======================= */
-
 const TIMEZONE = "Asia/Kolkata";
-const SLOTS = ['10:00 AM','11:00 AM','12:00 PM','01:00 PM','05:00 PM','06:00 PM','07:00 PM','08:00 PM'];
+// Matches your Admin Panel slots
+const SLOTS = ['10:00 AM','11:00 AM','12:00 PM','01:00 PM','05:00 PM','06:00 PM','07:00 PM','08:00 PM','09:00 PM'];
 
 const pad2 = n => String(n).padStart(2, '0');
 const nowIST = () => new Date(new Date().toLocaleString("en-US", { timeZone: TIMEZONE }));
 const ymd = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
 
 function parseSlot(dateYMD, label){
-  const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label);
-  let H = (parseInt(m[1]) % 12) + (m[3].toUpperCase()==='PM'?12:0);
-  return new Date(`${dateYMD}T${pad2(H)}:${m[2]}:00`);
+    const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(label);
+    let H = (parseInt(m[1]) % 12) + (m[3].toUpperCase()==='PM'?12:0);
+    return new Date(`${dateYMD}T${pad2(H)}:${m[2]}:00`);
 }
 
 function getSchedule(now){
-  const today = ymd(now);
-  const todaySlots = SLOTS.map(s=>({label:s,time:parseSlot(today,s),date:today}));
+    const today = ymd(now);
+    const todaySlots = SLOTS.map(s=>({label:s, time:parseSlot(today,s), date:today}));
 
-  const future = todaySlots.find(s=>s.time>now);
-  if(future){
-    const prev = todaySlots.filter(s=>s.time<=now).at(-1);
-    return {next:future, prev:prev};
-  }
+    const future = todaySlots.find(s=>s.time > now);
+    if(future){
+        const prev = todaySlots.filter(s=>s.time <= now).at(-1);
+        return {next:future, prev:prev};
+    }
 
-  const tomorrow = new Date(now); tomorrow.setDate(now.getDate()+1);
-  return {
-    next:{label:SLOTS[0], time:parseSlot(ymd(tomorrow),SLOTS[0]), date:ymd(tomorrow)},
-    prev:todaySlots.at(-1)
-  };
+    const tomorrow = new Date(now); 
+    tomorrow.setDate(now.getDate()+1);
+    return {
+        next:{label:SLOTS[0], time:parseSlot(ymd(tomorrow),SLOTS[0]), date:ymd(tomorrow)},
+        prev:todaySlots.at(-1)
+    };
 }
 
 const msToHMS = ms=>{
-  if(ms<0) ms=0;
-  const h=Math.floor(ms/3600000);
-  const m=Math.floor((ms%3600000)/60000);
-  const s=Math.floor((ms%60000)/1000);
-  return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+    if(ms<0) ms=0;
+    const h=Math.floor(ms/3600000);
+    const m=Math.floor((ms%3600000)/60000);
+    const s=Math.floor((ms%60000)/1000);
+    return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
 };
 
 /* =======================
-    RESULT LISTENER
+    RESULT LISTENER (STRICT VALIDATION)
    ======================= */
-
 let currentRef = null;
 
-function attachResultListener(date,label){
+function attachResultListener(date, label){
+    if(currentRef) off(currentRef);
 
-  if(currentRef){
-    off(currentRef);
-  }
+    // Listen to the whole slot object for validation
+    const path = `lottery/${date}/${label}`;
+    currentRef = ref(db, path);
 
-  const path = `lottery/${date}/${label}/result`;
-  currentRef = ref(db, path);
+    onValue(currentRef, snap=>{
+        const slotData = snap.val();
 
-  onValue(currentRef, snap=>{
-    if(!snap.exists()){
-      digits.forEach(d=>d.textContent="0");
-      return;
-    }
+        // THE FIX: Check if Admin filled Result, Machine, and Guessing
+        const isReady = slotData && 
+                        slotData.result && slotData.result.trim() !== "" &&
+                        slotData.machine && slotData.machine.trim() !== "" &&
+                        slotData.guessing && slotData.guessing.trim() !== "";
 
-    const value = String(snap.val()).replace(/\D/g,"").padStart(5,"0").slice(0,5);
+        if(!isReady){
+            digits.forEach(d => d.textContent = "0");
+            return;
+        }
 
-    for(let i=0;i<5;i++){
-      digits[i].textContent=value[i];
-    }
-  });
+        const value = String(slotData.result).replace(/\D/g,"").padStart(5,"0").slice(0,5);
+        for(let i=0; i<5; i++){
+            if(digits[i]) digits[i].textContent = value[i];
+        }
+    });
 }
 
 /* =======================
-   MAIN UPDATE LOOP
+    MAIN UPDATE LOOP
    ======================= */
-
 let schedule = getSchedule(nowIST());
-attachResultListener(schedule.prev.date, schedule.prev.label);
+if(schedule.prev) attachResultListener(schedule.prev.date, schedule.prev.label);
 
 function update(){
+    const now = nowIST();
+    const oldLabel = schedule.prev ? schedule.prev.label : null;
+    const oldDate = schedule.prev ? schedule.prev.date : null;
 
-  const now = nowIST();
-  const oldLabel = schedule.prev.label;
-  const oldDate = schedule.prev.date;
+    schedule = getSchedule(now);
 
-  schedule = getSchedule(now);
+    if(drawDateEl) drawDateEl.textContent = schedule.next.time.toLocaleDateString("en-IN",{timeZone:TIMEZONE});
+    
+    if(schedule.prev) {
+        if(drawTimeEl) drawTimeEl.textContent = schedule.prev.label;
+        if(drawTimeLeftEl) drawTimeLeftEl.textContent = schedule.prev.label;
+        
+        const weekday = now.toLocaleDateString("en-US",{timeZone:TIMEZONE, weekday:'long'}).toUpperCase();
+        const shortTime = schedule.prev.label.replace(":00","").replace(" ","");
+        
+        if(liveEl) liveEl.textContent = `DEAR ${weekday} LIVE ${shortTime}`;
+        if(weeklyEl) weeklyEl.textContent = `DEAR ${weekday} WEEKLY LOTTERY`;
+    }
 
-  drawDateEl.textContent = schedule.next.time.toLocaleDateString("en-IN",{timeZone:TIMEZONE});
-  drawTimeEl.textContent = schedule.prev.label;
-  drawTimeLeftEl.textContent = schedule.prev.label;
-  countdownEl.textContent = msToHMS(schedule.next.time-now);
+    if(countdownEl) countdownEl.textContent = msToHMS(schedule.next.time - now);
 
-  const weekday = now.toLocaleDateString("en-US",{timeZone:TIMEZONE,weekday:'long'}).toUpperCase();
-  liveEl.textContent = `DEAR ${weekday} LIVE ${schedule.prev.label.replace(":00","").replace(" ","")}`;
-  weeklyEl.textContent = `DEAR ${weekday} WEEKLY LOTTERY`;
-
-  if(oldLabel!==schedule.prev.label || oldDate!==schedule.prev.date){
-    attachResultListener(schedule.prev.date, schedule.prev.label);
-  }
+    // If the time slot changes, reconnect the listener
+    if(schedule.prev && (oldLabel !== schedule.prev.label || oldDate !== schedule.prev.date)){
+        attachResultListener(schedule.prev.date, schedule.prev.label);
+    }
 }
 
-setInterval(update,1000);
+setInterval(update, 1000);
 update();
 
 /* =======================
     DOWNLOAD IMAGE
    ======================= */
+const downloadBtn = document.getElementById("downloadBtn");
+if(downloadBtn) {
+    downloadBtn.addEventListener("click",()=>{
+        const area = document.getElementById("capture-area");
+        if(!area) return;
 
-document.getElementById("downloadBtn").addEventListener("click",()=>{
-  const area=document.getElementById("capture-area");
-
-  html2canvas(area,{
-    scale:3,
-    useCORS:true,
-    backgroundColor:"#ffffff"
-  }).then(canvas=>{
-    const link=document.createElement("a");
-    link.download=`DearMC_Result_${drawTimeEl.textContent.replace(/\s/g,'')}.png`;
-    link.href=canvas.toDataURL("image/png",1.0);
-    link.click();
-  });
-});
+        html2canvas(area, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: "#ffffff"
+        }).then(canvas => {
+            const link = document.createElement("a");
+            const timeTag = drawTimeEl ? drawTimeEl.textContent.replace(/\s/g,'') : 'Result';
+            link.download = `Dear_Result_${timeTag}.png`;
+            link.href = canvas.toDataURL("image/png", 1.0);
+            link.click();
+        });
+    });
+}
 </script>
 </body>
 
