@@ -117,7 +117,7 @@
         }
 
         .result-code {
-            font-size: 1.4rem;
+            font-size: 5rem;
             font-weight: bold;
             margin-bottom: 15px;
         }
@@ -249,16 +249,22 @@
         return `${year}-${month}-${day}`;
     };
 
-    // Helper: Check if slot time has passed
-    function isTimeReached(slotLabel, customHour = null) {
+    /**
+     * Helper: Check if slot time has passed
+     * @param {string} slotLabel - e.g., "11:00 AM"
+     * @param {number|null} customHour - 24h format (e.g., 14 for 2 PM)
+     * @param {number} customMinutes - minutes (e.g., 30)
+     */
+    function isTimeReached(slotLabel, customHour = null, customMinutes = 0) {
         const now = new Date();
         let hours, minutes = 0;
 
         if (customHour !== null) {
             hours = customHour;
+            minutes = customMinutes;
         } else {
             const m = /(\d{1,2}):(\d{2})\s*([AP]M)/i.exec(slotLabel);
-            if (!m) return true; // Default to true if format is weird
+            if (!m) return true; 
             hours = (parseInt(m[1]) % 12) + (m[3].toUpperCase() === 'PM' ? 12 : 0);
             minutes = parseInt(m[2]);
         }
@@ -279,9 +285,8 @@
            UPDATE JACKPOT BOXES (By Time Slot)
            ========================================= */
         document.querySelectorAll('.digit-box').forEach(box => {
-            const timeKey = box.getAttribute('data-time'); // e.g., "11:00 AM"
+            const timeKey = box.getAttribute('data-time');
             
-            // Logic: Must have data AND time must have passed
             if (data[timeKey] && data[timeKey].jackpot && isTimeReached(timeKey)) {
                 box.innerText = data[timeKey].jackpot;
             } else {
@@ -294,22 +299,21 @@
            ========================================= */
         if (data['Daily']) {
             const kl = data['Daily'];
-            const isKLTime = isTimeReached(null, 15); // Lock to 3:00 PM (15:00)
+            // Updated: Lock to 2:30 PM (14:30)
+            const isKLTime = isTimeReached(null, 14, 30); 
 
-            // Strict Ready Check: Ensure both result and machine are filled
+            // Ensure results exist and time has passed
             const isReady = kl.kl_result && kl.kl_result.trim() !== "" && 
                             kl.kl_machine && kl.kl_machine.trim() !== "" &&
                             isKLTime;
 
             if (isReady) {
-                // Guessing logic: X r Y
                 if (kl.kl_guessing && kl.kl_guessing.length >= 2) {
                     document.getElementById('guess-kl-2d').innerText = `${kl.kl_guessing.charAt(0)} r ${kl.kl_guessing.charAt(1)}`;
                 }
                 document.getElementById('machine-box').innerText = kl.kl_machine;
                 document.getElementById('kl-result-box').innerText = kl.kl_result;
             } else {
-                // Keep default state until ready and time reached
                 document.getElementById('guess-kl-2d').innerText = "-- r --";
                 document.getElementById('machine-box').innerText = "---";
                 document.getElementById('kl-result-box').innerText = "---";

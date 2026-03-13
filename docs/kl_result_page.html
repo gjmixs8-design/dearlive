@@ -175,7 +175,7 @@
 
     <button class="btn-download" id="dlBtn" onclick="downloadTable()">Download PNG Chart</button>
 
-  <script type="module">
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -190,10 +190,11 @@
     const tableBody = document.getElementById('tableBody');
     const tableYearHeader = document.getElementById('tableYearHeader');
 
-    // HELPER: Ensure results only show after 3:00 PM for the current day
+    // HELPER: Updated to check for 2:30 PM (14:30)
     function isTimeReached(selectedYear, monthIdx, day) {
         const now = new Date();
-        const slotTime = new Date(selectedYear, monthIdx, day, 15, 0, 0); // 15:00 = 3:00 PM
+        // 14:30:00 = 2:30 PM
+        const slotTime = new Date(selectedYear, monthIdx, day, 14, 30, 0); 
         return now >= slotTime;
     }
 
@@ -224,13 +225,10 @@
                         let machineVal = "---";
                         let resultVal = "---";
 
-                        // --- THE FIX: DATA VALIDATION ---
+                        // Data path: lottery/YYYY-MM-DD/Daily
                         const daily = (allData[dateKey] && allData[dateKey]['Daily']) ? allData[dateKey]['Daily'] : null;
                         
-                        // Check: 
-                        // 1. Data exists 
-                        // 2. Both Machine and Result are filled by Admin
-                        // 3. The current time has passed 3:00 PM (for today's row)
+                        // Ready Check: Data exists, fields are not empty, and time is >= 2:30 PM
                         const isReady = daily && 
                                         daily.kl_machine && daily.kl_machine.trim() !== "" &&
                                         daily.kl_result && daily.kl_result.trim() !== "" &&
@@ -257,6 +255,7 @@
 </script>
 
 <script>
+    // These functions handle the UI scaling and the image download
     function applyAutoScale() {
         const outer = document.getElementById('tableOuter');
         const table = document.getElementById('targetTable');

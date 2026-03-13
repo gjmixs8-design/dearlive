@@ -190,8 +190,7 @@
 
         <button class="btn-download" onclick="exportToPNG()">Download PNG Chart</button>
     </div>
-
-    <script type="module">
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -207,20 +206,25 @@
     const ySel = document.getElementById('yearSelect');
 
     // Helper: Validate if a specific slot time on a specific date has passed
-    function isTimeReached(dateKey, slotTimeStr, customHour = null) {
+    // Added customMinutes to handle the 2:30 requirement
+    function isTimeReached(dateKey, slotTimeStr, customHour = null, customMinutes = 0) {
         const now = new Date();
         const [time, modifier] = slotTimeStr.split(' ');
         let [hours, minutes] = time.split(':');
         hours = parseInt(hours);
+        minutes = parseInt(minutes || 0);
 
         if (modifier === 'PM' && hours < 12) hours += 12;
         if (modifier === 'AM' && hours === 12) hours = 0;
         
-        // If a custom hour is provided (like for Kerala), override
-        if (customHour !== null) hours = customHour;
+        // If a custom hour/minute is provided (like for Kerala), override
+        if (customHour !== null) {
+            hours = customHour;
+            minutes = customMinutes;
+        }
 
         const slotDate = new Date(dateKey); 
-        slotDate.setHours(hours, parseInt(minutes || 0), 0, 0);
+        slotDate.setHours(hours, minutes, 0, 0);
 
         return now >= slotDate;
     }
@@ -255,17 +259,16 @@
                 // 1. Process Jackpot Results
                 let results = timeSlots.map(slot => {
                     const slotData = dayData[slot];
-                    // Check if: 1. Data exists, 2. Jackpot field is filled, 3. Time has passed
                     const isReady = slotData && slotData.jackpot && slotData.jackpot.trim() !== "" && isTimeReached(dateKey, slot);
                     return isReady ? slotData.jackpot : "---";
                 });
                 
-                // 2. Process Kerala Result (Threshold: 3:00 PM)
+                // 2. Process Kerala Result (Updated Threshold: 2:30 PM)
                 let keralaVal = "---";
-                const isKeralaTime = isTimeReached(dateKey, "03:00 PM", 15);
+                // Changed: 14 for 2 PM, 30 for minutes
+                const isKeralaTime = isTimeReached(dateKey, "02:30 PM", 14, 30); 
                 
                 Object.values(dayData).forEach(val => {
-                    // Check if kl_result exists and kl_machine is also filled (standardizing "Ready" state)
                     if (val.kl_result && val.kl_result.trim() !== "" && val.kl_machine && isKeralaTime) {
                         keralaVal = val.kl_result;
                     }
