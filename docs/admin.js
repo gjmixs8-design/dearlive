@@ -53,8 +53,8 @@ async function render(shouldFetchData = true) {
     klContainer.innerHTML = `
         <h3 style="color:var(--primary); margin-left:10px">KL Daily Result</h3>
         <div class="grid-row">
-            ${createInp('KL Machine', 'kl_machine', 'Daily', 5, klD.kl_machine)}
-            ${createInp('KL Result', 'kl_result', 'Daily', 5, klD.kl_result)}
+            ${createInp('KL Machine', 'kl_machine', 'Daily', 6, klD.kl_machine)}
+            ${createInp('KL Result', 'kl_result', 'Daily', 6, klD.kl_result)}
             ${createInp('KL Guess', 'kl_guessing', 'Daily', 2, klD.kl_guessing)}
             <button class="dice-btn" onclick="rollDice('Daily', 'kl')">🎲</button>
         </div>`;
@@ -88,8 +88,8 @@ window.rollDice = (slot, category) => {
             }
             if(type === 'guessing') i.value = rand(2);
         } else if(category === 'kl') {
-            if(type.includes('machine')) i.value = rand(5);
-            if(type.includes('result')) i.value = rand(5);
+            if(type.includes('machine')) i.value = rand(6);
+            if(type.includes('result')) i.value = rand(6);
             if(type.includes('guessing')) i.value = rand(2);
         } else {
             i.value = rand(3);
