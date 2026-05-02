@@ -152,13 +152,15 @@
     }
 
     #date-text {
-      top: 46%;
-      font-size: 3.5rem;
-      color: #ffff00;
-      -webkit-text-stroke: 2px #2a2a72;
-      text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
-      letter-spacing: 1px;
-    }
+  top: 46%;
+  color: #ffff00;
+  -webkit-text-stroke: 2px #2a2a72;
+  text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+  letter-spacing: 1px;
+
+  /* Responsive font size for PC + Mobile */
+  font-size: clamp(1.8rem, 6vw, 3.5rem);
+}
 
     #day-text {
       display: none;
